@@ -131,7 +131,7 @@ public class WaygateNetworkManageMenu extends Menu {
             if (owner != null) {
                 ItemStack is = Util.getHead(owner);
                 List<String> lore = new ArrayList<String>();
-                lore.add(Msg.MENU_TEXT_EDITABLE.toString(owner.getName()));
+                lore.add(Util.color(Msg.MENU_TEXT_EDITABLE.toString(owner.getName())));
                 Util.setItemNameAndLore(is, Util.color(Msg.MENU_TITLE_NETWORK_OWNER.toString()), lore);
                 setOption(9, "Owner", is);
             }
