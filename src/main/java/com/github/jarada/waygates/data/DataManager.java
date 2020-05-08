@@ -298,9 +298,15 @@ public class DataManager {
             }
         }
         if (deleteNetwork) {
-            success = success && new File(networksFolder, String.format("%s.json", gate.getNetwork().getUUID())).delete();
+            success = success && deleteNetwork(gate.getNetwork());
         }
         return success;
+    }
+
+    public boolean deleteNetwork(Network network) {
+        if (network.isSystem())
+            return false;
+        return new File(networksFolder, String.format("%s.json", network.getUUID())).delete();
     }
 
     private boolean saveData(File dataFolder, UUID uuid, String data) {

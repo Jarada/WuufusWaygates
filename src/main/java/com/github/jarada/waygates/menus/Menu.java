@@ -126,14 +126,14 @@ public abstract class Menu {
         setOption(slot, optionName, is);
     }
 
-    void addOwnerToMenu(boolean editable) {
+    void addGateOwnerToMenu(boolean editable) {
         if (currentWaygate.getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getOwner());
             if (owner != null) {
                 ItemStack is = Util.getHead(owner);
                 List<String> lore = new ArrayList<String>();
                 lore.add(Util.color(editable ? Msg.MENU_TEXT_EDITABLE.toString(owner.getName()) : Msg.MENU_TEXT_STANDARD.toString(owner.getName())));
-                Util.setItemNameAndLore(is, Util.color(Msg.GATE_OWNER.toString()), lore);
+                Util.setItemNameAndLore(is, Util.color(Msg.MENU_TITLE_GATE_OWNER.toString()), lore);
                 setOption(9, "Owner", is);
             }
         }
@@ -161,7 +161,7 @@ public abstract class Menu {
 
         if (nw.getOwner() != null) {
             OfflinePlayer p = Bukkit.getOfflinePlayer(nw.getOwner());
-            lore.add(Util.color(Msg.GATE_OWNER.toString(p.getName())));
+            lore.add(Util.color(Msg.MENU_TEXT_OWNER.toString(p.getName())));
         }
         lore.add(Util.color(String.format("&f %d %s", gateCount, Msg.WORD_GATES.toString())));
 

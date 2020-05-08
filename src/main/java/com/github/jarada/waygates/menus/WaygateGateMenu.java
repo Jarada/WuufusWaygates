@@ -70,7 +70,7 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         initMenu();
         buildGates();
 
-        addOwnerToMenu(false);
+        addGateOwnerToMenu(false);
         addNetworkToMenu();
 
         if (page > 1) {

@@ -95,7 +95,7 @@ public class WaygateNetworkManageMenu extends Menu {
         initMenu();
         optionInvites = new OfflinePlayer[size];
 
-        addOwnerToMenu();
+        addNetworkOwnerToMenu();
 
         if (currentWaygate.getNetwork().isNetworkInvite())
             addInvitePlayerToMenu();
@@ -125,7 +125,7 @@ public class WaygateNetworkManageMenu extends Menu {
         addCloseToMenu();
     }
 
-    void addOwnerToMenu() {
+    void addNetworkOwnerToMenu() {
         if (currentWaygate.getNetwork().getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getNetwork().getOwner());
             if (owner != null) {

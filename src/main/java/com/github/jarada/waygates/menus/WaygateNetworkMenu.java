@@ -59,6 +59,15 @@ public class WaygateNetworkMenu extends Menu {
                 }
 
             });
+        } else if (optionNames[slot].equals("Manage")) {
+            Bukkit.getScheduler().runTask(pm, new Runnable() {
+
+                @Override
+                public void run() {
+                    mm.openWaygateNetworkManageMenu();
+                }
+
+            });
         } else {
             super.onInventoryClick(clickEvent);
         }
@@ -94,9 +103,8 @@ public class WaygateNetworkMenu extends Menu {
         if (p.hasPermission("wg.create.network"))
             addAddNetworkToMenu();
 
-        if (!currentWaygate.getNetwork().isSystem() && (currentWaygate.getNetwork().getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin"))) {
-            addItemToMenu(16, Material.LEVER, Msg.MENU_TITLE_NETWORK_MANAGE.toString(), "Manage");
-        }
+        if (!currentWaygate.getNetwork().isSystem() && (currentWaygate.getNetwork().getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")))
+            addManageNetworkToMenu();
 
         addCloseToMenu();
     }
@@ -108,5 +116,9 @@ public class WaygateNetworkMenu extends Menu {
 
     void addAddNetworkToMenu() {
         addItemToMenu(9, Material.WRITABLE_BOOK, Msg.MENU_TITLE_NETWORK_CREATE.toString(), "Create");
+    }
+
+    void addManageNetworkToMenu() {
+        addItemToMenu(16, Material.LEVER, Msg.MENU_TITLE_NETWORK_MANAGE.toString(), "Manage");
     }
 }

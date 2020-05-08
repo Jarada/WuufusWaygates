@@ -105,6 +105,9 @@ public class WaygateManager {
     }
 
     public void changeGateNetwork(Gate gate, Network network, boolean saveNetwork) {
+        // Record old network
+        Network prevNetwork = gate.getNetwork();
+
         // Remove from old network
         removeFromGates(gate);
 
@@ -116,6 +119,10 @@ public class WaygateManager {
 
         // Save to File
         DataManager.getManager().saveWaygate(gate, saveNetwork);
+
+        // Clear old network if need be
+        if (!prevNetwork.isSystem() && !this.gates.containsKey(prevNetwork))
+            DataManager.getManager().deleteNetwork(prevNetwork);
     }
 
     /* Gate Locating */

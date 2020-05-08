@@ -97,7 +97,7 @@ public class WaygateSettingsMenu extends Menu {
         if (p.hasPermission("wg.assign.gate.hidden"))
             addHiddenToMenu();
 
-        addOwnerToMenu(true);
+        addGateOwnerToMenu(true);
         addCloseToMenu();
     }
 
