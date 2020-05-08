@@ -1,15 +1,20 @@
 package com.github.jarada.waygates;
 
+import com.github.jarada.waygates.commands.PluginCommand;
+import com.github.jarada.waygates.commands.WGReloadCmd;
 import com.github.jarada.waygates.data.DataManager;
+import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.listeners.WaygateListener;
 import com.github.jarada.waygates.listeners.PlayerListener;
 import com.github.jarada.waygates.listeners.WaygateKeyListener;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 public class PluginMain extends JavaPlugin {
@@ -25,11 +30,14 @@ public class PluginMain extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveResource("CHANGELOG.txt", true);
-        DataManager.getManager().loadConfig();
+        DataManager.getManager().loadConfig(false);
         DataManager.getManager().loadWaygates();
 
-        // TODO Commands - reload, list in world, delete from world
+        // TODO Commands - list in world, delete from world
+        commands = new HashMap<>();
+        commands.put("reload", new WGReloadCmd());
 
+        getCommand("wg").setExecutor(this);
         getServer().getPluginManager().registerEvents(new WaygateKeyListener(), this);
         getServer().getPluginManager().registerEvents(new WaygateListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
@@ -45,7 +53,38 @@ public class PluginMain extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return false;
+        String cmd = command.getName().toLowerCase();
+        PluginCommand pluginCmd = null;
+        String[] param = null;
+
+        if (cmd.equals("wg")) {
+            if (args.length > 0) {
+                String key = args[0].toLowerCase();
+                param = Arrays.copyOfRange(args, 1, args.length);
+
+                if (commands.containsKey(key))
+                    pluginCmd = commands.get(key);
+            }
+
+            if (pluginCmd == null) {
+                sender.sendMessage("Wuufu's Waygates v" + getDescription().getVersion() + " by Wuufu.");
+                return false;
+            }
+        }
+
+        assert pluginCmd != null;
+        if (!(sender instanceof Player) && !pluginCmd.isConsoleExecutable()) {
+            Msg.CMD_NO_CONSOLE.sendTo(sender);
+            return true;
+        }
+
+        if (!pluginCmd.hasRequiredPerm(sender)) {
+            Msg.NO_PERMS.sendTo(sender);
+            return true;
+        }
+
+        pluginCmd.execute(sender, param);
+        return true;
     }
 
 }

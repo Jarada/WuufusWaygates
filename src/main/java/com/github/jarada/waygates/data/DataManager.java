@@ -60,7 +60,7 @@ public class DataManager {
         return dm;
     }
 
-    public void loadConfig() {
+    public void loadConfig(boolean reload) {
         if (!worldsFolder.exists())
             worldsFolder.mkdir();
         if (!networksFolder.exists())
@@ -99,47 +99,49 @@ public class DataManager {
         config.options().copyDefaults(true);
         pm.saveConfig();
 
-        registerGlow();
-        Glow glow = new Glow(new NamespacedKey(pm, "waygateglow"));
+        if (!reload) {
+            registerGlow();
+            Glow glow = new Glow(new NamespacedKey(pm, "waygateglow"));
 
-        List<String> lore = new ArrayList<String>();
-        Msg[] constructorLore = {Msg.LORE_CONSTRUCTOR_1, Msg.LORE_CONSTRUCTOR_2, Msg.LORE_CONSTRUCTOR_3, Msg.LORE_CONSTRUCTOR_4};
-        for (Msg msg : constructorLore)
-            if (msg.toString().length() > 0)
-                lore.add(Util.color(msg.toString()));
+            List<String> lore = new ArrayList<String>();
+            Msg[] constructorLore = {Msg.LORE_CONSTRUCTOR_1, Msg.LORE_CONSTRUCTOR_2, Msg.LORE_CONSTRUCTOR_3, Msg.LORE_CONSTRUCTOR_4};
+            for (Msg msg : constructorLore)
+                if (msg.toString().length() > 0)
+                    lore.add(Util.color(msg.toString()));
 
-        WAYGATE_CONSTRUCTOR = Util.setItemNameAndLore(new ItemStack(Material.GOLD_NUGGET, 1), Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
-        ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
-        if (activatorMeta != null) {
-            activatorMeta.addEnchant(glow, 1, true);
-            WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
+            WAYGATE_CONSTRUCTOR = Util.setItemNameAndLore(new ItemStack(Material.GOLD_NUGGET, 1), Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
+            ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
+            if (activatorMeta != null) {
+                activatorMeta.addEnchant(glow, 1, true);
+                WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
+            }
+
+            ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, "waygateconstructor"), WAYGATE_CONSTRUCTOR);
+            sr.shape("RRR", "RGR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('G', Material.GOLD_NUGGET);
+            Bukkit.addRecipe(sr);
+
+            lore = new ArrayList<>();
+            Msg[] keyLore = {Msg.LORE_KEY_1, Msg.LORE_KEY_2, Msg.LORE_KEY_3, Msg.LORE_KEY_4};
+            for (Msg msg : keyLore)
+                if (msg.toString().length() > 0)
+                    lore.add(Util.color(msg.toString()));
+
+            WAYGATE_KEY = Util.setItemNameAndLore(new ItemStack(Material.FEATHER, 1), Msg.LORE_KEY_NAME.toString(), lore);
+            ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
+            if (keyMeta != null) {
+                keyMeta.addEnchant(glow, 1, true);
+                WAYGATE_KEY.setItemMeta(keyMeta);
+            }
+
+            sr = new ShapedRecipe(new NamespacedKey(pm, "waygatekey"), WAYGATE_KEY);
+            sr.shape("RRR", "RKR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('K', Material.FEATHER);
+            Bukkit.addRecipe(sr);
         }
-
-        ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, "waygateconstructor"), WAYGATE_CONSTRUCTOR);
-        sr.shape("RRR", "RGR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('G', Material.GOLD_NUGGET);
-        Bukkit.addRecipe(sr);
-
-        lore = new ArrayList<>();
-        Msg[] keyLore = {Msg.LORE_KEY_1, Msg.LORE_KEY_2, Msg.LORE_KEY_3, Msg.LORE_KEY_4};
-        for (Msg msg : keyLore)
-            if (msg.toString().length() > 0)
-                lore.add(Util.color(msg.toString()));
-
-        WAYGATE_KEY = Util.setItemNameAndLore(new ItemStack(Material.FEATHER, 1), Msg.LORE_KEY_NAME.toString(), lore);
-        ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
-        if (keyMeta != null) {
-            keyMeta.addEnchant(glow, 1, true);
-            WAYGATE_KEY.setItemMeta(keyMeta);
-        }
-
-        sr = new ShapedRecipe(new NamespacedKey(pm, "waygatekey"), WAYGATE_KEY);
-        sr.shape("RRR", "RKR","RRR").setIngredient('R', Material.REDSTONE).setIngredient('K', Material.FEATHER);
-        Bukkit.addRecipe(sr);
     }
 
     public void reload() {
         pm.reloadConfig();
-        loadConfig();
+        loadConfig(true);
     }
 
     public String getMsg(Msg msg) {

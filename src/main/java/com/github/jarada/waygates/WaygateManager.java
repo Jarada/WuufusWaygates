@@ -156,6 +156,14 @@ public class WaygateManager {
         return gates;
     }
 
+    public ArrayList<Gate> getAllGates() {
+        ArrayList<Gate> gates = new ArrayList<Gate>();
+        for (List<Gate> networkGates : this.gates.values()) {
+            gates.addAll(networkGates);
+        }
+        return gates;
+    }
+
     /* Gate Networks */
 
     public List<Network> getCustomNetworks(Player owner, Gate currentGate) {

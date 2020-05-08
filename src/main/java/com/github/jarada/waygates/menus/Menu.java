@@ -46,8 +46,6 @@ public abstract class Menu {
     }
 
     protected void destroy() {
-        p.removeMetadata("InMenu", pm);
-
         pm = null;
         p = null;
         currentWaygate = null;

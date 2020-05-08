@@ -10,6 +10,7 @@ import java.util.logging.Level;
 public enum Msg {
 
     /* WAYGATES */
+    CMD_NO_CONSOLE("&cError: &fCommand unavailable to CONSOLE."),
     GATE_ACCESS_DENIED("&cError: &fAccess denied, gate is private."),
     GATE_ALREADY_EXISTS("&cError: &fThere is already a gate there, perhaps use a Waygate Key?"),
     GATE_CHANGE_OWNER("&6Enter name of new owner for Waygate:"),
@@ -95,6 +96,7 @@ public enum Msg {
     NETWORK_SYSTEM_NAME_UNDERWORLD("&9Underworld"),
     NETWORK_SYSTEM_NAME_VOID("&9Void"),
     NETWORK_SYSTEM_VOID("&9System Void Network"),
+    NO_PERMS("&cError: &fAccess denied."),
     RELOADED("&aWaygates &freloaded."),
     RENAMED("&6%s &frenamed to &6%s&f."),
     WORD_EITHER("either"),
