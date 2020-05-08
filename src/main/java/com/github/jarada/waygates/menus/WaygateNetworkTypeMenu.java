@@ -4,6 +4,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.data.Network;
+import com.github.jarada.waygates.types.NetworkType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -34,14 +35,14 @@ public class WaygateNetworkTypeMenu extends Menu {
             });
         } else if (optionNames[slot].matches("Private|Invite|Global")) {
             // We have one of the network types
-            int type = 0;  // Global 0, Private 1, Invite 2
+            NetworkType type = NetworkType.GLOBAL;
             if (optionNames[slot].equals("Private"))
-                type = 1;
+                type = NetworkType.PRIVATE;
             else if (optionNames[slot].equals("Invite"))
-                type = 2;
+                type = NetworkType.INVITE;
 
             if (mm.isNetworkNameUnique(name)) {
-                Network network = new Network(name, type == 1, type == 2);
+                Network network = new Network(name, type);
                 network.setOwner(p.getUniqueId());
                 Bukkit.getScheduler().runTask(pm, new Runnable() {
 

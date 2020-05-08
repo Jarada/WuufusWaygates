@@ -1,5 +1,6 @@
 package com.github.jarada.waygates.data;
 
+import com.github.jarada.waygates.types.NetworkType;
 import com.google.gson.Gson;
 import org.bukkit.Material;
 
@@ -20,7 +21,7 @@ public class Network {
     private static Network       oceanNetwork;
 
     private UUID                 uuid;
-    private transient String  sysUuid;
+    private transient String     sysUuid;
 
     private UUID                 owner;
     private String               name;
@@ -30,25 +31,21 @@ public class Network {
     // Private: Not shown in network list for selection, only Owner can add/use gates on network
     // Invite: Not shown in network list for selection, can only add gates using invite code from Owner
     // NB: Use direct invites to the Network NOT codes
-    private boolean              networkPrivate, networkInvite;
-    private boolean              system, isVoid;
+    private NetworkType          networkType;
     private List<UUID>           invitedUsers;
 
     public Network(String name) {
-        this(name, false, false);
+        this(name, NetworkType.GLOBAL);
     }
 
-    public Network(String name, boolean networkPrivate, boolean networkInvite) {
+    public Network(String name, NetworkType networkType) {
         this.name = name;
-        this.networkPrivate = networkPrivate;
-        this.networkInvite = networkInvite;
+        this.networkType = networkType;
     }
 
     public static Network getVoidNetwork() {
         if (voidNetwork == null) {
-            voidNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_VOID.toString());
-            voidNetwork.system = true;
-            voidNetwork.isVoid = true;
+            voidNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_VOID.toString(), NetworkType.SYSTEM_VOID);
             voidNetwork.icon = Material.SNOWBALL;
             voidNetwork.sysUuid = "sys_void";
         }
@@ -57,8 +54,7 @@ public class Network {
 
     public static Network getOverworldNetwork() {
         if (overworldNetwork == null) {
-            overworldNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_OVERWORLD.toString());
-            overworldNetwork.system = true;
+            overworldNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_OVERWORLD.toString(), NetworkType.SYSTEM);
             overworldNetwork.icon = Material.APPLE;
             overworldNetwork.sysUuid = "sys_overworld";
         }
@@ -67,8 +63,7 @@ public class Network {
 
     public static Network getOceanNetwork() {
         if (oceanNetwork == null) {
-            oceanNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_OCEAN.toString());
-            oceanNetwork.system = true;
+            oceanNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_OCEAN.toString(), NetworkType.SYSTEM);
             oceanNetwork.icon = Material.HEART_OF_THE_SEA;
             oceanNetwork.sysUuid = "sys_ocean";
         }
@@ -77,8 +72,7 @@ public class Network {
 
     public static Network getNetherNetwork() {
         if (netherNetwork == null) {
-            netherNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_NETHER.toString());
-            netherNetwork.system = true;
+            netherNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_NETHER.toString(), NetworkType.SYSTEM);
             netherNetwork.icon = Material.FIRE_CHARGE;
             netherNetwork.sysUuid = "sys_nether";
         }
@@ -87,8 +81,7 @@ public class Network {
 
     public static Network getUnderworldNetwork() {
         if (underworldNetwork == null) {
-            underworldNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_UNDERWORLD.toString());
-            underworldNetwork.system = true;
+            underworldNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_UNDERWORLD.toString(), NetworkType.SYSTEM);
             underworldNetwork.icon = Material.MAGMA_CREAM;
             underworldNetwork.sysUuid = "sys_underworld";
         }
@@ -97,8 +90,7 @@ public class Network {
 
     public static Network getTheEndNetwork() {
         if (theEndNetwork == null) {
-            theEndNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_THE_END.toString());
-            theEndNetwork.system = true;
+            theEndNetwork = new Network(Msg.NETWORK_SYSTEM_NAME_THE_END.toString(), NetworkType.SYSTEM);
             theEndNetwork.icon = Material.ENDER_EYE;
             theEndNetwork.sysUuid = "sys_the_end";
         }
@@ -169,6 +161,8 @@ public class Network {
     }
 
     public List<UUID> getInvitedUsers() {
+        if (invitedUsers == null)
+            return new ArrayList<>();
         return invitedUsers;
     }
 
@@ -185,22 +179,27 @@ public class Network {
     }
 
     public boolean isNetworkPrivate() {
-        return networkPrivate;
+        return networkType == NetworkType.PRIVATE;
     }
 
     public boolean isNetworkInvite() {
-        return networkInvite;
+        return networkType == NetworkType.INVITE;
     }
 
     public boolean isSystem() {
-        return system;
+        return networkType == NetworkType.SYSTEM || networkType == NetworkType.SYSTEM_VOID;
     }
 
     public boolean isGlobal() {
-        return isSystem() || (!isNetworkPrivate() && !isNetworkInvite());
+        return networkType == NetworkType.GLOBAL;
     }
 
-    public boolean isVoid() { return isVoid; }
+    public boolean isVoid() { return networkType == NetworkType.SYSTEM_VOID; }
+
+    public void clearSystemNetworkStatus() {
+        if (isSystem())
+            networkType = NetworkType.GLOBAL;
+    }
 
     /* Serialization */
 

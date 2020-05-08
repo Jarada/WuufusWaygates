@@ -209,6 +209,7 @@ public class DataManager {
                 for (File networkFile : networks) {
                     try {
                         Network network = Network.fromJson(loadData(networkFile));
+                        network.clearSystemNetworkStatus();
                         networkMap.put(network.getUUID().toString(), network);
                     } catch (Exception e) {
                         pm.getLogger().warning(String.format("Unable to load Network %s, all worlds in this Network will be placed in Void",
