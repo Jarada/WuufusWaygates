@@ -180,7 +180,7 @@ public class MenuManager implements Listener {
         Iterator<Network> networkIterator = networks.iterator();
         while (networkIterator.hasNext()){
             Network network = networkIterator.next();
-            String networkKey = Util.getKey(network.getName());
+            String networkKey = network.getSysUuid().replace("sys_", "");
             if (!currentWaygate.getNetwork().equals(network) && !player.hasPermission(String.format("wg.network.%s", networkKey)))
                 networkIterator.remove();
         }

@@ -172,7 +172,8 @@ public class WaygateManager {
             if (!network.isSystem() && (currentGate.getNetwork().equals(network) ||
                     ((!network.isNetworkInvite() || network.isInvitedUser(owner.getUniqueId())) &&
                     (!network.isNetworkPrivate() || network.getOwner().equals(owner.getUniqueId())) &&
-                    (!network.isGlobal() || owner.hasPermission("wg.network.global")))))
+                    (!network.isGlobal() || owner.hasPermission("wg.network.global") ||
+                            owner.hasPermission(String.format("wg.network.%s", Util.getKey(network.getName())))))))
                 customNetworks.add(network);
         }
         return customNetworks;
