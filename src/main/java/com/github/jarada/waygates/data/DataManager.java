@@ -90,6 +90,7 @@ public class DataManager {
                 for (String inv : config.getConfigurationSection("Waygates.BLOCKS_REQUIRED." + group).getKeys(false)) {
                     requirement.put(inv, config.getInt("Waygates.BLOCKS_REQUIRED." + group + "." + inv));
                 }
+                BLOCKS_REQUIRED.add(requirement);
             }
         } catch (NullPointerException e) {
             // Using Static Default
@@ -174,6 +175,7 @@ public class DataManager {
         }
 
         if (requiredBlocks.size() == 0) {
+            pm.getLogger().warning("Using default blocks for Waygate Construction");
             ArrayList<Map<Material, Integer>> defaultBlocks = new ArrayList<>();
             defaultBlocks.add(getDefaultBlocksRequired());
             return defaultBlocks;
