@@ -14,7 +14,6 @@
      children:
        wg.admin: true
        wg.reload: true
-       wg.key.unlimited: true
    wg.travel:
      default: true
      description: Can travel anywhere
@@ -22,7 +21,7 @@
      description: Grants access to use Waygate Keys to use gate controls
      children:
        wg.key.use: true
-       wg.key.unlimited: true
+       wg.key.permanent: true
    wg.create.*:
      description: Create gates and networks
      children:

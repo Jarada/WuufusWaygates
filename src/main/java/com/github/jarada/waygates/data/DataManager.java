@@ -81,7 +81,7 @@ public class DataManager {
         WG_NETWORK_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NETWORK_NAME_MAX_LENGTH"));
         WG_GATE_ACTIVATION_TIME = Integer.min(300, Integer.max(5, config.getInt("Waygates.WG_GATE_ACTIVATION_TIME")));
         WG_CONSTRUCTOR_CONSUMES = config.getBoolean("Waygates.WG_CONSTRUCTOR_CONSUMES");
-        WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT"); // TODO Future: Permanent Key
+        WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT");
 
         BLOCKS_REQUIRED = new ArrayList<>();
         try {
