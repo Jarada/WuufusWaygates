@@ -22,12 +22,14 @@ public class WaygateManager {
     private Map<Network, List<Gate>>    gates;
     private Map<BlockLocation, Gate>    locationGateMap;
     private Map<String, List<Gate>>     worldGateMap;
+    private List<String>                worldDeletion;
 
     public WaygateManager() {
         pm = PluginMain.getPluginInstance();
         gates = new LinkedHashMap<>();
         locationGateMap = new LinkedHashMap<>();
         worldGateMap = new LinkedHashMap<>();
+        worldDeletion = new ArrayList<>();
     }
 
     public static WaygateManager getManager() {
@@ -153,6 +155,20 @@ public class WaygateManager {
     public ArrayList<Gate> getConnectedGates(Gate gate) {
         ArrayList<Gate> gates = new ArrayList<>(this.gates.get(gate.getNetwork()));
         gates.remove(gate);
+        return gates;
+    }
+
+    public ArrayList<Gate> getAllGatesInWorld(String worldName, boolean accurate) {
+        ArrayList<Gate> gates = new ArrayList<Gate>();
+        if (accurate && worldGateMap.containsKey(worldName)) {
+            gates.addAll(worldGateMap.get(worldName));
+        } else if (!accurate) {
+            for (String storedWorldName : worldGateMap.keySet()) {
+                if (storedWorldName.equalsIgnoreCase(worldName)) {
+                    gates.addAll(worldGateMap.get(storedWorldName));
+                }
+            }
+        }
         return gates;
     }
 
@@ -288,11 +304,8 @@ public class WaygateManager {
     }
 
     public void destroyWaygate(@Nullable Player p, @NotNull Gate gate, @NotNull BlockLocation destroyingBlock) {
-        // Unrecord Gate
-        unrecordGate(gate);
-
-        // Close Gate
-        gate.deactivate();
+        // Clear Waygate
+        destroyWaygate(gate);
 
         // Run FX
         Util.playEffect(destroyingBlock.getLocation(), Effect.ENDER_SIGNAL);
@@ -304,6 +317,27 @@ public class WaygateManager {
         // Message
         if (p != null)
             Msg.GATE_DESTROYED.sendTo(p, gate.getName());
+    }
+
+    public void destroyWaygate(@NotNull Gate gate) {
+        // Unrecord Gate
+        unrecordGate(gate);
+
+        // Close Gate
+        gate.deactivate();
+    }
+
+    public boolean isWorldAwaitingDeletion(String worldName) {
+        return worldDeletion.contains(worldName);
+    }
+
+    public void setWorldForDeletion(String worldName) {
+        if (!worldDeletion.contains(worldName))
+            worldDeletion.add(worldName);
+    }
+
+    public void clearWorldForDeletion(String worldName) {
+        worldDeletion.remove(worldName);
     }
 
 }

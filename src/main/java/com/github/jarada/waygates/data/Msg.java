@@ -3,6 +3,7 @@ package com.github.jarada.waygates.data;
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.IllegalFormatException;
 import java.util.logging.Level;
@@ -11,6 +12,11 @@ public enum Msg {
 
     /* WAYGATES */
     CMD_NO_CONSOLE("&cError: &fCommand unavailable to CONSOLE."),
+    DELETE_WORLD_ACTION("&fRemoving %d gates from world: %s..."),
+    DELETE_WORLD_COMPLETED("&aSuccess: &fAll gates removed from world: %s!"),
+    DELETE_WORLD_EMPTY("&cError: &fWorld either does not exist or has no gates to remove."),
+    DELETE_WORLD_NOT_GIVEN("&cError: &fWorld not specified, please provide a world to remove gates from!"),
+    DELETE_WORLD_WARNING("&cWarning: THIS WILL REMOVE ALL %d GATES FROM WORLD: %s! This CANNOT be undone! To confirm, enter within 20s: /wg delete %s confirm"),
     GATE_ACCESS_DENIED("&cError: &fAccess denied, gate is private."),
     GATE_ALREADY_EXISTS("&cError: &fThere is already a gate there, perhaps use a Waygate Key?"),
     GATE_CHANGE_OWNER("&6Enter name of new owner for Waygate:"),
@@ -24,6 +30,13 @@ public enum Msg {
     GATE_NO_FRAME("&cError: &fThere is no frame for the gate, or it is too big."),
     GATE_SET_ICON("&6%s: &fWaygate icon set to &a%s&f."),
     GATE_SET_NAME("&6Enter new name for Waygate (max %d characters):"),
+    LIST_GATE("&6Gate &f%s &f(%s&f)&6 owned by &f%s &6in &aX: &f%d, &aY: &f%d, &aZ: &f%d"),
+    LIST_GATE_WORLDS("&6Gate &f%s (%s)&6 owned by &f%s &6in &aX: &f%d, &aY: &f%d, &aZ: &f%d, &aWorld: &f%s"),
+    LIST_NONE_FOUND("&cError: &fNo gates found!"),
+    LIST_NONE_FOUND_WORLD("&cError: &fNo gates found in world %s, or world doesn't exist!"),
+    LIST_SUMMARY("&aSuccess: &fFound %d gates! Showing Page %d of %d:"),
+    LIST_SUMMARY_WORLD("&aSuccess: &fFound %d gates in world: %s! Showing Page %d of %d:"),
+    LIST_SUMMARY_WORLDS("&aSuccess: &fFound %d gates in worlds named similarly to: %s! Showing Page %d of %d:"),
     LORE_CONSTRUCTOR_NAME("&aWaygate Constructor"),
     LORE_CONSTRUCTOR_1("&fManipulates space/time"),
     LORE_CONSTRUCTOR_2("&fto coalesce the energies"),
@@ -138,7 +151,10 @@ public enum Msg {
     }
 
     public void sendTo(CommandSender sender) {
-        sender.sendMessage(Util.color(toString()));
+        if (sender instanceof Player)
+            sender.sendMessage(Util.color(toString()));
+        else
+            sender.sendMessage(Util.stripColor(toString()));
     }
 
     public void sendTo(CommandSender sender, Object... args) {
@@ -155,7 +171,10 @@ public enum Msg {
                             String.format("\"Waypoints.Messages.%s\" is misconfigured in plugin.yml.", this.name()));
         }
 
-        sender.sendMessage(Util.color(msg));
+        if (sender instanceof Player)
+            sender.sendMessage(Util.color(msg));
+        else
+            sender.sendMessage(Util.stripColor(msg));
     }
 
 }

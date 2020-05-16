@@ -26,7 +26,7 @@ public class WGReloadCmd implements PluginCommand {
 
     @Override
     public boolean hasRequiredPerm(CommandSender sender) {
-        return sender.hasPermission("wg.reload");
+        return sender.hasPermission("wg.command.reload");
     }
 
 }

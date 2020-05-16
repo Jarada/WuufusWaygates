@@ -13,7 +13,7 @@
      description: Grants all plugin permissions
      children:
        wg.admin: true
-       wg.reload: true
+       wg.command.*: true
    wg.travel:
      default: true
      description: Can travel anywhere
@@ -42,6 +42,22 @@
      children:
        wg.assign.network.global: true
        wg.assign.network.invite: true
+   wg.command.*:
+     description: Use all commands
+     children:
+       wg.command.reload: true
+       wg.command.world.*: true
+   wg.command.reload:
+     description: Reload Config
+   wg.command.world.*:
+     description: Use of commands for gate management in worlds
+     children:
+       wg.command.world.list: true
+       wg.command.world.delete: true
+   wg.command.world.list:
+     description: Use of command to list gates in world
+   wg.command.world.delete:
+     description: Use of command to delete all gates in world
    wg.network.*:
      description: Add gates you create to any global/system network
      children:
@@ -59,18 +75,16 @@
        wg.create.*: true
        wg.assign.gate.*: true
        wg.assign.network.invite: true
-   wg.global:
+   wg.player.global:
      description: Global permission set
      children:
        wg.player: true
        wg.assign.network.global: true
        wg.network.*: true
-   wg.reload:
-     description: Reload Config
    wg.bypass:
      description: Access private/hidden gates
    wg.admin:
      description: Admin permission set
      children:
-       wg.global: true
+       wg.player.global: true
        wg.bypass: true

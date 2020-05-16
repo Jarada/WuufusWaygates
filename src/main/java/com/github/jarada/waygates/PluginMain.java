@@ -1,6 +1,8 @@
 package com.github.jarada.waygates;
 
 import com.github.jarada.waygates.commands.PluginCommand;
+import com.github.jarada.waygates.commands.WGDeleteCmd;
+import com.github.jarada.waygates.commands.WGListCmd;
 import com.github.jarada.waygates.commands.WGReloadCmd;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Msg;
@@ -33,8 +35,9 @@ public class PluginMain extends JavaPlugin {
         DataManager.getManager().loadConfig(false);
         DataManager.getManager().loadWaygates();
 
-        // TODO Commands - list in world, delete from world
         commands = new HashMap<>();
+        commands.put("delete", new WGDeleteCmd());
+        commands.put("list", new WGListCmd());
         commands.put("reload", new WGReloadCmd());
 
         getCommand("wg").setExecutor(this);
