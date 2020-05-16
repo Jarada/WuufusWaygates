@@ -4,6 +4,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
+import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
@@ -56,6 +57,14 @@ public class PlayerListener implements Listener {
             // Use Gate Key
             Bukkit.getPluginManager().callEvent(new WaygateKeyUseEvent(p, a, event.getClickedBlock()));
             event.setCancelled(true);
+        } else if (p.isSneaking() && (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+            BlockLocation gateLocation = new BlockLocation(event.getClickedBlock().getLocation());
+            Gate gate = WaygateManager.getManager().getGateAtLocation(gateLocation);
+            if (gate != null) {
+                Bukkit.getPluginManager().callEvent(new WaygateInteractEvent(p, gate, a, is));
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 

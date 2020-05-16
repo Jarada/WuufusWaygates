@@ -4,8 +4,13 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
+import com.github.jarada.waygates.data.Msg;
+import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.util.Util;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +22,8 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 public class WaygateListener implements Listener {
 
@@ -112,4 +119,58 @@ public class WaygateListener implements Listener {
         e.setCancelled(true);
     }
 
+    /* Gate Modification */
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onWaygateInteract(WaygateInteractEvent event) {
+        if ((event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) ||
+                event.getItem() == null)
+            return;
+
+        DataManager dm = DataManager.getManager();
+        Player player = event.getPlayer();
+        Gate gate = event.getWaygate();
+        ItemStack is = event.getItem();
+
+        // Only owner can modify gate
+        if (gate.getOwner().equals(player.getUniqueId()) || player.hasPermission("wp.admin")) {
+            // Check
+            Material m = is.getType();
+            if (m == Material.WRITTEN_BOOK) {
+                BookMeta bm = (BookMeta) is.getItemMeta();
+
+                if (bm.hasDisplayName() || bm.hasLore())
+                    return;
+
+                String content = "";
+
+                for (int page = 1; page <= bm.getPageCount(); page++) {
+                    content += bm.getPage(page);
+
+                    if (page != bm.getPageCount())
+                        content += " ";
+                }
+
+                if (content.length() > dm.WG_DESC_MAX_LENGTH)
+                    content = content.substring(0, dm.WG_DESC_MAX_LENGTH);
+
+                player.closeInventory();
+                gate.setDescription(content);
+                Msg.GATE_DESC_UPDATED_BOOK.sendTo(player, gate.getName(), bm.getTitle());
+            }  else {
+                if (is.hasItemMeta())
+                    return;
+
+                gate.setIcon(m);
+                Msg.GATE_SET_ICON.sendTo(player, gate.getName(), m.toString());
+            }
+
+            is.setAmount(is.getAmount() - 1);
+            player.getInventory().setItemInMainHand(is);
+            dm.saveWaygate(gate, false);
+            Util.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+        } else {
+            Msg.NO_PERMS.sendTo(player);
+        }
+    }
 }

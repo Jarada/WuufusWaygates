@@ -77,7 +77,7 @@ public class DataManager {
 
         MAX_AREA = config.getInt("Waygates.MAX_AREA");
         WG_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NAME_MAX_LENGTH"));
-        WG_DESC_MAX_LENGTH = config.getInt("Waygates.WG_DESC_MAX_LENGTH"); // TODO Future: Gate Description
+        WG_DESC_MAX_LENGTH = config.getInt("Waygates.WG_DESC_MAX_LENGTH");
         WG_NETWORK_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NETWORK_NAME_MAX_LENGTH"));
         WG_GATE_ACTIVATION_TIME = Integer.min(300, Integer.max(5, config.getInt("Waygates.WG_GATE_ACTIVATION_TIME")));
         WG_CONSTRUCTOR_CONSUMES = config.getBoolean("Waygates.WG_CONSTRUCTOR_CONSUMES");
