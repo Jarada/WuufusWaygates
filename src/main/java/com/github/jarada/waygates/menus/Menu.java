@@ -110,10 +110,6 @@ public abstract class Menu {
         optionIcons = new ItemStack[size];
     }
 
-    void loadMenus() {
-
-    }
-
     void addItemToMenu(int slot, Material icon, String name, String optionName) {
         addItemToMenu(slot, icon, name, optionName, null);
     }
@@ -209,6 +205,7 @@ public abstract class Menu {
             displayName += String.format(" %s", Msg.MENU_GATE_HIDDEN.toString());
 
         List<String> lore = new ArrayList<String>();
+        // TODO Add Owner
         lore.add(Util.color(String.format("&f&o(%s)", loc.getWorld().getName())));
         lore.add(Util.color(String.format("&aX: &f%s", loc.getBlockX())));
         lore.add(Util.color(String.format("&aY: &f%s", loc.getBlockY())));

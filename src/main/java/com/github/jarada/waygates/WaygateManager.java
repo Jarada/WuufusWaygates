@@ -101,8 +101,10 @@ public class WaygateManager {
         if (this.gates.keySet().size() == 0)
             for (Network systemNetwork : Network.systemNetworks())
                 this.gates.put(systemNetwork, new ArrayList<>());
-        for (Gate gate : gates)
+        for (Gate gate : gates) {
             recordGate(gate, true);
+            gate.deactivate();
+        }
         pm.getLogger().info(String.format("Loaded %d gates in %d world(s)", gates.size(), worldGateMap.keySet().size()));
     }
 
@@ -325,6 +327,8 @@ public class WaygateManager {
 
         // Close Gate
         gate.deactivate();
+
+        // TODO Clear Menus
     }
 
     public boolean isWorldAwaitingDeletion(String worldName) {

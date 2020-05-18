@@ -81,18 +81,11 @@ public class PlayerListener implements Listener {
         if (from.equals(to))
             return;
 
+
+
         // Verify Gate
         Gate gate = gm.getGateAtLocation(to);
-        if (gate == null)
-            return;
-
-        // Verify Active
-        if (!gate.isActive())
-            return;
-
-        // Verify Permission
-        if (!p.hasPermission("wg.travel") || (gate.isOwnerPrivate() && !gate.getOwner().equals(p.getUniqueId()) &&
-                !p.hasPermission("wg.bypass")))
+        if (gate == null || !gate.verify(p))
             return;
 
         // Transport!

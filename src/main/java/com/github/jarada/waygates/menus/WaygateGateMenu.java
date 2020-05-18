@@ -4,6 +4,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
+import com.github.jarada.waygates.types.GateActivationResult;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,13 +29,15 @@ public class WaygateGateMenu extends WaygateAccessMenu {
                 public void run() {
                     if (currentWaygate.isActive())
                         currentWaygate.deactivate();
-                    boolean success = currentWaygate.activate(selectedGate.getExit());
-                    if (success)
+                    GateActivationResult result = currentWaygate.activate(selectedGate.getExit());
+                    if (result == GateActivationResult.RESULT_ACTIVATED)
                         mm.saveUpdateToGate();
                     p.closeInventory();
-                    if (!success) {
+                    if (result == GateActivationResult.RESULT_NOT_INTACT) {
                         WaygateManager.getManager().destroyWaygate(p, currentWaygate,
                                 new BlockLocation(currentWaygate.getCenterBlock().getLocation()));
+                    } else if (result == GateActivationResult.RESULT_NOT_FOUND) {
+                        Msg.GATE_EXIT_FAILURE.sendTo(p);
                     }
                 }
 

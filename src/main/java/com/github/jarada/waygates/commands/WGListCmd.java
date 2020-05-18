@@ -11,7 +11,7 @@ import java.util.List;
 
 public class WGListCmd implements PluginCommand {
 
-    private static int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 5;
 
     @Override
     public void execute(CommandSender sender, String[] args) {

@@ -7,6 +7,7 @@ import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.util.Util;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -17,18 +18,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+
+import java.util.HashMap;
 
 public class WaygateListener implements Listener {
 
     DataManager dm;
     WaygateManager gm;
+
+    private final HashMap<Player, Location> playerLocationAtEvent = new HashMap<>();
 
     public WaygateListener() {
         dm = DataManager.getManager();
@@ -85,17 +88,49 @@ public class WaygateListener implements Listener {
 
     /* Disable Vanilla Portal Behaviour */
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerPortalEvent(PlayerPortalEvent e) {
-        if (gm.isGateNearby(new BlockLocation(e.getFrom()))) {
+        e.getPlayer().sendMessage("Portal Event Detected");
+        BlockLocation playerLocation = (playerLocationAtEvent.containsKey(e.getPlayer())) ?
+                new BlockLocation(playerLocationAtEvent.get(e.getPlayer())) :
+                new BlockLocation(e.getTo());
+        if (gm.isGateNearby(playerLocation)) {
+            Player p = e.getPlayer();
             e.setCancelled(true);
+            p.sendMessage("Portal Event Cancelled");
+
+            // Verify Gate
+            Gate gate = gm.getGateAtLocation(playerLocation);
+            if (gate == null || !gate.verify(p))
+                return;
+
+            // Transport!
+            gate.teleport(p);
+            dm.saveWaygate(gate, false);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onEntityPortalEvent(EntityPortalEvent e) {
-        if (gm.isGateNearby(new BlockLocation(e.getFrom()))) {
+        BlockLocation entityLocation = new BlockLocation(e.getEntity().getLocation());
+        if (gm.isGateNearby(entityLocation)) {
             e.setCancelled(true);
+
+            // Verify Gate
+            Gate gate = gm.getGateAtLocation(entityLocation);
+            if (gate == null || !gate.isActive())
+                return;
+
+            // Transport!
+            gate.teleportEntity(e.getEntity());
+            dm.saveWaygate(gate, false);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEntityPortalEnterEvent(EntityPortalEnterEvent e) {
+        if (e.getEntity() instanceof Player) {
+            playerLocationAtEvent.put((Player)e.getEntity(), e.getLocation());
         }
     }
 
@@ -172,5 +207,12 @@ public class WaygateListener implements Listener {
         } else {
             Msg.NO_PERMS.sendTo(player);
         }
+    }
+
+    /* Clearance */
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        playerLocationAtEvent.remove(e.getPlayer());
     }
 }

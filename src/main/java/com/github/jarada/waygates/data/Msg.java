@@ -25,6 +25,7 @@ public enum Msg {
     GATE_CREATED("&aSuccess: &fWaygate online and can be used and edited using a Waygate Key"),
     GATE_DESC_UPDATED_BOOK("&6%s: &fScanned &a%s&f. Waygate description set."),
     GATE_DESTROYED("&cGate Disruption: &fWaygate %s has been disrupted and can no longer function"),
+    GATE_EXIT_FAILURE("&cError: &fThe exit to this gate cannot be found! Gate shutdown has commenced."),
     GATE_MUST_CONTAIN("&cError: &fThe gate frame must contain %s!"),
     GATE_MUST_CONTAIN_GROUPED("required blocks, please contact server operators for full list"),
     GATE_NO_FRAME("&cError: &fThere is no frame for the gate, or it is too big."),

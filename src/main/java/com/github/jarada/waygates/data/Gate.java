@@ -2,6 +2,7 @@ package com.github.jarada.waygates.data;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.data.json.*;
+import com.github.jarada.waygates.types.GateActivationResult;
 import com.github.jarada.waygates.types.GateOrientation;
 import com.github.jarada.waygates.util.FloodUtil;
 import com.github.jarada.waygates.util.Util;
@@ -11,7 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Orientable;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 
@@ -185,10 +186,15 @@ public class Gate {
 
     /* Transport */
 
-    public boolean activate(GridLocation location) {
+    public GateActivationResult activate(GridLocation location) {
         // Verify Intact
         if (!isIntact()) {
-            return false;
+            return GateActivationResult.RESULT_NOT_INTACT;
+        }
+
+        // Verify Location
+        if (location.getWorld() == null) {
+            return GateActivationResult.RESULT_NOT_FOUND;
         }
 
         activeDestination = location;
@@ -206,7 +212,7 @@ public class Gate {
             }
 
         }, activationTime);
-        return true;
+        return GateActivationResult.RESULT_ACTIVATED;
     }
 
     public void deactivate() {
@@ -217,19 +223,126 @@ public class Gate {
         close();
     }
 
+    public boolean verify(Player p) {
+        // Verify Active
+        if (!isActive())
+            return false;
+
+        // Verify Permission
+        return p.hasPermission("wg.travel") && (!isOwnerPrivate() || getOwner().equals(p.getUniqueId()) ||
+                p.hasPermission("wg.bypass"));
+    }
+
     public void teleport(Player p) {
+        // Record Time Usage
         usedMillis = System.currentTimeMillis();
+
+        // Gather Attached Entities
+        final List<LivingEntity> leashed = getLeashed(p);
+        final Entity vehicle = p.getVehicle();
+
+        // Get and Verify Location
+        BlockLocation to = (activeDestination != null) ? activeDestination : exit;
+        if (to.getWorld() == null) {
+            // Abort! Abort!
+            deactivate();
+            Msg.GATE_EXIT_FAILURE.sendTo(p);
+            return;
+        }
+        Util.checkChunkLoad(to.getWorld().getBlockAt(to.getLocation()));
+
+        // Teleport Player
         Util.playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT);
-        if (activeDestination != null) {
-            p.teleport(activeDestination.getLocation());
-            Util.playSound(activeDestination.getLocation(), Sound.ENTITY_GHAST_SHOOT);
+        if (p.isInsideVehicle() && vehicle instanceof LivingEntity) {
+            vehicle.eject();
+            if (!(vehicle instanceof Player)) {
+                vehicle.teleport(to.getLocation());
+                vehicle.setFireTicks(0);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), new Runnable() {
+                    @Override
+                    public void run() {
+                        vehicle.addPassenger(p);
+                    }
+                }, 2L);
+
+            }
         } else {
-            p.teleport(exit.getLocation());
+            p.teleport(to.getLocation());
+            p.setFireTicks(0);
+        }
+
+        if (to != exit)
+            Util.playSound(activeDestination.getLocation(), Sound.ENTITY_GHAST_SHOOT);
+
+        // Include Leashed Entities
+        for (LivingEntity leashedEntity : leashed)
+            teleportLeashed(leashedEntity, p);
+    }
+
+    public void teleportEntity(Entity entity) {
+        // Record Time Usage
+        usedMillis = System.currentTimeMillis();
+
+        // Get and Verify Location
+        BlockLocation to = (activeDestination != null) ? activeDestination : exit;
+        if (to.getWorld() == null) {
+            // Abort! Abort!
+            deactivate();
+            return;
+        }
+        Util.checkChunkLoad(to.getWorld().getBlockAt(to.getLocation()));
+
+        if (entity.getType().isSpawnable()) {
+            entity.teleport(to.getLocation());
+        } else if (entity.getType() == EntityType.DROPPED_ITEM) {
+            World world = to.getLocation().getWorld();
+            if (world != null) {
+                entity.remove();
+                world.dropItemNaturally(to.getLocation(), ((Item) entity).getItemStack());
+            }
         }
     }
 
     public boolean isActive() {
         return activeDestination != null;
+    }
+
+    /* Leashed Transport */
+
+    private List<LivingEntity> getLeashed(Player player) {
+        List<LivingEntity> animals = new ArrayList<LivingEntity>();
+        for (Entity entity : player.getNearbyEntities(15, 15, 15)) {
+            if (entity instanceof LivingEntity) {
+                LivingEntity livingEntity = (LivingEntity) entity;
+                try {
+                    if (livingEntity.getLeashHolder().equals(player)) {
+                        animals.add(livingEntity);
+                    }
+                } catch (IllegalStateException ignored) { }
+            }
+        }
+        return animals;
+    }
+
+    private void teleportLeashed(LivingEntity livingEntity, Player player) {
+        livingEntity.setLeashHolder(null);
+        livingEntity.teleport(player);
+        UUID entityUUID = livingEntity.getUniqueId();
+        Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), new Runnable() {
+            @Override
+            public void run() {
+                for (Entity aroundEntity : player.getNearbyEntities(15, 15, 15)) {
+                    if (aroundEntity instanceof LivingEntity) {
+                        LivingEntity living = (LivingEntity) aroundEntity;
+                        if (aroundEntity.getUniqueId().equals(entityUUID)) {
+                            aroundEntity.teleport(player);
+                            living.setLeashHolder(player);
+                            break;
+                        }
+                    }
+                }
+            }
+        }, 3L);
     }
 
     /* Gate Makeup */

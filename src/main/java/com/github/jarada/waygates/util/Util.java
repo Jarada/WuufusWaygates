@@ -2,6 +2,7 @@ package com.github.jarada.waygates.util;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -65,6 +66,15 @@ public class Util {
     }
 
     /* Location */
+
+    public static void checkChunkLoad(final Block b) {
+        final World w = b.getWorld();
+        final Chunk c = b.getChunk();
+
+        if (!w.isChunkLoaded(c)) {
+            w.loadChunk(c);
+        }
+    }
 
     public static void playEffect(Location loc, Effect effect) {
         loc.getWorld().playEffect(loc, effect, 0);
