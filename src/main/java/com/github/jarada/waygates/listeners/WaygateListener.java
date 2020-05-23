@@ -90,14 +90,12 @@ public class WaygateListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerPortalEvent(PlayerPortalEvent e) {
-        e.getPlayer().sendMessage("Portal Event Detected");
         BlockLocation playerLocation = (playerLocationAtEvent.containsKey(e.getPlayer())) ?
                 new BlockLocation(playerLocationAtEvent.get(e.getPlayer())) :
                 new BlockLocation(e.getTo());
         if (gm.isGateNearby(playerLocation)) {
             Player p = e.getPlayer();
             e.setCancelled(true);
-            p.sendMessage("Portal Event Cancelled");
 
             // Verify Gate
             Gate gate = gm.getGateAtLocation(playerLocation);
