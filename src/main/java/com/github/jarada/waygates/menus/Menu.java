@@ -204,12 +204,21 @@ public abstract class Menu {
         else if (gate.isOwnerHidden())
             displayName += String.format(" %s", Msg.MENU_GATE_HIDDEN.toString());
 
+
+
         List<String> lore = new ArrayList<String>();
-        // TODO Add Owner
-        lore.add(Util.color(String.format("&f&o(%s)", loc.getWorld().getName())));
-        lore.add(Util.color(String.format("&aX: &f%s", loc.getBlockX())));
-        lore.add(Util.color(String.format("&aY: &f%s", loc.getBlockY())));
-        lore.add(Util.color(String.format("&aZ: &f%s", loc.getBlockZ())));
+        if (loc.getWorld() != null)
+            lore.add(Util.color(Msg.MENU_LORE_GATE_1.toString(loc.getWorld().getName())));
+        else
+            lore.add(Util.color(Msg.MENU_LORE_GATE_1.toString(Msg.MENU_TEXT_WORLD_NOT_FOUND.toString())));
+        if (gate.getOwner() != null) {
+            OfflinePlayer owner = Bukkit.getOfflinePlayer(gate.getOwner());
+            if (owner != null)
+                lore.add(Util.color(Msg.MENU_LORE_GATE_2.toString(owner.getName())));
+        }
+        lore.add(Util.color(Msg.MENU_LORE_GATE_3.toString(loc.getBlockX())));
+        lore.add(Util.color(Msg.MENU_LORE_GATE_4.toString(loc.getBlockY())));
+        lore.add(Util.color(Msg.MENU_LORE_GATE_5.toString(loc.getBlockZ())));
 
         if (gate.getDescription() != null && gate.getDescription().length() > 0)
             lore.addAll(Arrays.asList(Util.getWrappedLore(gate.getDescription(), 25)));
