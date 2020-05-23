@@ -6,6 +6,7 @@ import com.github.jarada.waygates.commands.WGListCmd;
 import com.github.jarada.waygates.commands.WGReloadCmd;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Msg;
+import com.github.jarada.waygates.listeners.VehicleListener;
 import com.github.jarada.waygates.listeners.WaygateListener;
 import com.github.jarada.waygates.listeners.PlayerListener;
 import com.github.jarada.waygates.listeners.WaygateKeyListener;
@@ -44,6 +45,7 @@ public class PluginMain extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new WaygateKeyListener(), this);
         getServer().getPluginManager().registerEvents(new WaygateListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new VehicleListener(), this);
         getLogger().info("Waygate system online!");
     }
 

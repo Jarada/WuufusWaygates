@@ -15,6 +15,7 @@ import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Gate {
 
@@ -233,23 +234,32 @@ public class Gate {
                 p.hasPermission("wg.bypass"));
     }
 
-    public void teleport(Player p) {
+    private BlockLocation preTeleportChecks() {
         // Record Time Usage
         usedMillis = System.currentTimeMillis();
 
-        // Gather Attached Entities
-        final List<LivingEntity> leashed = getLeashed(p);
-        final Entity vehicle = p.getVehicle();
-
-        // Get and Verify Location
+        // Verify
         BlockLocation to = (activeDestination != null) ? activeDestination : exit;
         if (to.getWorld() == null) {
             // Abort! Abort!
             deactivate();
+            return null;
+        }
+        Util.checkChunkLoad(to.getWorld().getBlockAt(to.getLocation()));
+        return to;
+    }
+
+    public void teleport(Player p) {
+        // Gather Attached Entities
+        final List<LivingEntity> leashed = getLeashed(p);
+        final Entity vehicle = p.getVehicle();
+
+        // Perform Pre Teleport checks
+        BlockLocation to = preTeleportChecks();
+        if (to == null) {
             Msg.GATE_EXIT_FAILURE.sendTo(p);
             return;
         }
-        Util.checkChunkLoad(to.getWorld().getBlockAt(to.getLocation()));
 
         // Teleport Player
         Util.playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT);
@@ -280,17 +290,11 @@ public class Gate {
     }
 
     public void teleportEntity(Entity entity) {
-        // Record Time Usage
-        usedMillis = System.currentTimeMillis();
-
-        // Get and Verify Location
-        BlockLocation to = (activeDestination != null) ? activeDestination : exit;
-        if (to.getWorld() == null) {
-            // Abort! Abort!
-            deactivate();
+        // Perform Pre Teleport checks
+        BlockLocation to = preTeleportChecks();
+        if (to == null) {
             return;
         }
-        Util.checkChunkLoad(to.getWorld().getBlockAt(to.getLocation()));
 
         if (entity.getType().isSpawnable()) {
             entity.teleport(to.getLocation());
@@ -300,6 +304,48 @@ public class Gate {
                 entity.remove();
                 world.dropItemNaturally(to.getLocation(), ((Item) entity).getItemStack());
             }
+        }
+    }
+
+    public void teleportVehicle(Vehicle vehicle) {
+        // Gather Passengers
+        final List<Entity> passengers = vehicle.getPassengers();
+        final List<Player> players = new ArrayList<>();
+        for (Entity p : passengers) {
+            if (p instanceof Player) {
+                players.add((Player)p);
+            }
+        }
+
+        // Perform Pre Teleport checks
+        BlockLocation to = preTeleportChecks();
+        if (to == null) {
+            for (Player p : players)
+                Msg.GATE_EXIT_FAILURE.sendTo(p);
+            return;
+        }
+
+        // Teleport Vehicle
+        vehicle.eject();
+        if (!(vehicle instanceof Player)) {
+            vehicle.teleport(to.getLocation());
+            vehicle.setFireTicks(0);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    for (Entity passenger : passengers) {
+                        passenger.teleport(to.getLocation());
+                        passenger.setFireTicks(0);
+                    }
+                }
+            }, 0L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    for (Entity passenger : passengers)
+                        vehicle.addPassenger(passenger);
+                }
+            }, 2L);
         }
     }
 
@@ -361,6 +407,8 @@ public class Gate {
         {
             return null;
         }
+        if (world == null)
+            return null;
 
         for (BlockLocation coord : this.getCoords())
         {
