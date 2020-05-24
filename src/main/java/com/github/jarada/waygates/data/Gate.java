@@ -2,6 +2,7 @@ package com.github.jarada.waygates.data;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.data.json.*;
+import com.github.jarada.waygates.menus.Menu;
 import com.github.jarada.waygates.types.GateActivationResult;
 import com.github.jarada.waygates.types.GateOrientation;
 import com.github.jarada.waygates.util.FloodUtil;
@@ -40,6 +41,7 @@ public class Gate {
     private GridLocation exit;
     private Set<BlockLocation> coords;
 
+    private transient Set<Menu> activeMenus;
     private transient GridLocation activeDestination;
     private transient BukkitTask activeTask;
 
@@ -52,6 +54,8 @@ public class Gate {
         this.name = UUID.randomUUID().toString().replace("-", "").substring(0, 6);
         this.network = Network.getVoidNetwork();
         this.createdMillis = System.currentTimeMillis();
+
+        this.activeMenus = new HashSet<>();
     }
 
     /* Getters / Setters */
@@ -183,6 +187,23 @@ public class Gate {
 
     public World getWorld() {
         return exit.getWorld();
+    }
+
+    /* Menus */
+
+    public void addActiveMenu(Menu menu) {
+        activeMenus.add(menu);
+    }
+
+    public void removeActiveMenu(Menu menu) {
+        activeMenus.remove(menu);
+    }
+
+    public void closeActiveMenus() {
+        Iterator<Menu> activeMenuIterator = activeMenus.iterator();
+
+        while (activeMenuIterator.hasNext())
+            activeMenuIterator.next().close();
     }
 
     /* Transport */

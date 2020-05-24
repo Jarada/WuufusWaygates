@@ -38,6 +38,7 @@ public abstract class Menu {
         this.mm = mm;
         this.p = p;
         this.currentWaygate = currentWaygate;
+        this.currentWaygate.addActiveMenu(this);
     }
 
     void setup() {
@@ -46,6 +47,7 @@ public abstract class Menu {
     }
 
     protected void destroy() {
+        currentWaygate.removeActiveMenu(this);
         pm = null;
         p = null;
         currentWaygate = null;
@@ -100,6 +102,12 @@ public abstract class Menu {
             }
 
         });
+    }
+
+    public void close() {
+        if (p.getInventory().getContents().equals(optionIcons)) {
+            p.closeInventory();
+        }
     }
 
     public abstract void buildMenu();
