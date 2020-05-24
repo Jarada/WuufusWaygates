@@ -32,6 +32,7 @@ public class PlayerListener implements Listener {
         Player p = event.getPlayer();
         Action a = event.getAction();
         ItemStack is = event.getItem();
+        ItemStack mis = p.getInventory().getItemInMainHand();
 
         if (a == Action.PHYSICAL || p.hasMetadata("InMenu"))
             return;
@@ -50,7 +51,10 @@ public class PlayerListener implements Listener {
                 is.setAmount(is.getAmount() - 1);
                 p.getInventory().setItemInMainHand(is);
             }
-        } else if (!p.isSneaking() && is.isSimilar(dm.WAYGATE_KEY)) {
+        } else if (!p.isSneaking() && (is.isSimilar(dm.WAYGATE_KEY) || (!is.equals(mis) && mis.isSimilar(dm.WAYGATE_KEY)))) {
+            if (!is.equals(mis))
+                event.setCancelled(true);
+            
             if (!p.hasPermission("wg.key.use"))
                 return;
 
@@ -63,7 +67,6 @@ public class PlayerListener implements Listener {
             if (gate != null) {
                 Bukkit.getPluginManager().callEvent(new WaygateInteractEvent(p, gate, a, is));
                 event.setCancelled(true);
-                return;
             }
         }
     }
@@ -80,8 +83,6 @@ public class PlayerListener implements Listener {
         BlockLocation to = new BlockLocation(e.getTo());
         if (from.equals(to))
             return;
-
-
 
         // Verify Gate
         Gate gate = gm.getGateAtLocation(to);
