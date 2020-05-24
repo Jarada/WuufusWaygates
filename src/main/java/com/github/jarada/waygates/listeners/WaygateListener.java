@@ -174,23 +174,23 @@ public class WaygateListener implements Listener {
             if (m == Material.WRITTEN_BOOK) {
                 BookMeta bm = (BookMeta) is.getItemMeta();
 
-                if (bm.hasDisplayName() || bm.hasLore())
+                if (bm == null || bm.hasDisplayName() || bm.hasLore())
                     return;
 
-                String content = "";
+                StringBuilder content = new StringBuilder();
 
                 for (int page = 1; page <= bm.getPageCount(); page++) {
-                    content += bm.getPage(page);
+                    content.append(bm.getPage(page));
 
                     if (page != bm.getPageCount())
-                        content += " ";
+                        content.append(" ");
                 }
 
                 if (content.length() > dm.WG_DESC_MAX_LENGTH)
-                    content = content.substring(0, dm.WG_DESC_MAX_LENGTH);
+                    content = new StringBuilder(content.substring(0, dm.WG_DESC_MAX_LENGTH));
 
                 player.closeInventory();
-                gate.setDescription(content);
+                gate.setDescription(content.toString());
                 Msg.GATE_DESC_UPDATED_BOOK.sendTo(player, gate.getName(), bm.getTitle());
             }  else {
                 if (is.hasItemMeta())
