@@ -29,7 +29,7 @@ public class Gate {
     private transient Network network;
     private String networkUuid;
 
-    private transient Gate destination;
+    private transient Gate destination; // TODO Redstone Activation (+ Permission for Fixed Destination)
     private String destinationUuid;
 
     private Material icon;

@@ -146,7 +146,8 @@ public class WaygateListener implements Listener {
             return;
 
         // Check Settings
-        // TODO Future: Pigman Spawn Setting
+        if (dm.WG_ZOMBIE_PIGMAN_ALLOWED)
+            return;
 
         // Cancel
         e.setCancelled(true);
