@@ -54,8 +54,6 @@ public class Gate {
         this.name = UUID.randomUUID().toString().replace("-", "").substring(0, 6);
         this.network = Network.getVoidNetwork();
         this.createdMillis = System.currentTimeMillis();
-
-        this.activeMenus = new HashSet<>();
     }
 
     /* Getters / Setters */
@@ -192,18 +190,23 @@ public class Gate {
     /* Menus */
 
     public void addActiveMenu(Menu menu) {
+        if (activeMenus == null)
+            activeMenus = new HashSet<>();
         activeMenus.add(menu);
     }
 
     public void removeActiveMenu(Menu menu) {
-        activeMenus.remove(menu);
+        if (activeMenus != null)
+            activeMenus.remove(menu);
     }
 
     public void closeActiveMenus() {
-        Iterator<Menu> activeMenuIterator = activeMenus.iterator();
+        if (activeMenus != null) {
+            Iterator<Menu> activeMenuIterator = activeMenus.iterator();
 
-        while (activeMenuIterator.hasNext())
-            activeMenuIterator.next().close();
+            while (activeMenuIterator.hasNext())
+                activeMenuIterator.next().close();
+        }
     }
 
     /* Transport */
