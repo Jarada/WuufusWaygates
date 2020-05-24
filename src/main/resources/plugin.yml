@@ -35,6 +35,7 @@
    wg.assign.gate.*:
      description: Assign flags to gates
      children:
+       wg.assign.gate.destination: true
        wg.assign.gate.private: true
        wg.assign.gate.hidden: true
    wg.assign.network.*:

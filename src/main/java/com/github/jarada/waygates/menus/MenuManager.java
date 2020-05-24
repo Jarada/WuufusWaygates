@@ -5,7 +5,6 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Network;
-import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -142,8 +141,8 @@ public class MenuManager implements Listener {
         if (currentWaygate == null)
             return;
 
-        if (currentWaygate.getDestination() != null) {
-            Gate accessGate = currentWaygate.getDestination();
+        if (currentWaygate.getFixedDestination() != null) {
+            Gate accessGate = currentWaygate.getFixedDestination();
             if (accessGate.isOwnerHidden() && !(isOwner() || canBypass())) {
                 // No Gates To Show
                 open(new WaygateGateMenu(this, player, currentWaygate, new ArrayList<>()));

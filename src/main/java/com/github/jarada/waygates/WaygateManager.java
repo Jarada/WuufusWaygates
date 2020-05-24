@@ -123,11 +123,15 @@ public class WaygateManager {
         Iterator<Gate> gateIterator = getGatesInNetwork(prevNetwork).iterator();
         while (gateIterator.hasNext()) {
             Gate toClose = gateIterator.next();
-            if (toClose.getActiveDestination().equals(gate.getExit())) {
+            if (toClose.isActive() && toClose.getActiveDestination().equals(gate.getExit())) {
                 // Close!
                 toClose.deactivate();
             }
-            // TODO Clear Fixed Destination Gates
+            if (toClose.getFixedDestination() != null && toClose.getFixedDestination() == gate) {
+                // Remove destination
+                toClose.setFixedDestination(null);
+                DataManager.getManager().saveWaygate(toClose, false);
+            }
         }
 
         // Adjust network
@@ -152,8 +156,31 @@ public class WaygateManager {
         return null;
     }
 
+    public List<Gate> getGatesNearLocation(BlockLocation blockLocation) {
+        return getGatesNearLocation(blockLocation, 3);
+    }
+
+    public List<Gate> getGatesNearLocation(BlockLocation blockLocation, final int radius) {
+        ArrayList<Gate> gates = new ArrayList<>();
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dy = -radius; dy <= radius; dy++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    BlockLocation search = new BlockLocation(blockLocation.getWorldName(),
+                            blockLocation.getX() + dx, blockLocation.getY() + dy, blockLocation.getZ() + dz);
+                    Gate gate = getGateAtLocation(search);
+                    if (gate != null && !gates.contains(gate))
+                        gates.add(gate);
+                }
+            }
+        }
+        return gates;
+    }
+
     public boolean isGateNearby(BlockLocation blockLocation) {
-        final int radius = 3;
+        return isGateNearby(blockLocation, 3);
+    }
+
+    public boolean isGateNearby(BlockLocation blockLocation, final int radius) {
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
                 for (int dz = -radius; dz <= radius; dz++) {

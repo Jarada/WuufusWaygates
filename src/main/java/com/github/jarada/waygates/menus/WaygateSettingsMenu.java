@@ -89,7 +89,9 @@ public class WaygateSettingsMenu extends Menu {
 
         addNameToMenu();
         addNetworkToMenu();
-        addDestinationToMenu();
+
+        if (p.hasPermission("wg.assign.gate.destination"))
+            addFixedDestinationToMenu();
 
         if (p.hasPermission("wg.assign.gate.private"))
             addPrivateToMenu();
@@ -114,10 +116,10 @@ public class WaygateSettingsMenu extends Menu {
         addItemToMenu(1, icon, Msg.MENU_TITLE_NETWORK.toString(), "Network", lore);
     }
 
-    void addDestinationToMenu() {
+    void addFixedDestinationToMenu() {
         List<String> lore = new ArrayList<String>();
-        if (currentWaygate.getDestination() != null)
-            lore.add(Util.color(Msg.MENU_TEXT_DESTINATION_SET.toString(Util.stripColor(currentWaygate.getDestination().getName()))));
+        if (currentWaygate.getFixedDestination() != null)
+            lore.add(Util.color(Msg.MENU_TEXT_DESTINATION_SET.toString(Util.stripColor(currentWaygate.getFixedDestination().getName()))));
         else
             lore.add(Util.color(Msg.MENU_TEXT_DESTINATION_UNSET.toString()));
         addItemToMenu(2, Material.ENDER_PEARL, Msg.MENU_TITLE_DESTINATION.toString(), "Destination", lore);

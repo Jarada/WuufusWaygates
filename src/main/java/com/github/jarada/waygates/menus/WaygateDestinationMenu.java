@@ -1,19 +1,13 @@
 package com.github.jarada.waygates.menus;
 
-import com.github.jarada.waygates.WaygateManager;
-import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
-import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 //import com.github.jarada.waygates.tasks.TeleportTask;
@@ -34,7 +28,7 @@ public class WaygateDestinationMenu extends WaygateAccessMenu {
 
                 @Override
                 public void run() {
-                    currentWaygate.setDestination(selectedGate);
+                    currentWaygate.setFixedDestination(selectedGate);
                     mm.saveUpdateToGate().openWaygateSettingsMenu();
                 }
 
@@ -54,7 +48,7 @@ public class WaygateDestinationMenu extends WaygateAccessMenu {
 
                     @Override
                     public void run() {
-                        currentWaygate.setDestination(null);
+                        currentWaygate.setFixedDestination(null);
                         mm.saveUpdateToGate().openWaygateSettingsMenu();
                     }
 
@@ -81,7 +75,7 @@ public class WaygateDestinationMenu extends WaygateAccessMenu {
             addNextToMenu();
         }
 
-        if (currentWaygate.getDestination() != null) {
+        if (currentWaygate.getFixedDestination() != null) {
             addItemToMenu(16, Material.BARRIER, Msg.MENU_TITLE_DESTINATION_CLEAR.toString(), "Clear");
         }
 

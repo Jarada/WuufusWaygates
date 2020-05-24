@@ -6,12 +6,12 @@ import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
+import com.github.jarada.waygates.types.GateActivationResult;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class WaygateListener implements Listener {
 
@@ -206,6 +207,28 @@ public class WaygateListener implements Listener {
         } else {
             Msg.NO_PERMS.sendTo(player);
         }
+    }
+
+    /* Gate Activation */
+
+    @EventHandler
+    public void onBlockRestoneChange(BlockRedstoneEvent event) {
+        BlockLocation blockLocation = new BlockLocation(event.getBlock().getLocation());
+        List<Gate> gates = gm.getGatesNearLocation(blockLocation, 1);
+
+        if (event.getNewCurrent() > 0)
+            for (Gate gate : gates) {
+                if (gate != null && gate.getFixedDestination() != null && !gate.isActive()) {
+                    DataManager dm = DataManager.getManager();
+                    WaygateManager wm = WaygateManager.getManager();
+                    GateActivationResult result = gate.activate(gate.getFixedDestination().getExit());
+
+                    if (result == GateActivationResult.RESULT_ACTIVATED)
+                        dm.saveWaygate(gate, false);
+                    else if (result == GateActivationResult.RESULT_NOT_INTACT)
+                        wm.destroyWaygate(gate);
+                }
+            }
     }
 
     /* Clearance */

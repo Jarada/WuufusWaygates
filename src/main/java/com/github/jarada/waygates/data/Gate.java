@@ -16,7 +16,6 @@ import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Gate {
 
@@ -30,7 +29,7 @@ public class Gate {
     private transient Network network;
     private String networkUuid;
 
-    private transient Gate destination; // TODO Redstone Activation (+ Permission for Fixed Destination)
+    private transient Gate destination;
     private String destinationUuid;
 
     private Material icon;
@@ -107,17 +106,17 @@ public class Gate {
         this.networkUuid = networkUuid;
     }
 
-    public Gate getDestination() {
+    public Gate getFixedDestination() {
         return destination;
     }
 
-    public void setDestination(Gate destination) {
+    public void setFixedDestination(Gate destination) {
         this.destination = destination;
     }
 
     public String getDestinationUuid() {
-        if (destinationUuid == null && getDestination() != null)
-            return getDestination().getUUID().toString();
+        if (destinationUuid == null && getFixedDestination() != null)
+            return getFixedDestination().getUUID().toString();
         return destinationUuid;
     }
 
