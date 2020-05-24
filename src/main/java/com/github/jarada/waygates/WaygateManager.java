@@ -109,11 +109,26 @@ public class WaygateManager {
     }
 
     public void changeGateNetwork(Gate gate, Network network, boolean saveNetwork) {
+        // No change needed if the networks are the same!
+        if (gate.getNetwork() == network)
+            return;
+
         // Record old network
         Network prevNetwork = gate.getNetwork();
 
         // Remove from old network
         removeFromGates(gate);
+
+        // Close gates active to this gate, network has changed
+        Iterator<Gate> gateIterator = getGatesInNetwork(prevNetwork).iterator();
+        while (gateIterator.hasNext()) {
+            Gate toClose = gateIterator.next();
+            if (toClose.getActiveDestination().equals(gate.getExit())) {
+                // Close!
+                toClose.deactivate();
+            }
+            // TODO Clear Fixed Destination Gates
+        }
 
         // Adjust network
         gate.setNetwork(network);
@@ -215,7 +230,7 @@ public class WaygateManager {
         return 0;
     }
 
-    public List<Gate> gatesInNetwork(Network network) {
+    public List<Gate> getGatesInNetwork(Network network) {
         if (this.gates.containsKey(network))
             return this.gates.get(network);
         return new ArrayList<>();
