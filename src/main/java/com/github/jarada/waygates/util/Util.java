@@ -9,6 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.metadata.Metadatable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Util {
@@ -69,6 +70,17 @@ public class Util {
 
         item.setItemMeta(meta);
         return item;
+    }
+
+    public static List<Player> getNearbyPlayers(Location loc, int distance) {
+        List<Player> res = new ArrayList<Player>();
+        int d2 = distance * distance;
+        for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+            if (p.getWorld() == loc.getWorld() && p.getLocation().distanceSquared(loc) <= d2) {
+                res.add(p);
+            }
+        }
+        return res;
     }
 
     /* Location */

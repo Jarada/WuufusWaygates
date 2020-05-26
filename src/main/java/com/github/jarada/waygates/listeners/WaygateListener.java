@@ -212,13 +212,22 @@ public class WaygateListener implements Listener {
     /* Gate Activation */
 
     @EventHandler
-    public void onBlockRestoneChange(BlockRedstoneEvent event) {
+    public void onBlockRedstoneChange(BlockRedstoneEvent event) {
         BlockLocation blockLocation = new BlockLocation(event.getBlock().getLocation());
         List<Gate> gates = gm.getGatesNearLocation(blockLocation, 1);
 
         if (event.getNewCurrent() > 0)
             for (Gate gate : gates) {
                 if (gate != null && gate.getFixedDestination() != null && !gate.isActive()) {
+                    // If gate is private or destination hidden, we only activate if the correct owners are present
+                    if (gate.isOwnerPrivate() || gate.getFixedDestination().isOwnerHidden()) {
+                        // Get list of nearby players, distance 1, to the event
+                        List<Player> nearbyPlayers = Util.getNearbyPlayers(blockLocation.getLocation(), 1);
+                        if ((gate.isOwnerPrivate() && nearbyPlayers.stream().noneMatch(o -> o.getUniqueId().equals(gate.getOwner()))) ||
+                                (gate.getFixedDestination().isOwnerHidden() && nearbyPlayers.stream().noneMatch(o -> o.getUniqueId().equals(gate.getFixedDestination().getOwner()))))
+                            return;
+                    }
+
                     DataManager dm = DataManager.getManager();
                     WaygateManager wm = WaygateManager.getManager();
                     GateActivationResult result = gate.activate(gate.getFixedDestination().getExit());
@@ -233,7 +242,7 @@ public class WaygateListener implements Listener {
 
     /* Clearance */
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public void onPlayerQuit(PlayerQuitEvent e) {
         playerLocationAtEvent.remove(e.getPlayer());
     }
