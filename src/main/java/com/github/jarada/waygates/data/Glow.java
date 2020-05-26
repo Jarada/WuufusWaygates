@@ -6,6 +6,7 @@ import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings( "deprecation" )
 public class Glow extends Enchantment {
 
     public Glow(NamespacedKey i) {
