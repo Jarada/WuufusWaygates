@@ -112,15 +112,15 @@ public class MenuManager implements Listener {
         return player.hasPermission("wg.bypass");
     }
 
-    private boolean isOwner() {
-        return currentWaygate.getOwner().equals(player.getUniqueId());
+    private boolean isOwner(Gate accessGate) {
+        return accessGate.getOwner().equals(player.getUniqueId());
     }
 
     private ArrayList<Gate> loadAccessList() {
         ArrayList<Gate> accessList = (!currentWaygate.getNetwork().isVoid() || canBypass()) ?
                 wm.getConnectedGates(currentWaygate) : new ArrayList<>();
         // Remove Hidden Gates if not owner or bypass
-        accessList.removeIf(accessGate -> accessGate.isOwnerHidden() && !(isOwner() || canBypass()));
+        accessList.removeIf(accessGate -> accessGate.isOwnerHidden() && !(isOwner(accessGate) || canBypass()));
         return accessList;
     }
 
@@ -130,7 +130,7 @@ public class MenuManager implements Listener {
 
         if (currentWaygate.getFixedDestination() != null) {
             Gate accessGate = currentWaygate.getFixedDestination();
-            if (accessGate.isOwnerHidden() && !(isOwner() || canBypass())) {
+            if (accessGate.isOwnerHidden() && !(isOwner(accessGate) || canBypass())) {
                 // No Gates To Show
                 open(new WaygateGateMenu(this, player, currentWaygate, new ArrayList<>()));
             } else {
