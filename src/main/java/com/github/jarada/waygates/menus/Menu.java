@@ -132,10 +132,9 @@ public abstract class Menu {
         if (currentWaygate.getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getOwner());
             if (owner != null) {
-                ItemStack is = Util.getHead(owner);
                 List<String> lore = new ArrayList<String>();
                 lore.add(Util.color(editable ? Msg.MENU_TEXT_EDITABLE.toString(owner.getName()) : Msg.MENU_TEXT_STANDARD.toString(owner.getName())));
-                Util.setItemNameAndLore(is, Util.color(Msg.MENU_TITLE_GATE_OWNER.toString()), lore);
+                ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_GATE_OWNER.toString()), lore);
                 setOption(9, "Owner", is);
             }
         }

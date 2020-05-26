@@ -129,10 +129,9 @@ public class WaygateNetworkManageMenu extends Menu {
         if (currentWaygate.getNetwork().getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getNetwork().getOwner());
             if (owner != null) {
-                ItemStack is = Util.getHead(owner);
                 List<String> lore = new ArrayList<String>();
                 lore.add(Util.color(Msg.MENU_TEXT_EDITABLE.toString(owner.getName())));
-                Util.setItemNameAndLore(is, Util.color(Msg.MENU_TITLE_NETWORK_OWNER.toString()), lore);
+                ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_NETWORK_OWNER.toString()), lore);
                 setOption(9, "Owner", is);
             }
         }
@@ -143,10 +142,9 @@ public class WaygateNetworkManageMenu extends Menu {
     }
 
     private void addInvitedPlayerToMenu(int slot, OfflinePlayer invitedPlayer) {
-        ItemStack is = Util.getHead(invitedPlayer);
         List<String> lore = new ArrayList<String>();
         lore.add(Msg.MENU_TEXT_EDITABLE.toString(invitedPlayer.getName()));
-        Util.setItemNameAndLore(is, Util.color(Msg.MENU_TITLE_NETWORK_INVITE_EXISTING.toString()), lore);
+        ItemStack is = Util.getHead(invitedPlayer, Util.color(Msg.MENU_TITLE_NETWORK_INVITE_EXISTING.toString()), lore);
         setOption(slot, invitedPlayer.getUniqueId().toString(), is);
         optionInvites[slot] = invitedPlayer;
     }

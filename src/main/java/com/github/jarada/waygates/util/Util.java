@@ -58,10 +58,16 @@ public class Util {
         return true;
     }
 
-    public static ItemStack getHead(OfflinePlayer player) {
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
+    public static ItemStack getHead(OfflinePlayer player, String name, List<String> lore) {
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
+
         meta.setOwningPlayer(player);
+        meta.setDisplayName(color(name));
+        if (lore != null)
+            meta.setLore(lore);
+
+        item.setItemMeta(meta);
         return item;
     }
 
