@@ -68,14 +68,7 @@ public class MenuManager implements Listener {
         if (activeMenu != null) {
             if (Arrays.equals(closeEvent.getInventory().getContents(), activeMenu.optionIcons) && player == closeEvent.getPlayer()) {
                 activeMenu.onInventoryClose(closeEvent);
-                Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        destroy();
-                    }
-
-                });
+                Bukkit.getScheduler().runTask(pm, this::destroy);
             }
         }
     }
@@ -107,6 +100,7 @@ public class MenuManager implements Listener {
 
         pm = null;
         wm = null;
+        dm = null;
         player = null;
         currentWaygate = null;
 
@@ -125,15 +119,8 @@ public class MenuManager implements Listener {
     private ArrayList<Gate> loadAccessList() {
         ArrayList<Gate> accessList = (!currentWaygate.getNetwork().isVoid() || canBypass()) ?
                 wm.getConnectedGates(currentWaygate) : new ArrayList<>();
-        Iterator<Gate> gateIterator = accessList.iterator();
-        while (gateIterator.hasNext()) {
-            Gate accessGate = gateIterator.next();
-
-            // Remove Hidden Gates if not owner or bypass
-            if (accessGate.isOwnerHidden() && !(isOwner() || canBypass()))
-                gateIterator.remove();
-
-        }
+        // Remove Hidden Gates if not owner or bypass
+        accessList.removeIf(accessGate -> accessGate.isOwnerHidden() && !(isOwner() || canBypass()));
         return accessList;
     }
 

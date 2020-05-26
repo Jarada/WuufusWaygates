@@ -7,15 +7,16 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class WaygateInteractEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean                  cancelled;
 
-    private Player p;
-    private Gate wg;
-    private Action a;
-    private ItemStack item;
+    private final Player p;
+    private final Gate wg;
+    private final Action a;
+    private final ItemStack item;
 
     public WaygateInteractEvent(Player p, Gate wg, Action a, ItemStack item) {
         this.p = p;
@@ -50,12 +51,9 @@ public class WaygateInteractEvent extends Event implements Cancellable {
         this.cancelled = cancelled;
     }
 
+    @NotNull
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

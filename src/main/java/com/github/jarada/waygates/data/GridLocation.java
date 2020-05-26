@@ -24,9 +24,7 @@ public class GridLocation extends BlockLocation {
 
     @Override
     public int hashCode() {
-        int result = 0;
-        result = super.hashCode() + (int)pitch + (int)yaw;
-        return result;
+        return super.hashCode() + (int)pitch + (int)yaw;
     }
 
     @Override

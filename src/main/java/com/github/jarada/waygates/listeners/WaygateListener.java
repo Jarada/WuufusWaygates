@@ -29,9 +29,8 @@ import java.util.List;
 
 public class WaygateListener implements Listener {
 
-    DataManager dm;
-    WaygateManager gm;
-
+    private final DataManager dm;
+    private final WaygateManager gm;
     private final HashMap<Player, Location> playerLocationAtEvent = new HashMap<>();
 
     public WaygateListener() {

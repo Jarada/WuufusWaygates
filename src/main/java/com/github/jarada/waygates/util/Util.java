@@ -28,12 +28,14 @@ public class Util {
 
     public static ItemStack setItemNameAndLore(ItemStack item, String name, List<String> lore) {
         ItemMeta im = item.getItemMeta();
-        im.setDisplayName(color(name));
+        if (im != null) {
+            im.setDisplayName(color(name));
 
-        if (lore != null)
-            im.setLore(lore);
+            if (lore != null)
+                im.setLore(lore);
 
-        item.setItemMeta(im);
+            item.setItemMeta(im);
+        }
         return item;
     }
 
@@ -55,25 +57,24 @@ public class Util {
 
     public static boolean isPlayer(Object object) {
         if (!(object instanceof Player)) return false;
-        if (isNpc(object)) return false;
-        return true;
+        return !isNpc(object);
     }
 
     public static ItemStack getHead(OfflinePlayer player, String name, List<String> lore) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-
-        meta.setOwningPlayer(player);
-        meta.setDisplayName(color(name));
-        if (lore != null)
-            meta.setLore(lore);
-
-        item.setItemMeta(meta);
+        if (meta != null) {
+            meta.setOwningPlayer(player);
+            meta.setDisplayName(color(name));
+            if (lore != null)
+                meta.setLore(lore);
+            item.setItemMeta(meta);
+        }
         return item;
     }
 
     public static List<Player> getNearbyPlayers(Location loc, int distance) {
-        List<Player> res = new ArrayList<Player>();
+        List<Player> res = new ArrayList<>();
         int d2 = distance * distance;
         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
             if (p.getWorld() == loc.getWorld() && p.getLocation().distanceSquared(loc) <= d2) {
@@ -95,20 +96,27 @@ public class Util {
     }
 
     public static void playEffect(Location loc, Effect effect) {
-        loc.getWorld().playEffect(loc, effect, 0);
+        World world = loc.getWorld();
+        if (world != null)
+            world.playEffect(loc, effect, 0);
     }
 
     public static void playParticle(Location loc, Particle particle, int count) {
-        if (particle == Particle.REDSTONE) {
-            Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
-            loc.getWorld().spawnParticle(particle, loc, count, 0, 0, 0, 0, dustOptions);
-        } else {
-            loc.getWorld().spawnParticle(particle, loc, count);
+        World world = loc.getWorld();
+        if (world != null) {
+            if (particle == Particle.REDSTONE) {
+                Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
+                world.spawnParticle(particle, loc, count, 0, 0, 0, 0, dustOptions);
+            } else {
+                world.spawnParticle(particle, loc, count);
+            }
         }
     }
 
     public static void playSound(Location loc, Sound sound) {
-        loc.getWorld().playSound(loc, sound, 10F, 1F);
+        World world = loc.getWorld();
+        if (world != null)
+            world.playSound(loc, sound, 10F, 1F);
     }
     
     /* Key */

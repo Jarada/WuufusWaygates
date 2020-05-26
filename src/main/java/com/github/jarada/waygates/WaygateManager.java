@@ -16,13 +16,13 @@ import java.util.*;
 
 public class WaygateManager {
 
-    private static WaygateManager       gm;
-    private PluginMain                  pm;
+    private static WaygateManager             gm;
+    private final PluginMain                  pm;
 
-    private Map<Network, List<Gate>>    gates;
-    private Map<BlockLocation, Gate>    locationGateMap;
-    private Map<String, List<Gate>>     worldGateMap;
-    private List<String>                worldDeletion;
+    private final Map<Network, List<Gate>>    gates;
+    private final Map<BlockLocation, Gate>    locationGateMap;
+    private final Map<String, List<Gate>>     worldGateMap;
+    private final List<String>                worldDeletion;
 
     public WaygateManager() {
         pm = PluginMain.getPluginInstance();
@@ -120,9 +120,7 @@ public class WaygateManager {
         removeFromGates(gate);
 
         // Close gates active to this gate, network has changed
-        Iterator<Gate> gateIterator = getGatesInNetwork(prevNetwork).iterator();
-        while (gateIterator.hasNext()) {
-            Gate toClose = gateIterator.next();
+        for (Gate toClose : getGatesInNetwork(prevNetwork)) {
             if (toClose.isActive() && toClose.getActiveDestination().equals(gate.getExit())) {
                 // Close!
                 toClose.deactivate();
@@ -156,6 +154,7 @@ public class WaygateManager {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public List<Gate> getGatesNearLocation(BlockLocation blockLocation) {
         return getGatesNearLocation(blockLocation, 3);
     }
@@ -203,7 +202,7 @@ public class WaygateManager {
     }
 
     public ArrayList<Gate> getAllGatesInWorld(String worldName, boolean accurate) {
-        ArrayList<Gate> gates = new ArrayList<Gate>();
+        ArrayList<Gate> gates = new ArrayList<>();
         if (accurate && worldGateMap.containsKey(worldName)) {
             gates.addAll(worldGateMap.get(worldName));
         } else if (!accurate) {
@@ -217,7 +216,7 @@ public class WaygateManager {
     }
 
     public ArrayList<Gate> getAllGates() {
-        ArrayList<Gate> gates = new ArrayList<Gate>();
+        ArrayList<Gate> gates = new ArrayList<>();
         for (List<Gate> networkGates : this.gates.values()) {
             gates.addAll(networkGates);
         }

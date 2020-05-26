@@ -3,7 +3,6 @@ package com.github.jarada.waygates.listeners;
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.callbacks.ChatCallback;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -14,19 +13,15 @@ public class ChatListener implements Listener {
 
     private PluginMain pm;
     private ChatCallback chatCallback;
-    private BukkitTask timeout;
+    private final BukkitTask timeout;
 
     public ChatListener(ChatCallback chatCallback) {
         this.pm = PluginMain.getPluginInstance();
         this.chatCallback = chatCallback;
         Bukkit.getPluginManager().registerEvents(this, pm);
 
-        timeout = Bukkit.getScheduler().runTaskLater(pm, new Runnable() {
-            @Override
-            public void run() {
-                destroy();
-            }
-        }, 600L); // 20L is 1 second, we give 30s
+        // 20L is 1 second, we give 30s
+        timeout = Bukkit.getScheduler().runTaskLater(pm, this::destroy, 600L);
     }
 
     @EventHandler
@@ -46,12 +41,7 @@ public class ChatListener implements Listener {
             }
 
             // Destroy
-            Bukkit.getScheduler().scheduleSyncDelayedTask(pm, new Runnable() {
-                @Override
-                public void run() {
-                    destroy();
-                }
-            }, 20L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(pm, this::destroy, 20L);
         }
     }
 

@@ -15,10 +15,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class PluginMain extends JavaPlugin {
 
@@ -41,7 +43,11 @@ public class PluginMain extends JavaPlugin {
         commands.put("list", new WGListCmd());
         commands.put("reload", new WGReloadCmd());
 
-        getCommand("wg").setExecutor(this);
+        try {
+            Objects.requireNonNull(getCommand("wg")).setExecutor(this);
+        } catch (NullPointerException ignored) {
+            getLogger().warning("Unable to register commands; no commands available!");
+        }
         getServer().getPluginManager().registerEvents(new WaygateKeyListener(), this);
         getServer().getPluginManager().registerEvents(new WaygateListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
@@ -57,7 +63,7 @@ public class PluginMain extends JavaPlugin {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, Command command, @NotNull String label, @NotNull String[] args) {
         String cmd = command.getName().toLowerCase();
         PluginCommand pluginCmd = null;
         String[] param = null;

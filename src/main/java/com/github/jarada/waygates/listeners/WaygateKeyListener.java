@@ -24,18 +24,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.Iterator;
-
 public class WaygateKeyListener implements Listener {
-
-    private static WaygateKeyListener listener;
-
-    public static WaygateKeyListener getListener() {
-        if (listener == null)
-            listener = new WaygateKeyListener();
-
-        return listener;
-    }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onWaygateKeyUse(WaygateKeyUseEvent useEvent) {
@@ -89,11 +78,7 @@ public class WaygateKeyListener implements Listener {
         DataManager dm = DataManager.getManager();
 
         if (dm.WG_KEY_PERMANENT && deathEvent.getEntity().hasPermission("wg.key.permanent")) {
-            Iterator<ItemStack> it = deathEvent.getDrops().iterator();
-
-            while (it.hasNext())
-                if (it.next().isSimilar(dm.WAYGATE_KEY))
-                    it.remove();
+            deathEvent.getDrops().removeIf(itemStack -> itemStack.isSimilar(dm.WAYGATE_KEY));
         }
     }
 

@@ -40,24 +40,16 @@ public class WGDeleteCmd implements PluginCommand {
         final String actualWorldName = worldName;
         if (confirm && wm.isWorldAwaitingDeletion(worldName)) {
             Msg.DELETE_WORLD_ACTION.sendTo(sender, gates.size(), actualWorldName);
-            Bukkit.getScheduler().runTaskAsynchronously(PluginMain.getPluginInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    for (Gate gate : gates) {
-                        wm.destroyWaygate(gate);
-                    }
-                    Msg.DELETE_WORLD_COMPLETED.sendTo(sender, actualWorldName);
+            Bukkit.getScheduler().runTaskAsynchronously(PluginMain.getPluginInstance(), () -> {
+                for (Gate gate : gates) {
+                    wm.destroyWaygate(gate);
                 }
+                Msg.DELETE_WORLD_COMPLETED.sendTo(sender, actualWorldName);
             });
         } else {
             Msg.DELETE_WORLD_WARNING.sendTo(sender, gates.size(), actualWorldName, actualWorldName);
             wm.setWorldForDeletion(worldName);
-            Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    wm.clearWorldForDeletion(actualWorldName);
-                }
-            }, 400L);
+            Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), () -> wm.clearWorldForDeletion(actualWorldName), 400L);
         }
     }
 

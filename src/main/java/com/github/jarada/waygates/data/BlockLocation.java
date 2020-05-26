@@ -1,6 +1,5 @@
 package com.github.jarada.waygates.data;
 
-import com.google.gson.annotations.Expose;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,21 +13,8 @@ public class BlockLocation {
         setLocation(loc);
     }
 
-    public BlockLocation(int x, int y, int z) {
-        setX(x);
-        setY(y);
-        setZ(z);
-    }
-
     public BlockLocation(String worldName, int x, int y, int z) {
         setWorldName(worldName);
-        setX(x);
-        setY(y);
-        setZ(z);
-    }
-
-    public BlockLocation(World world, int x, int y, int z) {
-        setWorld(world);
         setX(x);
         setY(y);
         setZ(z);
@@ -88,8 +74,7 @@ public class BlockLocation {
 
     @Override
     public int hashCode() {
-        int result = 0;
-        result = (int)x + (int)y + (int)z;
+        int result = x + y + z;
         result += (worldName != null) ? worldName.hashCode() : 0;
         return result;
     }

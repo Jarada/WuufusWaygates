@@ -23,45 +23,28 @@ public class WaygateGateMenu extends WaygateAccessMenu {
 
         if (optionWaygates[slot] != null) {
             Gate selectedGate = optionWaygates[slot];
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    if (currentWaygate.isActive())
-                        currentWaygate.deactivate();
-                    GateActivationResult result = currentWaygate.activate(selectedGate.getExit());
-                    if (result == GateActivationResult.RESULT_ACTIVATED)
-                        mm.saveUpdateToGate();
-                    p.closeInventory();
-                    if (result == GateActivationResult.RESULT_NOT_INTACT) {
-                        WaygateManager.getManager().destroyWaygate(p, currentWaygate,
-                                new BlockLocation(currentWaygate.getCenterBlock().getLocation()));
-                    } else if (result == GateActivationResult.RESULT_NOT_FOUND) {
-                        Msg.GATE_EXIT_FAILURE.sendTo(p);
-                    }
+            Bukkit.getScheduler().runTask(pm, () -> {
+                if (currentWaygate.isActive())
+                    currentWaygate.deactivate();
+                GateActivationResult result = currentWaygate.activate(selectedGate.getExit());
+                if (result == GateActivationResult.RESULT_ACTIVATED)
+                    mm.saveUpdateToGate();
+                p.closeInventory();
+                if (result == GateActivationResult.RESULT_NOT_INTACT) {
+                    WaygateManager.getManager().destroyWaygate(p, currentWaygate,
+                            new BlockLocation(currentWaygate.getCenterBlock().getLocation()));
+                } else if (result == GateActivationResult.RESULT_NOT_FOUND) {
+                    Msg.GATE_EXIT_FAILURE.sendTo(p);
                 }
-
             });
         } else {
             if (optionNames[slot].equals("Settings")) {
-                Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        mm.openWaygateSettingsMenu();
-                    }
-
-                });
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateSettingsMenu());
             } else if (optionNames[slot].equals("Close")) {
-                Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (currentWaygate.isActive())
-                            currentWaygate.deactivate();
-                        mm.close();
-                    }
-
+                Bukkit.getScheduler().runTask(pm, () -> {
+                    if (currentWaygate.isActive())
+                        currentWaygate.deactivate();
+                    mm.close();
                 });
             } else {
                 super.onInventoryClick(clickEvent);

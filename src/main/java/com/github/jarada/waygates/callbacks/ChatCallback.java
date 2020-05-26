@@ -5,8 +5,8 @@ import org.bukkit.entity.Player;
 
 public abstract class ChatCallback {
 
-    private Player player;
-    private Gate currentWaygate;
+    private final Player player;
+    private final Gate currentWaygate;
 
     public ChatCallback(Player player, Gate currentWaygate) {
         this.player = player;

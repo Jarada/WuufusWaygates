@@ -24,34 +24,17 @@ public class WaygateDestinationMenu extends WaygateAccessMenu {
 
         if (optionWaygates[slot] != null) {
             Gate selectedGate = optionWaygates[slot];
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    currentWaygate.setFixedDestination(selectedGate);
-                    mm.saveUpdateToGate().openWaygateSettingsMenu();
-                }
-
+            Bukkit.getScheduler().runTask(pm, () -> {
+                currentWaygate.setFixedDestination(selectedGate);
+                mm.saveUpdateToGate().openWaygateSettingsMenu();
             });
         } else {
             if (optionNames[slot].equals("Close")) {
-                Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        mm.openWaygateSettingsMenu();
-                    }
-
-                });
+                Bukkit.getScheduler().runTask(pm, mm::openWaygateSettingsMenu);
             } else if (optionNames[slot].equals("Clear")) {
-                Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        currentWaygate.setFixedDestination(null);
-                        mm.saveUpdateToGate().openWaygateSettingsMenu();
-                    }
-
+                Bukkit.getScheduler().runTask(pm, () -> {
+                    currentWaygate.setFixedDestination(null);
+                    mm.saveUpdateToGate().openWaygateSettingsMenu();
                 });
             } else {
                 super.onInventoryClick(clickEvent);

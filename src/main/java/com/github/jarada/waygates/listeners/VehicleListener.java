@@ -16,8 +16,8 @@ import java.util.List;
 
 public class VehicleListener implements Listener {
 
-    DataManager dm;
-    WaygateManager gm;
+    private final DataManager dm;
+    private final WaygateManager gm;
 
     public VehicleListener() {
         dm = DataManager.getManager();

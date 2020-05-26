@@ -34,6 +34,7 @@ public class Network {
     private NetworkType          networkType;
     private List<UUID>           invitedUsers;
 
+    @SuppressWarnings("unused")
     public Network(String name) {
         this(name, NetworkType.GLOBAL);
     }
@@ -114,7 +115,7 @@ public class Network {
     }
 
     public static List<Network> systemNetworks() {
-        return new ArrayList<Network>(
+        return new ArrayList<>(
                 Arrays.asList(getVoidNetwork(), getOverworldNetwork(), getOceanNetwork(),
                         getNetherNetwork(), getUnderworldNetwork(), getTheEndNetwork())
         );
@@ -160,6 +161,13 @@ public class Network {
         return icon;
     }
 
+    private void prepareInvitedUsers() {
+        if (invitedUsers == null)
+            invitedUsers = new ArrayList<>();
+        else if (invitedUsers.size() == 0)
+            invitedUsers = null;
+    }
+
     public List<UUID> getInvitedUsers() {
         if (invitedUsers == null)
             return new ArrayList<>();
@@ -167,15 +175,19 @@ public class Network {
     }
 
     public void addInvitedUser(UUID invite) {
+        prepareInvitedUsers();
         invitedUsers.add(invite);
     }
 
     public void removeInvitedUser(UUID invite) {
-        invitedUsers.remove(invite);
+        if (invitedUsers != null) {
+            invitedUsers.remove(invite);
+            prepareInvitedUsers();
+        }
     }
 
     public boolean isInvitedUser(UUID invite) {
-        return getOwner().equals(invite) || invitedUsers.contains(invite);
+        return getOwner().equals(invite) || (invitedUsers != null && invitedUsers.contains(invite));
     }
 
     public boolean isNetworkPrivate() {

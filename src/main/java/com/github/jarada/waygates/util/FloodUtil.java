@@ -1,7 +1,6 @@
 package com.github.jarada.waygates.util;
 
 import com.github.jarada.waygates.types.GateOrientation;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -13,9 +12,9 @@ import java.util.Set;
 public class FloodUtil {
 
     public static Map.Entry<GateOrientation, Set<Block>> getFloodInfo(Block startBlock, int maxarea) {
-        GateOrientation gateOrientation = null;
-        Set<Block> blocksNS = getFloodBlocks(startBlock, new HashSet<Block>(), GateOrientation.NS.getExpandFaces(), maxarea);
-        Set<Block> blocksWE = getFloodBlocks(startBlock, new HashSet<Block>(), GateOrientation.WE.getExpandFaces(), maxarea);
+        GateOrientation gateOrientation;
+        Set<Block> blocksNS = getFloodBlocks(startBlock, new HashSet<>(), GateOrientation.NS.getExpandFaces(), maxarea);
+        Set<Block> blocksWE = getFloodBlocks(startBlock, new HashSet<>(), GateOrientation.WE.getExpandFaces(), maxarea);
 
         // OK, what direction are we facing?
         Set<Block> blocks;

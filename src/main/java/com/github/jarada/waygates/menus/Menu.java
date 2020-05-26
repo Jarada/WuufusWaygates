@@ -76,7 +76,7 @@ public abstract class Menu {
 
     boolean verifyInventoryClick(InventoryClickEvent clickEvent) {
         if (!Arrays.equals(clickEvent.getInventory().getContents(), optionIcons)
-                || p != (Player) clickEvent.getWhoClicked())
+                || p != clickEvent.getWhoClicked())
             return false;
 
         if (!clickEvent.isCancelled())
@@ -87,25 +87,16 @@ public abstract class Menu {
 
         final int slot = clickEvent.getRawSlot();
 
-        if (slot < 0 || slot >= size || optionNames[slot] == null)
-            return false;
-
-        return true;
+        return slot >= 0 && slot < size && optionNames[slot] != null;
     }
 
+    @SuppressWarnings("unused")
     void onInventoryClose(InventoryCloseEvent closeEvent) {
-        Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-            @Override
-            public void run() {
-                destroy();
-            }
-
-        });
+        Bukkit.getScheduler().runTask(pm, this::destroy);
     }
 
     public void close() {
-        if (p.getInventory().getContents().equals(optionIcons)) {
+        if (Arrays.equals(p.getInventory().getContents(), optionIcons)) {
             p.closeInventory();
         }
     }
@@ -131,12 +122,10 @@ public abstract class Menu {
     void addGateOwnerToMenu(boolean editable) {
         if (currentWaygate.getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getOwner());
-            if (owner != null) {
-                List<String> lore = new ArrayList<String>();
-                lore.add(Util.color(editable ? Msg.MENU_TEXT_EDITABLE.toString(owner.getName()) : Msg.MENU_TEXT_STANDARD.toString(owner.getName())));
-                ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_GATE_OWNER.toString()), lore);
-                setOption(9, "Owner", is);
-            }
+            List<String> lore = new ArrayList<>();
+            lore.add(Util.color(editable ? Msg.MENU_TEXT_EDITABLE.toString(owner.getName()) : Msg.MENU_TEXT_STANDARD.toString(owner.getName())));
+            ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_GATE_OWNER.toString()), lore);
+            setOption(9, "Owner", is);
         }
     }
 
@@ -146,7 +135,7 @@ public abstract class Menu {
                 Msg.MENU_COLOR_NETWORK.toString() + Util.stripColor(nw.getName());
         int gateCount = WaygateManager.getManager().countOfGatesInNetwork(p, nw, false);
 
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         if (nw.isSystem()) {
             if (nw.equals(Network.getVoidNetwork()))
                 lore.add(Util.color(Msg.NETWORK_SYSTEM_VOID.toString()));
@@ -213,15 +202,14 @@ public abstract class Menu {
 
 
 
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         if (loc.getWorld() != null)
             lore.add(Util.color(Msg.MENU_LORE_GATE_1.toString(loc.getWorld().getName())));
         else
             lore.add(Util.color(Msg.MENU_LORE_GATE_1.toString(Msg.MENU_TEXT_WORLD_NOT_FOUND.toString())));
         if (gate.getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(gate.getOwner());
-            if (owner != null)
-                lore.add(Util.color(Msg.MENU_LORE_GATE_2.toString(owner.getName())));
+            lore.add(Util.color(Msg.MENU_LORE_GATE_2.toString(owner.getName())));
         }
         lore.add(Util.color(Msg.MENU_LORE_GATE_3.toString(loc.getBlockX())));
         lore.add(Util.color(Msg.MENU_LORE_GATE_4.toString(loc.getBlockY())));

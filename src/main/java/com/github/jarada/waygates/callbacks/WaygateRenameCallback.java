@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public class WaygateRenameCallback extends ChatCallback {
 
-    private String oldName;
+    private final String oldName;
 
     public WaygateRenameCallback(Player player, Gate currentWaygate) {
         super(player, currentWaygate);

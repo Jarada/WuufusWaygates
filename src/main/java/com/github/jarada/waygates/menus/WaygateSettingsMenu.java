@@ -24,62 +24,38 @@ public class WaygateSettingsMenu extends Menu {
     void onInventoryClick(InventoryClickEvent clickEvent) {
         final int slot = clickEvent.getRawSlot();
 
-        if (optionNames[slot].equals("Close")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    mm.openWaygateMenu();
-                }
-
-            });
-        } else if (optionNames[slot].equals("Name")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
+        switch (optionNames[slot]) {
+            case "Close":
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateMenu());
+                break;
+            case "Name":
+                Bukkit.getScheduler().runTask(pm, () -> {
                     p.closeInventory();
                     new ChatListener(new WaygateRenameCallback(p, currentWaygate));
-                }
-
-            });
-        } else if (optionNames[slot].equals("Owner")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
+                });
+                break;
+            case "Owner":
+                Bukkit.getScheduler().runTask(pm, () -> {
                     p.closeInventory();
                     new ChatListener(new WaygateOwnerChangeCallback(p, currentWaygate));
+                });
+                break;
+            case "Network":
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateNetworkMenu());
+                break;
+            case "Destination":
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateDestinationMenu());
+                break;
+            default:
+                if (optionNames[slot].equals("Private")) {
+                    currentWaygate.setOwnerPrivate(!currentWaygate.isOwnerPrivate());
+                    mm.saveUpdateToGate();
+                } else if (optionNames[slot].equals("Hidden")) {
+                    currentWaygate.setOwnerHidden(!currentWaygate.isOwnerHidden());
+                    mm.saveUpdateToGate();
                 }
-
-            });
-        } else if (optionNames[slot].equals("Network")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    mm.openWaygateNetworkMenu();
-                }
-
-            });
-        } else if (optionNames[slot].equals("Destination")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    mm.openWaygateDestinationMenu();
-                }
-
-            });
-        } else {
-            if (optionNames[slot].equals("Private")) {
-                currentWaygate.setOwnerPrivate(!currentWaygate.isOwnerPrivate());
-                mm.saveUpdateToGate();
-            } else if (optionNames[slot].equals("Hidden")) {
-                currentWaygate.setOwnerHidden(!currentWaygate.isOwnerHidden());
-                mm.saveUpdateToGate();
-            }
-            super.onInventoryClick(clickEvent);
+                super.onInventoryClick(clickEvent);
+                break;
         }
     }
 
@@ -104,20 +80,20 @@ public class WaygateSettingsMenu extends Menu {
     }
 
     void addNameToMenu() {
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         lore.add(Util.color(Msg.MENU_TEXT_EDITABLE.toString(Util.stripColor(currentWaygate.getName()))));
         addItemToMenu(0, Material.NAME_TAG, Msg.MENU_TITLE_NAME.toString(), "Name", lore);
     }
 
     void addNetworkToMenu() {
         Material icon = currentWaygate.getNetwork().getIcon();
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         lore.add(Util.color(Msg.MENU_TEXT_EDITABLE.toString(Util.stripColor(currentWaygate.getNetwork().getName()))));
         addItemToMenu(1, icon, Msg.MENU_TITLE_NETWORK.toString(), "Network", lore);
     }
 
     void addFixedDestinationToMenu() {
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         if (currentWaygate.getFixedDestination() != null)
             lore.add(Util.color(Msg.MENU_TEXT_DESTINATION_SET.toString(Util.stripColor(currentWaygate.getFixedDestination().getName()))));
         else
@@ -126,7 +102,7 @@ public class WaygateSettingsMenu extends Menu {
     }
 
     void addPrivateToMenu() {
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         lore.add(Util.color(currentWaygate.isOwnerPrivate() ? Msg.MENU_TEXT_PRIVATE_SET.toString() :
                 Msg.MENU_TEXT_PRIVATE_UNSET.toString()));
         Msg[] privateLore = {Msg.MENU_LORE_PRIVATE_1, Msg.MENU_LORE_PRIVATE_2, Msg.MENU_LORE_PRIVATE_3};
@@ -137,7 +113,7 @@ public class WaygateSettingsMenu extends Menu {
     }
 
     void addHiddenToMenu() {
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         lore.add(Util.color(currentWaygate.isOwnerHidden() ? Msg.MENU_TEXT_HIDDEN_SET.toString() :
                 Msg.MENU_TEXT_HIDDEN_UNSET.toString()));
         Msg[] hiddenLore = {Msg.MENU_LORE_HIDDEN_1, Msg.MENU_LORE_HIDDEN_2, Msg.MENU_LORE_HIDDEN_3};

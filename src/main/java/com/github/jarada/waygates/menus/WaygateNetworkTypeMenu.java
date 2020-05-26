@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class WaygateNetworkTypeMenu extends Menu {
 
-    private String name;
+    private final String name;
 
     WaygateNetworkTypeMenu(MenuManager mm, Player p, Gate currentWaygate, String name) {
         super(mm, p, currentWaygate);
@@ -25,14 +25,7 @@ public class WaygateNetworkTypeMenu extends Menu {
         final int slot = clickEvent.getRawSlot();
 
         if (optionNames[slot].equals("Close")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    mm.openWaygateNetworkMenu();
-                }
-
-            });
+            Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateNetworkMenu());
         } else if (optionNames[slot].matches("Private|Invite|Global")) {
             // We have one of the network types
             NetworkType type = NetworkType.GLOBAL;
@@ -44,31 +37,16 @@ public class WaygateNetworkTypeMenu extends Menu {
             if (mm.isNetworkNameUnique(name)) {
                 Network network = new Network(name, type);
                 network.setOwner(p.getUniqueId());
-                Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        WaygateManager.getManager().changeGateNetwork(currentWaygate, network, true);
-                        mm.openWaygateSettingsMenu();
-                    }
-
+                Bukkit.getScheduler().runTask(pm, () -> {
+                    WaygateManager.getManager().changeGateNetwork(currentWaygate, network, true);
+                    mm.openWaygateSettingsMenu();
                 });
             } else {
-                Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                    @Override
-                    public void run() {
-                        p.closeInventory();
-                        Msg.NETWORK_CREATE_GLOBAL_UNIQUE.sendTo(p);
-                    }
-
+                Bukkit.getScheduler().runTask(pm, () -> {
+                    p.closeInventory();
+                    Msg.NETWORK_CREATE_GLOBAL_UNIQUE.sendTo(p);
                 });
-                Bukkit.getScheduler().runTaskLater(pm, new Runnable() {
-                    @Override
-                    public void run() {
-                        new MenuManager(p, currentWaygate).openWaygateSettingsMenu();
-                    }
-                }, 40L);
+                Bukkit.getScheduler().runTaskLater(pm, () -> new MenuManager(p, currentWaygate).openWaygateSettingsMenu(), 40L);
             }
         }
         super.onInventoryClick(clickEvent);
@@ -79,7 +57,7 @@ public class WaygateNetworkTypeMenu extends Menu {
         initMenu();
 
         // Add Private Gate Type
-        addPrivateToMenu(0);
+        addPrivateToMenu();
 
         int index = 1;
         // Add Invite Gate Type
@@ -96,8 +74,8 @@ public class WaygateNetworkTypeMenu extends Menu {
         addCancelToMenu();
     }
 
-    private void addPrivateToMenu(int index) {
-        addItemToMenu(index, Material.RAIL, Msg.MENU_TITLE_NETWORK_TYPE_PRIVATE.toString(), "Private");
+    private void addPrivateToMenu() {
+        addItemToMenu(0, Material.RAIL, Msg.MENU_TITLE_NETWORK_TYPE_PRIVATE.toString(), "Private");
     }
 
     private void addInviteToMenu(int index) {

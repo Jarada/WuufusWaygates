@@ -21,17 +21,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings({"ResultOfMethodCallIgnored", "rawtypes"})
 public class DataManager {
 
     private static final String WORLDS_FOLDER_FILENAME = "worlds";
     private static final String NETWORKS_FOLDER_FILENAME = "networks";
 
     private static DataManager          dm;
-    private PluginMain                  pm;
-    private WaygateManager              wm;
+    private final PluginMain            pm;
+    private final WaygateManager        wm;
 
-    private File                        worldsFolder, networksFolder;
-    private Map<Msg, String>            messages;
+    private final File                  worldsFolder;
+    private final File                  networksFolder;
+    private final Map<Msg, String>      messages;
 
     public ItemStack                    WAYGATE_CONSTRUCTOR;
     public ItemStack                    WAYGATE_KEY;
@@ -49,7 +51,7 @@ public class DataManager {
         pm = PluginMain.getPluginInstance();
         wm = WaygateManager.getManager();
 
-        messages = new HashMap<Msg, String>();
+        messages = new HashMap<>();
         worldsFolder = new File(pm.getDataFolder(), WORLDS_FOLDER_FILENAME);
         networksFolder = new File(pm.getDataFolder(), NETWORKS_FOLDER_FILENAME);
     }
@@ -87,9 +89,9 @@ public class DataManager {
 
         BLOCKS_REQUIRED = new ArrayList<>();
         try {
-            for (String group : config.getConfigurationSection("Waygates.BLOCKS_REQUIRED").getKeys(false)) {
+            for (String group : Objects.requireNonNull(config.getConfigurationSection("Waygates.BLOCKS_REQUIRED")).getKeys(false)) {
                 HashMap<String, Integer> requirement = new HashMap<>();
-                for (String inv : config.getConfigurationSection("Waygates.BLOCKS_REQUIRED." + group).getKeys(false)) {
+                for (String inv : Objects.requireNonNull(config.getConfigurationSection("Waygates.BLOCKS_REQUIRED." + group)).getKeys(false)) {
                     requirement.put(inv, config.getInt("Waygates.BLOCKS_REQUIRED." + group + "." + inv));
                 }
                 BLOCKS_REQUIRED.add(requirement);
@@ -106,7 +108,7 @@ public class DataManager {
             registerGlow();
             Glow glow = new Glow(new NamespacedKey(pm, "waygateglow"));
 
-            List<String> lore = new ArrayList<String>();
+            List<String> lore = new ArrayList<>();
             Msg[] constructorLore = {Msg.LORE_CONSTRUCTOR_1, Msg.LORE_CONSTRUCTOR_2, Msg.LORE_CONSTRUCTOR_3, Msg.LORE_CONSTRUCTOR_4};
             for (Msg msg : constructorLore)
                 if (msg.toString().length() > 0)
@@ -269,6 +271,7 @@ public class DataManager {
 
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean saveWaygate(Gate gate, boolean saveNetwork) {
         String world = gate.getExit().getWorldName();
         File worldFolder = new File(worldsFolder, Util.getKey(world));
@@ -290,6 +293,7 @@ public class DataManager {
         return saveData(networksFolder, network.getUUID(), network.toJson());
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean deleteWaygate(Gate gate, boolean deleteNetwork) {
         boolean success = true;
         String world = gate.getExit().getWorldName();
@@ -297,7 +301,7 @@ public class DataManager {
         if (worldFolder.exists()) {
             success = new File(worldFolder, String.format("%s.json", gate.getUUID())).delete();
             try {
-                if (worldFolder.list().length == 0) {
+                if (Objects.requireNonNull(worldFolder.list()).length == 0) {
                     worldFolder.delete();
                 }
             } catch (Exception e) {
@@ -330,12 +334,9 @@ public class DataManager {
 
             if (dataFile.exists()) {
                 try {
-                    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(dataFile), Charsets.UTF_8);
 
-                    try {
+                    try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(dataFile), Charsets.UTF_8)) {
                         writer.write(data);
-                    } finally {
-                        writer.close();
                     }
                     return true;
                 } catch (IOException e) {
@@ -347,9 +348,7 @@ public class DataManager {
     }
 
     private String loadData(File file) throws IOException {
-        String content = "";
-        content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
-        return content;
+        return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
     }
 
     static class JSONFilenameFilter implements FilenameFilter {

@@ -34,11 +34,13 @@ public class Gate {
 
     private Material icon;
     private boolean ownerPrivate, ownerHidden;
-    private long createdMillis, activatedMillis, usedMillis;
+    private final long createdMillis;
+    private long activatedMillis;
+    private long usedMillis;
 
-    private BlockLocation start;
-    private GridLocation exit;
-    private Set<BlockLocation> coords;
+    private final BlockLocation start;
+    private final GridLocation exit;
+    private final Set<BlockLocation> coords;
 
     private transient Set<Menu> activeMenus;
     private transient GridLocation activeDestination;
@@ -102,6 +104,7 @@ public class Gate {
         return networkUuid;
     }
 
+    @SuppressWarnings("unused")
     public void setNetworkUuid(String networkUuid) {
         this.networkUuid = networkUuid;
     }
@@ -120,6 +123,7 @@ public class Gate {
         return destinationUuid;
     }
 
+    @SuppressWarnings("unused")
     public void setDestinationUuid(String destinationUuid) {
         this.destinationUuid = destinationUuid;
     }
@@ -150,18 +154,22 @@ public class Gate {
         this.ownerHidden = ownerHidden;
     }
 
+    @SuppressWarnings("unused")
     public long getCreatedMillis() {
         return createdMillis;
     }
 
+    @SuppressWarnings("unused")
     public long getActivatedMillis() {
         return activatedMillis;
     }
 
+    @SuppressWarnings("unused")
     public long getUsedMillis() {
         return usedMillis;
     }
 
+    @SuppressWarnings("unused")
     public BlockLocation getStart() {
         return start;
     }
@@ -182,6 +190,7 @@ public class Gate {
         return exit.getWorldName();
     }
 
+    @SuppressWarnings("unused")
     public World getWorld() {
         return exit.getWorld();
     }
@@ -201,10 +210,8 @@ public class Gate {
 
     public void closeActiveMenus() {
         if (activeMenus != null) {
-            Iterator<Menu> activeMenuIterator = activeMenus.iterator();
-
-            while (activeMenuIterator.hasNext())
-                activeMenuIterator.next().close();
+            for (Menu activeMenu : activeMenus)
+                activeMenu.close();
         }
     }
 
@@ -226,15 +233,10 @@ public class Gate {
         open();
 
         long activationTime = 20 * DataManager.getManager().WG_GATE_ACTIVATION_TIME;
-        activeTask = Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), new Runnable() {
-
-            @Override
-            public void run() {
-                activeTask = null;
-                activeDestination = null;
-                close();
-            }
-
+        activeTask = Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), () -> {
+            activeTask = null;
+            activeDestination = null;
+            close();
         }, activationTime);
         return GateActivationResult.RESULT_ACTIVATED;
     }
@@ -291,12 +293,7 @@ public class Gate {
             if (!(vehicle instanceof Player)) {
                 vehicle.teleport(to.getLocation());
                 vehicle.setFireTicks(0);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), new Runnable() {
-                    @Override
-                    public void run() {
-                        vehicle.addPassenger(p);
-                    }
-                }, 2L);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> vehicle.addPassenger(p), 2L);
 
             }
         } else {
@@ -353,21 +350,15 @@ public class Gate {
         if (!(vehicle instanceof Player)) {
             vehicle.teleport(to.getLocation());
             vehicle.setFireTicks(0);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    for (Entity passenger : passengers) {
-                        passenger.teleport(to.getLocation());
-                        passenger.setFireTicks(0);
-                    }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> {
+                for (Entity passenger : passengers) {
+                    passenger.teleport(to.getLocation());
+                    passenger.setFireTicks(0);
                 }
             }, 0L);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    for (Entity passenger : passengers)
-                        vehicle.addPassenger(passenger);
-                }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> {
+                for (Entity passenger : passengers)
+                    vehicle.addPassenger(passenger);
             }, 2L);
         }
     }
@@ -379,7 +370,7 @@ public class Gate {
     /* Leashed Transport */
 
     private List<LivingEntity> getLeashed(Player player) {
-        List<LivingEntity> animals = new ArrayList<LivingEntity>();
+        List<LivingEntity> animals = new ArrayList<>();
         for (Entity entity : player.getNearbyEntities(15, 15, 15)) {
             if (entity instanceof LivingEntity) {
                 LivingEntity livingEntity = (LivingEntity) entity;
@@ -397,17 +388,14 @@ public class Gate {
         livingEntity.setLeashHolder(null);
         livingEntity.teleport(player);
         UUID entityUUID = livingEntity.getUniqueId();
-        Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), new Runnable() {
-            @Override
-            public void run() {
-                for (Entity aroundEntity : player.getNearbyEntities(15, 15, 15)) {
-                    if (aroundEntity instanceof LivingEntity) {
-                        LivingEntity living = (LivingEntity) aroundEntity;
-                        if (aroundEntity.getUniqueId().equals(entityUUID)) {
-                            aroundEntity.teleport(player);
-                            living.setLeashHolder(player);
-                            break;
-                        }
+        Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), () -> {
+            for (Entity aroundEntity : player.getNearbyEntities(15, 15, 15)) {
+                if (aroundEntity instanceof LivingEntity) {
+                    LivingEntity living = (LivingEntity) aroundEntity;
+                    if (aroundEntity.getUniqueId().equals(entityUUID)) {
+                        aroundEntity.teleport(player);
+                        living.setLeashHolder(player);
+                        break;
                     }
                 }
             }

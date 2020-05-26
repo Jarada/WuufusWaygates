@@ -19,8 +19,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class PlayerListener implements Listener {
 
-    private DataManager     dm;
-    private WaygateManager gm;
+    private final DataManager    dm;
+    private final WaygateManager gm;
 
     public PlayerListener() {
         dm = DataManager.getManager();

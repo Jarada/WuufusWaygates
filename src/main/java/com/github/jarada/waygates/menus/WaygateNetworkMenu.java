@@ -29,47 +29,28 @@ public class WaygateNetworkMenu extends Menu {
 
         if (optionNetworks[slot] != null) {
             Network network = optionNetworks[slot];
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    WaygateManager.getManager().changeGateNetwork(currentWaygate, network, false);
-                    mm.openWaygateSettingsMenu();
-                }
-
+            Bukkit.getScheduler().runTask(pm, () -> {
+                WaygateManager.getManager().changeGateNetwork(currentWaygate, network, false);
+                mm.openWaygateSettingsMenu();
             });
         }
 
-        if (optionNames[slot].equals("Close")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    mm.openWaygateSettingsMenu();
-                }
-
-            });
-        } else if (optionNames[slot].equals("Create")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
+        switch (optionNames[slot]) {
+            case "Close":
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateSettingsMenu());
+                break;
+            case "Create":
+                Bukkit.getScheduler().runTask(pm, () -> {
                     p.closeInventory();
                     new ChatListener(new WaygateNetworkCreateCallback(p, currentWaygate));
-                }
-
-            });
-        } else if (optionNames[slot].equals("Manage")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    mm.openWaygateNetworkManageMenu();
-                }
-
-            });
-        } else {
-            super.onInventoryClick(clickEvent);
+                });
+                break;
+            case "Manage":
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateNetworkManageMenu());
+                break;
+            default:
+                super.onInventoryClick(clickEvent);
+                break;
         }
     }
 

@@ -28,9 +28,7 @@ public class WaygateNetworkManageMenu extends Menu {
         invites = new ArrayList<>();
         for (UUID invitedUser : currentWaygate.getNetwork().getInvitedUsers()) {
             OfflinePlayer invitedPlayer = Bukkit.getOfflinePlayer(invitedUser);
-            if (invitedPlayer != null) {
-                invites.add(invitedPlayer);
-            }
+            invites.add(invitedPlayer);
         }
 
         setup();
@@ -42,51 +40,34 @@ public class WaygateNetworkManageMenu extends Menu {
 
         if (optionInvites[slot] != null) {
             OfflinePlayer offlinePlayer = optionInvites[slot];
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    currentWaygate.getNetwork().removeInvitedUser(offlinePlayer.getUniqueId());
-                    mm.saveUpdateToNetwork();
-                    buildMenu();
-                    clickEvent.getInventory().setContents(optionIcons);
-                    // TODO Future: Add Confirmation Dialog
-                }
-
+            Bukkit.getScheduler().runTask(pm, () -> {
+                currentWaygate.getNetwork().removeInvitedUser(offlinePlayer.getUniqueId());
+                mm.saveUpdateToNetwork();
+                buildMenu();
+                clickEvent.getInventory().setContents(optionIcons);
+                // TODO Future: Add Confirmation Dialog
             });
         }
 
-        if (optionNames[slot].equals("Close")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
-                    mm.openWaygateNetworkMenu();
-                }
-
-            });
-        } else if (optionNames[slot].equals("Owner")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
+        switch (optionNames[slot]) {
+            case "Close":
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateNetworkMenu());
+                break;
+            case "Owner":
+                Bukkit.getScheduler().runTask(pm, () -> {
                     p.closeInventory();
                     new ChatListener(new WaygateNetworkOwnerChangeCallback(p, currentWaygate));
-                }
-
-            });
-        } else if (optionNames[slot].equals("Invite")) {
-            Bukkit.getScheduler().runTask(pm, new Runnable() {
-
-                @Override
-                public void run() {
+                });
+                break;
+            case "Invite":
+                Bukkit.getScheduler().runTask(pm, () -> {
                     p.closeInventory();
                     new ChatListener(new WaygateNetworkInviteCallback(p, currentWaygate));
-                }
-
-            });
-        } else {
-            super.onInventoryClick(clickEvent);
+                });
+                break;
+            default:
+                super.onInventoryClick(clickEvent);
+                break;
         }
     }
 
@@ -128,12 +109,10 @@ public class WaygateNetworkManageMenu extends Menu {
     void addNetworkOwnerToMenu() {
         if (currentWaygate.getNetwork().getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getNetwork().getOwner());
-            if (owner != null) {
-                List<String> lore = new ArrayList<String>();
-                lore.add(Util.color(Msg.MENU_TEXT_EDITABLE.toString(owner.getName())));
-                ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_NETWORK_OWNER.toString()), lore);
-                setOption(9, "Owner", is);
-            }
+            List<String> lore = new ArrayList<>();
+            lore.add(Util.color(Msg.MENU_TEXT_EDITABLE.toString(owner.getName())));
+            ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_NETWORK_OWNER.toString()), lore);
+            setOption(9, "Owner", is);
         }
     }
 
@@ -142,7 +121,7 @@ public class WaygateNetworkManageMenu extends Menu {
     }
 
     private void addInvitedPlayerToMenu(int slot, OfflinePlayer invitedPlayer) {
-        List<String> lore = new ArrayList<String>();
+        List<String> lore = new ArrayList<>();
         lore.add(Msg.MENU_TEXT_EDITABLE.toString(invitedPlayer.getName()));
         ItemStack is = Util.getHead(invitedPlayer, Util.color(Msg.MENU_TITLE_NETWORK_INVITE_EXISTING.toString()), lore);
         setOption(slot, invitedPlayer.getUniqueId().toString(), is);
