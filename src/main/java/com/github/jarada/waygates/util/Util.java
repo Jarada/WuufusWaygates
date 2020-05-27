@@ -73,6 +73,20 @@ public class Util {
         return item;
     }
 
+
+
+    /* Player Location */
+
+    public static boolean isPlayerNearby(Player player, Location loc, int distance) {
+        int d2 = distance * distance;
+        for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+            if (p.equals(player) && p.getWorld() == loc.getWorld() && p.getLocation().distanceSquared(loc) <= d2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static List<Player> getNearbyPlayers(Location loc, int distance) {
         List<Player> res = new ArrayList<>();
         int d2 = distance * distance;
@@ -91,7 +105,7 @@ public class Util {
         final Chunk c = b.getChunk();
 
         if (!w.isChunkLoaded(c)) {
-            w.loadChunk(c);
+            w.getChunkAt(b).load();
         }
     }
 

@@ -23,7 +23,7 @@ public abstract class ChatCallback {
     }
 
     public boolean isPlayerNearGate() {
-        return Util.getNearbyPlayers(getCurrentWaygate().getCenterBlock().getLocation(), 5).contains(getPlayer());
+        return Util.isPlayerNearby(getPlayer(), getCurrentWaygate().getCenterBlock().getLocation(), 5);
     }
 
     public abstract boolean verify(String chat);
