@@ -1,6 +1,7 @@
 package com.github.jarada.waygates.callbacks;
 
 import com.github.jarada.waygates.data.Gate;
+import com.github.jarada.waygates.util.Util;
 import org.bukkit.entity.Player;
 
 public abstract class ChatCallback {
@@ -19,6 +20,10 @@ public abstract class ChatCallback {
 
     public Gate getCurrentWaygate() {
         return currentWaygate;
+    }
+
+    public boolean isPlayerNearGate() {
+        return Util.getNearbyPlayers(getCurrentWaygate().getCenterBlock().getLocation(), 5).contains(getPlayer());
     }
 
     public abstract boolean verify(String chat);

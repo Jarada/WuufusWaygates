@@ -4,6 +4,7 @@ import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.menus.MenuManager;
+import com.github.jarada.waygates.util.Util;
 import org.bukkit.entity.Player;
 
 public class WaygateRenameCallback extends ChatCallback {
@@ -34,6 +35,9 @@ public class WaygateRenameCallback extends ChatCallback {
 
     @Override
     public void callback() {
-        new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToGate().openWaygateSettingsMenu();
+        if (isPlayerNearGate())
+            new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToGate().openWaygateSettingsMenu();
+        else
+            new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToGate();
     }
 }

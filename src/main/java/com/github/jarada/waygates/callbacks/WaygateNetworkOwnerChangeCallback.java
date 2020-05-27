@@ -3,6 +3,7 @@ package com.github.jarada.waygates.callbacks;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.menus.MenuManager;
+import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -43,7 +44,7 @@ public class WaygateNetworkOwnerChangeCallback extends ChatCallback {
     public void callback() {
         if (ownerChange != null) {
             // Success
-            if (!getPlayer().hasPermission("wg.admin")) {
+            if (!getPlayer().hasPermission("wg.admin") || !isPlayerNearGate()) {
                 new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork();
                 return;
             }
@@ -51,7 +52,8 @@ public class WaygateNetworkOwnerChangeCallback extends ChatCallback {
             new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork().openWaygateNetworkManageMenu();
         } else {
             // Failed
-            new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkMenu();
+            if (!isPlayerNearGate())
+                new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkMenu();
         }
     }
 }

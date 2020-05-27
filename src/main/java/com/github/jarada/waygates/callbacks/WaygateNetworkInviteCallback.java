@@ -3,6 +3,7 @@ package com.github.jarada.waygates.callbacks;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.menus.MenuManager;
+import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -51,9 +52,14 @@ public class WaygateNetworkInviteCallback extends ChatCallback {
 
     @Override
     public void callback() {
-        if (invite != null && !failedExists)
-            new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork().openWaygateNetworkManageMenu();
-        else
-            new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkManageMenu();
+        if (invite != null && !failedExists) {
+            if (isPlayerNearGate())
+                new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork().openWaygateNetworkManageMenu();
+            else
+                new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork();
+        } else {
+            if (isPlayerNearGate())
+                new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkManageMenu();
+        }
     }
 }
