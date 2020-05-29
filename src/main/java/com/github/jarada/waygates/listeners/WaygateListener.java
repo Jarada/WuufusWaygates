@@ -86,6 +86,17 @@ public class WaygateListener implements Listener {
         verifyGateIntegrity(null, e.getBlock());
     }
 
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlaceEvent(BlockPlaceEvent e) {
+        // If placed block would be added to a gate
+        BlockLocation blockLocation = new BlockLocation(e.getBlockPlaced().getLocation());
+        Gate gate = gm.getGateAtLocation(blockLocation);
+        if (gate != null) {
+            // Prevent it
+            e.setCancelled(true);
+        }
+    }
+
     /* Disable Vanilla Portal Behaviour */
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -155,7 +166,7 @@ public class WaygateListener implements Listener {
 
     /* Gate Modification */
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true)
     public void onWaygateInteract(WaygateInteractEvent event) {
         if ((event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK) ||
                 event.getItem() == null)

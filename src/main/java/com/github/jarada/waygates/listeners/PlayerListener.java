@@ -63,7 +63,6 @@ public class PlayerListener implements Listener {
             if (gate != null) {
                 Bukkit.getPluginManager().callEvent(new WaygateInteractEvent(p, gate, a, is));
                 event.setCancelled(true);
-                return;
             }
         }
     }
