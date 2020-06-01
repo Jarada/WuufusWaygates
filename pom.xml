@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.jarada</groupId>
 	<artifactId>waygates</artifactId>
-	<version>0.6.2-dev</version>
+	<version>0.6.4-dev</version>
 	<name>Wuufu's Waygates</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

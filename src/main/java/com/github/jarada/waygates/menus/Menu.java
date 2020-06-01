@@ -5,6 +5,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.data.Network;
+import com.github.jarada.waygates.util.ItemStackUtil;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -75,7 +76,7 @@ public abstract class Menu {
     }
 
     boolean verifyInventoryClick(InventoryClickEvent clickEvent) {
-        if (!Arrays.equals(clickEvent.getInventory().getContents(), optionIcons)
+        if (!ItemStackUtil.equals(clickEvent.getInventory().getContents(), optionIcons)
                 || p != clickEvent.getWhoClicked())
             return false;
 
@@ -96,7 +97,7 @@ public abstract class Menu {
     }
 
     public void close() {
-        if (Arrays.equals(p.getInventory().getContents(), optionIcons)) {
+        if (ItemStackUtil.equals(p.getInventory().getContents(), optionIcons)) {
             p.closeInventory();
         }
     }

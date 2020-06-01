@@ -5,6 +5,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Network;
+import com.github.jarada.waygates.util.ItemStackUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,11 +15,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 public class MenuManager implements Listener {
 
@@ -66,7 +70,7 @@ public class MenuManager implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     void onInventoryClose(InventoryCloseEvent closeEvent) {
         if (activeMenu != null) {
-            if (Arrays.equals(closeEvent.getInventory().getContents(), activeMenu.optionIcons) && player == closeEvent.getPlayer()) {
+            if (ItemStackUtil.equals(closeEvent.getInventory().getContents(), activeMenu.optionIcons) && player == closeEvent.getPlayer()) {
                 activeMenu.onInventoryClose(closeEvent);
                 Bukkit.getScheduler().runTask(pm, this::destroy);
             }
