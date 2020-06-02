@@ -80,7 +80,7 @@ public class PlayerListener implements Listener {
         if (from.equals(to))
             return;
 
-
+        // Verify InMenu
 
         // Verify Gate
         Gate gate = gm.getGateAtLocation(to);

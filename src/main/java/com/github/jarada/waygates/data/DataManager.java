@@ -268,7 +268,6 @@ public class DataManager {
 
         // Save
         wm.loadGates(new ArrayList<>(gateMap.values()));
-
     }
 
     @SuppressWarnings("UnusedReturnValue")

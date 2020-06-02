@@ -142,9 +142,9 @@ public abstract class Menu {
                 lore.add(Util.color(Msg.NETWORK_SYSTEM_VOID.toString()));
             else
                 lore.add(Util.color(Msg.NETWORK_SYSTEM.toString()));
-        } else if (nw.isNetworkPrivate()) {
+        } else if (nw.isPrivate()) {
             lore.add(Util.color(Msg.NETWORK_PRIVATE.toString()));
-        } else if (nw.isNetworkInvite()) {
+        } else if (nw.isInvite()) {
             lore.add(Util.color(Msg.NETWORK_INVITE.toString()));
         } else {
             lore.add(Util.color(Msg.NETWORK_GLOBAL.toString()));

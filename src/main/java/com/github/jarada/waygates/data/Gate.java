@@ -147,6 +147,8 @@ public class Gate {
     }
 
     public boolean isOwnerHidden() {
+        if (getNetwork().isFixed() && !getNetwork().canAssignHiddenToGates(getOwner()))
+            return true;
         return ownerHidden;
     }
 

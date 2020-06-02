@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class WaygateNetworkManageMenu extends Menu {
+public class WaygateNetworkSettingsMenu extends Menu {
 
     List<OfflinePlayer>         invites;
     private OfflinePlayer[]     optionInvites;
 
-    WaygateNetworkManageMenu(MenuManager mm, Player p, Gate currentWaygate) {
+    WaygateNetworkSettingsMenu(MenuManager mm, Player p, Gate currentWaygate) {
         super(mm, p, currentWaygate);
 
         invites = new ArrayList<>();
@@ -78,7 +78,7 @@ public class WaygateNetworkManageMenu extends Menu {
 
         addNetworkOwnerToMenu();
 
-        if (currentWaygate.getNetwork().isNetworkInvite())
+        if (currentWaygate.getNetwork().isInvite() || currentWaygate.getNetwork().isFixed())
             addInvitePlayerToMenu();
 
         for (int slot = 0; slot < 9; slot++) {

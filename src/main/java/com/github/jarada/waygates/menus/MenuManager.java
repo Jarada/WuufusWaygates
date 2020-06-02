@@ -15,14 +15,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Logger;
 
 public class MenuManager implements Listener {
 
@@ -122,7 +118,7 @@ public class MenuManager implements Listener {
 
     private ArrayList<Gate> loadAccessList() {
         ArrayList<Gate> accessList = (!currentWaygate.getNetwork().isVoid() || canBypass()) ?
-                wm.getConnectedGates(currentWaygate) : new ArrayList<>();
+                wm.getConnectedGates(currentWaygate, currentWaygate.getNetwork().isFixed()) : new ArrayList<>();
         // Remove Hidden Gates if not owner or bypass
         accessList.removeIf(accessGate -> accessGate.isOwnerHidden() && !(isOwner(accessGate) || canBypass()));
         return accessList;
@@ -152,7 +148,7 @@ public class MenuManager implements Listener {
         if (currentWaygate == null)
             return;
 
-        open(new WaygateSettingsMenu(this, player, currentWaygate));
+        open(new WaygateGateSettingsMenu(this, player, currentWaygate));
     }
 
     public void openWaygateDestinationMenu() {
@@ -167,14 +163,7 @@ public class MenuManager implements Listener {
             return;
 
         ArrayList<Network> networks = new ArrayList<>(Network.systemNetworks());
-        Iterator<Network> networkIterator = networks.iterator();
-        while (networkIterator.hasNext()){
-            Network network = networkIterator.next();
-            String networkKey = network.getSysUuid().replace("sys_", "");
-            if (!currentWaygate.getNetwork().equals(network) && !player.hasPermission(String.format("wg.network.%s", networkKey)))
-                networkIterator.remove();
-        }
-
+        networks.removeIf(network -> !currentWaygate.getNetwork().equals(network) && !player.hasPermission(String.format("wg.network.%s", network.getSysKey())));
         networks.addAll(wm.getCustomNetworks(player, currentWaygate));
         open(new WaygateNetworkMenu(this, player, currentWaygate, networks));
     }
@@ -190,7 +179,7 @@ public class MenuManager implements Listener {
         if (currentWaygate == null)
             return;
 
-        open(new WaygateNetworkManageMenu(this, player, currentWaygate));
+        open(new WaygateNetworkSettingsMenu(this, player, currentWaygate));
     }
 
 }

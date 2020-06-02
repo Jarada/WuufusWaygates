@@ -14,9 +14,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WaygateSettingsMenu extends Menu {
+public class WaygateGateSettingsMenu extends Menu {
 
-    public WaygateSettingsMenu(MenuManager mm, Player p, Gate currentWaygate) {
+    public WaygateGateSettingsMenu(MenuManager mm, Player p, Gate currentWaygate) {
         super(mm, p, currentWaygate);
         setup();
     }
@@ -66,13 +66,13 @@ public class WaygateSettingsMenu extends Menu {
         addNameToMenu();
         addNetworkToMenu();
 
-        if (p.hasPermission("wg.assign.gate.destination"))
+        if (p.hasPermission("wg.assign.destination"))
             addFixedDestinationToMenu();
 
-        if (p.hasPermission("wg.assign.gate.private"))
+        if (p.hasPermission("wg.assign.private"))
             addPrivateToMenu();
 
-        if (p.hasPermission("wg.assign.gate.hidden"))
+        if (p.hasPermission("wg.assign.hidden") && currentWaygate.getNetwork().canAssignHiddenToGates(p.getUniqueId()))
             addHiddenToMenu();
 
         addGateOwnerToMenu(true);

@@ -172,7 +172,7 @@ public class WaygateManager {
                 }
             }
         }
-        return gates;
+        return sortedGates(gates);
     }
 
     public boolean isGateNearby(BlockLocation blockLocation) {
@@ -195,10 +195,10 @@ public class WaygateManager {
 
     /* Gate Getters */
 
-    public ArrayList<Gate> getConnectedGates(Gate gate) {
+    public ArrayList<Gate> getConnectedGates(Gate gate, boolean hiddenComparator) {
         ArrayList<Gate> gates = new ArrayList<>(this.gates.get(gate.getNetwork()));
         gates.remove(gate);
-        return gates;
+        return sortedGates(gates, hiddenComparator);
     }
 
     public ArrayList<Gate> getAllGatesInWorld(String worldName, boolean accurate) {
@@ -212,7 +212,7 @@ public class WaygateManager {
                 }
             }
         }
-        return gates;
+        return sortedGates(gates);
     }
 
     public ArrayList<Gate> getAllGates() {
@@ -220,7 +220,29 @@ public class WaygateManager {
         for (List<Gate> networkGates : this.gates.values()) {
             gates.addAll(networkGates);
         }
-        return gates;
+        return sortedGates(gates);
+    }
+
+    public ArrayList<Gate> sortedGates(ArrayList<Gate> unsorted) {
+        return sortedGates(unsorted, false);
+    }
+
+    public ArrayList<Gate> sortedGates(ArrayList<Gate> unsorted, final boolean hiddenComparator) {
+        unsorted.sort((o1, o2) -> {
+            if (hiddenComparator) {
+                boolean hiddenA = o1.isOwnerHidden();
+                boolean hiddenB = o2.isOwnerHidden();
+
+                // Prefer non-hidden gates to hidden ones
+                if (hiddenA && !hiddenB)
+                    return -1;
+                else if (hiddenB && !hiddenA)
+                    return 1;
+            }
+            
+            return o1.getName().compareTo(o2.getName());
+        });
+        return unsorted;
     }
 
     /* Gate Networks */
@@ -228,11 +250,7 @@ public class WaygateManager {
     public List<Network> getCustomNetworks(Player owner, Gate currentGate) {
         ArrayList<Network> customNetworks = new ArrayList<>();
         for (Network network : gates.keySet()) {
-            if (!network.isSystem() && (currentGate.getNetwork().equals(network) ||
-                    ((!network.isNetworkInvite() || network.isInvitedUser(owner.getUniqueId())) &&
-                    (!network.isNetworkPrivate() || network.getOwner().equals(owner.getUniqueId())) &&
-                    (!network.isGlobal() || owner.hasPermission("wg.network.global") ||
-                            owner.hasPermission(String.format("wg.network.%s", Util.getKey(network.getName())))))))
+            if (!network.isSystem() && network.isGateAbleToUseNetwork(owner, currentGate))
                 customNetworks.add(network);
         }
         return customNetworks;
@@ -269,7 +287,8 @@ public class WaygateManager {
                 return false;
         }
         for (Network network : this.gates.keySet()) {
-            if (network.isGlobal() && cleansedName.equals(Util.stripColor(network.getName()).toLowerCase()))
+            if ((network.isGlobal() || network.isFixed()) &&
+                    cleansedName.equals(Util.stripColor(network.getName()).toLowerCase()))
                 return false;
         }
         return true;

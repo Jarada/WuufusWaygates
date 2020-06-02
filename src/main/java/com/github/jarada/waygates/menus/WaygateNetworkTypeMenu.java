@@ -26,13 +26,15 @@ public class WaygateNetworkTypeMenu extends Menu {
 
         if (optionNames[slot].equals("Close")) {
             Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateNetworkMenu());
-        } else if (optionNames[slot].matches("Private|Invite|Global")) {
+        } else if (optionNames[slot].matches("Private|Invite|Fixed|Global")) {
             // We have one of the network types
             NetworkType type = NetworkType.GLOBAL;
             if (optionNames[slot].equals("Private"))
                 type = NetworkType.PRIVATE;
             else if (optionNames[slot].equals("Invite"))
                 type = NetworkType.INVITE;
+            else if (optionNames[slot].equals("Fixed"))
+                type = NetworkType.FIXED;
 
             if (mm.isNetworkNameUnique(name)) {
                 Network network = new Network(name, type);
@@ -55,19 +57,28 @@ public class WaygateNetworkTypeMenu extends Menu {
     @Override
     public void buildMenu() {
         initMenu();
+        int index = 0;
 
         // Add Private Gate Type
-        addPrivateToMenu();
+        if (p.hasPermission("wg.create.network.private")) {
+            addPrivateToMenu();
+            index += 1;
+        }
 
-        int index = 1;
         // Add Invite Gate Type
-        if (p.hasPermission("wg.assign.network.invite")) {
+        if (p.hasPermission("wg.create.network.invite")) {
             addInviteToMenu(index);
             index += 1;
         }
 
+        // Add Fixed Gate Type
+        if (p.hasPermission("wg.create.network.fixed")) {
+            addFixedToMenu(index);
+            index += 1;
+        }
+
         // Add Global Gate Type
-        if (p.hasPermission("wg.assign.network.global")) {
+        if (p.hasPermission("wg.create.network.global")) {
             addGlobalToMenu(index);
         }
 
@@ -80,6 +91,10 @@ public class WaygateNetworkTypeMenu extends Menu {
 
     private void addInviteToMenu(int index) {
         addItemToMenu(index, Material.DETECTOR_RAIL, Msg.MENU_TITLE_NETWORK_TYPE_INVITE.toString(), "Invite");
+    }
+
+    private void addFixedToMenu(int index) {
+        addItemToMenu(index, Material.ACTIVATOR_RAIL, Msg.MENU_TITLE_NETWORK_TYPE_FIXED.toString(), "Fixed");
     }
 
     private void addGlobalToMenu(int index) {

@@ -81,7 +81,7 @@ public class WaygateNetworkMenu extends Menu {
             addNextToMenu();
         }
 
-        if (p.hasPermission("wg.create.network"))
+        if (Network.isAbleToCreateNetworks(p))
             addAddNetworkToMenu();
 
         if (!currentWaygate.getNetwork().isSystem() && (currentWaygate.getNetwork().getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")))

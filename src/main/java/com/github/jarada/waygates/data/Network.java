@@ -1,8 +1,11 @@
 package com.github.jarada.waygates.data;
 
 import com.github.jarada.waygates.types.NetworkType;
+import com.github.jarada.waygates.util.Util;
 import com.google.gson.Gson;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,6 +124,16 @@ public class Network {
         );
     }
 
+    public static boolean isAbleToCreateNetworks(Player owner) {
+        for (NetworkType networkType : NetworkType.values()) {
+            if (networkType == NetworkType.SYSTEM || networkType == NetworkType.SYSTEM_VOID)
+                continue;
+            if (owner.hasPermission(String.format("wg.create.network.%s", networkType.toString().toLowerCase())))
+                return true;
+        }
+        return false;
+    }
+
     public UUID getUUID() {
         if (uuid == null) {
             uuid = UUID.randomUUID();
@@ -130,6 +143,10 @@ public class Network {
 
     public String getSysUuid() {
         return sysUuid;
+    }
+
+    public String getSysKey() {
+        return getSysUuid().replace("sys_", "");
     }
 
     public UUID getOwner() {
@@ -152,10 +169,12 @@ public class Network {
 
     public Material getIcon() {
         if (icon == null) {
-            if (isNetworkPrivate())
+            if (isPrivate())
                 return Material.RAIL;
-            if (isNetworkInvite())
+            if (isInvite())
                 return Material.DETECTOR_RAIL;
+            if (isFixed())
+                return Material.ACTIVATOR_RAIL;
             return Material.POWERED_RAIL;
         }
         return icon;
@@ -190,12 +209,51 @@ public class Network {
         return getOwner().equals(invite) || (invitedUsers != null && invitedUsers.contains(invite));
     }
 
-    public boolean isNetworkPrivate() {
+    public boolean isGateAbleToUseNetwork(Gate gate) {
+        Player owner = Bukkit.getPlayer(gate.getOwner());
+        if (owner == null)
+            return false;
+
+        return isGateAbleToUseNetwork(owner, gate);
+    }
+
+    public boolean isGateAbleToUseNetwork(Player owner, Gate gate) {
+        // Same network, of course!
+        if (gate.getNetwork().equals(this))
+            return true;
+
+        // System network, permission check
+        if (isSystem() && !owner.hasPermission(String.format("wg.network.%s", getSysKey())))
+            return false;
+
+        // Global network, permission check
+        if (isGlobal() && !(owner.hasPermission("wg.network.global") ||
+                owner.hasPermission(String.format("wg.network.%s", Util.getKey(getName())))))
+            return false;
+
+        // Fixed network, permission check
+        if (isFixed() && !(owner.hasPermission("wg.network.fixed") ||
+                owner.hasPermission(String.format("wg.network.%s", Util.getKey(getName())))))
+            return false;
+
+        // Invite network, permission check
+        if (isInvite() && !isInvitedUser(owner.getUniqueId()))
+            return false;
+
+        // Private network, permission check
+        return !isPrivate() || getOwner().equals(owner.getUniqueId());
+    }
+
+    public boolean isPrivate() {
         return networkType == NetworkType.PRIVATE;
     }
 
-    public boolean isNetworkInvite() {
+    public boolean isInvite() {
         return networkType == NetworkType.INVITE;
+    }
+
+    public boolean isFixed() {
+        return networkType == NetworkType.FIXED;
     }
 
     public boolean isSystem() {
@@ -207,6 +265,10 @@ public class Network {
     }
 
     public boolean isVoid() { return networkType == NetworkType.SYSTEM_VOID; }
+
+    public boolean canAssignHiddenToGates(UUID gateOwner) {
+        return networkType != NetworkType.FIXED || isInvitedUser(gateOwner);
+    }
 
     public void clearSystemNetworkStatus() {
         if (isSystem())

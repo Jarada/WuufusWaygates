@@ -26,23 +26,20 @@
      description: Create gates and networks
      children:
        wg.create.gate: true
-       wg.create.network: true
-   wg.assign.*:
-     description: Assign all the things
+       wg.create.network.*: true
+   wg.create.network.*:
+     description: Create networks of any type
      children:
-       wg.assign.gate.*: true
-       wg.assign.network.*: true
-   wg.assign.gate.*:
+       wg.create.network.global: true
+       wg.create.network.invite: true
+       wg.create.network.fixed: true
+       wg.create.network.private: true
+   wg.assign.*:
      description: Assign flags to gates
      children:
-       wg.assign.gate.destination: true
-       wg.assign.gate.private: true
-       wg.assign.gate.hidden: true
-   wg.assign.network.*:
-     description: Assign network type on creation
-     children:
-       wg.assign.network.global: true
-       wg.assign.network.invite: true
+       wg.assign.destination: true
+       wg.assign.private: true
+       wg.assign.hidden: true
    wg.command.*:
      description: Use all commands
      children:
@@ -68,19 +65,21 @@
        wg.network.the_end: true
        wg.network.ocean: true
        wg.network.global: true
+       wg.network.fixed: true
    wg.player:
      description: Standard permission set
      children:
        wg.travel: true
        wg.key.use: true
-       wg.create.*: true
-       wg.assign.gate.*: true
-       wg.assign.network.invite: true
+       wg.assign.*: true
+       wg.create.gate: true
+       wg.create.network.private: true
+       wg.create.network.invite: true
    wg.player.global:
      description: Global permission set
      children:
        wg.player: true
-       wg.assign.network.global: true
+       wg.create.network.global: true
        wg.network.*: true
    wg.bypass:
      description: Access private/hidden gates
@@ -88,4 +87,5 @@
      description: Admin permission set
      children:
        wg.player.global: true
+       wg.create.network.fixed: true
        wg.bypass: true

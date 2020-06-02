@@ -88,6 +88,7 @@ public enum Msg {
     MENU_TITLE_NETWORK_INVITE_ADD("&aAdd Player"),
     MENU_TITLE_NETWORK_INVITE_EXISTING("&aActive Player"),
     MENU_TITLE_NETWORK_OWNER("&aNetwork Owner"),
+    MENU_TITLE_NETWORK_TYPE_FIXED("&aFixed Network"),
     MENU_TITLE_NETWORK_TYPE_GLOBAL("&aGlobal Network"),
     MENU_TITLE_NETWORK_TYPE_INVITE("&aInvite Network"),
     MENU_TITLE_NETWORK_TYPE_PRIVATE("&aPrivate Network"),

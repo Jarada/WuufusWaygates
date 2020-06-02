@@ -9,6 +9,7 @@ public abstract class ChatCallback {
     private final Player player;
     private final Gate currentWaygate;
 
+    // TODO Create Item Listener/Callback for Updating Network Icons
     public ChatCallback(Player player, Gate currentWaygate) {
         this.player = player;
         this.currentWaygate = currentWaygate;
