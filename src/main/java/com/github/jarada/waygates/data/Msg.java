@@ -108,6 +108,7 @@ public enum Msg {
     NETWORK_CREATE_SET_NAME("&6Enter name for new Network (max %d characters):"),
     NETWORK_CREATE_SET_TYPE("&aSuccess: &6To complete select Network type."),
     NETWORK_CREATE_GLOBAL_UNIQUE("&cError: &fGlobal Network names must be unique, please retry with a new name."),
+    NETWORK_FIXED("&dFixed Network"),
     NETWORK_GLOBAL("&dGlobal Network"),
     NETWORK_INVITE("&dInvite Network"),
     NETWORK_PRIVATE("&dPrivate Network"),
