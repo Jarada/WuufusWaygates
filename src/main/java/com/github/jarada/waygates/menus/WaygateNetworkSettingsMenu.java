@@ -122,7 +122,7 @@ public class WaygateNetworkSettingsMenu extends Menu {
 
     private void addInvitedPlayerToMenu(int slot, OfflinePlayer invitedPlayer) {
         List<String> lore = new ArrayList<>();
-        lore.add(Msg.MENU_TEXT_EDITABLE.toString(invitedPlayer.getName()));
+        lore.add(Util.color(Msg.MENU_TEXT_EDITABLE.toString(invitedPlayer.getName())));
         ItemStack is = Util.getHead(invitedPlayer, Util.color(Msg.MENU_TITLE_NETWORK_INVITE_EXISTING.toString()), lore);
         setOption(slot, invitedPlayer.getUniqueId().toString(), is);
         optionInvites[slot] = invitedPlayer;
