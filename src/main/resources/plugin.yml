@@ -57,7 +57,7 @@
    wg.command.world.delete:
      description: Use of command to delete all gates in world
    wg.network.*:
-     description: Add gates you create to any global/system network
+     description: Add gates you create to any fixed/global/system network
      children:
        wg.network.overworld: true
        wg.network.nether: true
