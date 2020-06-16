@@ -61,7 +61,7 @@ public class FloodUtil {
             return foundBlocks;
         }
 
-        if (startBlock.getType().isAir())
+        if (Util.isMaterialAir(startBlock.getType()))
         {
             // We have an air/portal block, let's add to our internals
             foundBlocks.add(startBlock);

@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.metadata.Metadatable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Util {
@@ -43,6 +44,20 @@ public class Util {
         return WordUtils.wrap(description, maxLineLength, "\n", true).split("\\n");
     }
 
+    /* Materials */
+
+    @SuppressWarnings("deprecation")
+    public static boolean isMaterialAir(Material material) {
+        Class<Material> materialClass = Material.class;
+        try {
+            materialClass.getMethod("isAir", (Class<?>) null);
+            return material.isAir();
+        } catch (NoSuchMethodException e) {
+            // 1.13 support
+            return Arrays.asList(Material.AIR, Material.CAVE_AIR, Material.VOID_AIR, Material.LEGACY_AIR).contains(material);
+        }
+    }
+
     /* Player */
 
     public static boolean isNpc(Object object) {
@@ -72,9 +87,7 @@ public class Util {
         }
         return item;
     }
-
-
-
+    
     /* Player Location */
 
     public static boolean isPlayerNearby(Player player, Location loc, int distance) {

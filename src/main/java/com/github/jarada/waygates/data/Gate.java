@@ -496,7 +496,7 @@ public class Gate {
         {
             Material blockMaterial = block.getType();
 
-            if (blockMaterial != Material.NETHER_PORTAL && !blockMaterial.isAir()) continue;
+            if (blockMaterial != Material.NETHER_PORTAL && !Util.isMaterialAir(blockMaterial)) continue;
 
             block.setType(material);
 
