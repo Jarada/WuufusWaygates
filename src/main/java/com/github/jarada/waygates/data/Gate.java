@@ -477,21 +477,11 @@ public class Gate {
     {
         List<Block> blocks = this.getBlocks();
         if (blocks == null) return;
-        Axis axis = Axis.X;
 
         // Orientation check
-        if (material == Material.NETHER_PORTAL)
-        {
-            Block origin = blocks.get(0);
-            Block blockSouth = origin.getRelative(BlockFace.SOUTH);
-            Block blockNorth = origin.getRelative(BlockFace.NORTH);
+        Axis axis = getOrientation();
 
-            if (blocks.contains(blockNorth) || blocks.contains(blockSouth))
-            {
-                axis = Axis.Z;
-            }
-        }
-
+        // Set Content
         for (Block block : blocks)
         {
             Material blockMaterial = block.getType();
@@ -509,6 +499,19 @@ public class Gate {
                 block.setBlockData(data);
             }
         }
+    }
+
+    private Axis getOrientation() {
+        List<Block> blocks = this.getBlocks();
+        if (blocks != null) {
+            Block origin = blocks.get(0);
+            for (int i = 1; i < blocks.size(); i++) {
+                Block other = blocks.get(i);
+                if (other.getLocation().getBlockX() != origin.getLocation().getBlockX()) return Axis.X;
+                if (other.getLocation().getBlockZ() != origin.getLocation().getBlockZ()) return Axis.Z;
+            }
+        }
+        return Axis.X;
     }
 
     private void open() {
