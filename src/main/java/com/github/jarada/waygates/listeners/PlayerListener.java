@@ -4,8 +4,10 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
+import com.github.jarada.waygates.data.GridLocation;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
+import com.github.jarada.waygates.types.GateCreationResult;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,9 +46,17 @@ public class PlayerListener implements Listener {
                 return;
 
             // Attempt to create a gate
-            boolean success = gm.createWaygate(p, event.getClickedBlock(), event.getBlockFace());
+            GateCreationResult result = gm.createWaygate(p, event.getClickedBlock(), event.getBlockFace());
+            boolean canConsume = result == GateCreationResult.RESULT_GATE_CREATED;
             event.setCancelled(true);
-            if (dm.WG_CONSTRUCTOR_CONSUMES && success && !p.hasPermission("wg.admin")) {
+
+            // Check if we need to move exit of a gate
+            if (result == GateCreationResult.RESULT_EXISTING_GATE_FOUND) {
+                canConsume = gm.updateWaygateExit(p, event.getClickedBlock());
+            }
+
+            // Consume Waygate Constructor
+            if (dm.WG_CONSTRUCTOR_CONSUMES && canConsume && !p.hasPermission("wg.admin")) {
                 is.setAmount(is.getAmount() - 1);
                 p.getInventory().setItemInMainHand(is);
             }

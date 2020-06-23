@@ -31,6 +31,10 @@ public class BlockLocation {
         return new Location(getWorld(), getX(), getY(), getZ());
     }
 
+    public Location getTeleportLocation() {
+        return getLocation().add(0.5, 0, 0.5);
+    }
+
     public World getWorld() {
         if (worldName != null)
             return Bukkit.getWorld(worldName);

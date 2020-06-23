@@ -1,8 +1,10 @@
 package com.github.jarada.waygates;
 
 import com.github.jarada.waygates.data.*;
+import com.github.jarada.waygates.types.GateCreationResult;
 import com.github.jarada.waygates.types.GateOrientation;
 import com.github.jarada.waygates.util.FloodUtil;
+import com.github.jarada.waygates.util.GateUtil;
 import com.github.jarada.waygates.util.MaterialCountUtil;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.*;
@@ -296,13 +298,15 @@ public class WaygateManager {
 
     /* Gate Manipulation */
 
-    public boolean createWaygate(Player p, Block clickedBlock, BlockFace clickedFace) {
+    public GateCreationResult createWaygate(Player p, Block clickedBlock, BlockFace clickedFace) {
         BlockLocation blockLocation = new BlockLocation(clickedBlock.getLocation());
 
         // If gate already exists, bail out
-        if (getGateAtLocation(blockLocation) != null) {
-            Msg.GATE_ALREADY_EXISTS.sendTo(p);
-            return false;
+        Gate existing = getGateAtLocation(blockLocation);
+        if (existing != null) {
+            if (!existing.getOwner().equals(p.getUniqueId()))
+                Msg.GATE_ALREADY_EXISTS.sendTo(p);
+            return GateCreationResult.RESULT_EXISTING_GATE_FOUND;
         }
 
         // Alright, let's check if we can actually make something out of this
@@ -312,7 +316,7 @@ public class WaygateManager {
 
         if (gateFloodInfo == null) {
             Msg.GATE_NO_FRAME.sendTo(p);
-            return false;
+            return GateCreationResult.RESULT_NO_FRAME;
         }
 
         GateOrientation gateOrientation = gateFloodInfo.getKey();
@@ -331,14 +335,11 @@ public class WaygateManager {
         }
         if (!hasRequiredBlocks) {
             Msg.GATE_MUST_CONTAIN.sendTo(p, MaterialCountUtil.desc(requiredBlocks));
-            return false;
+            return GateCreationResult.RESULT_REQUIRES_KEY_BLOCKS;
         }
 
         // Calculate Exit Location
-        Location playerLoc = p.getLocation();
-        playerLoc.setPitch(0F);
-        playerLoc.setYaw(gateOrientation.getExitYaw(playerLoc, blocks.iterator().next().getLocation()));
-        GridLocation exit = new GridLocation(playerLoc);
+        GridLocation exit = GateUtil.getExitForGate(p.getLocation(), blocks.iterator().next().getLocation(), null, gateOrientation);
 
         // Calculate Coords
         Set<BlockLocation> coords = new HashSet<>();
@@ -362,7 +363,30 @@ public class WaygateManager {
         // Inform Player
         Msg.GATE_CREATED.sendTo(p);
 
-        return true;
+        return GateCreationResult.RESULT_GATE_CREATED;
+    }
+
+    public boolean updateWaygateExit(@NotNull Player p, Block clickedBlock) {
+        Gate gate = gm.getGateAtLocation(new BlockLocation(clickedBlock.getLocation()));
+
+        if (gate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")) {
+            // Close Gate if Open
+            if (gate.isActive())
+                gate.deactivate();
+
+            // Move exit
+            GridLocation exit = GateUtil.getExitForGate(p.getLocation(), gate.getStart().getLocation(), gate, null);
+            gate.setExit(exit);
+
+            // Save Update
+            DataManager.getManager().saveWaygate(gate, false);
+
+            // Send Message
+            Msg.GATE_EXIT_UPDATED.sendTo(p, gate.getName());
+
+            return true;
+        }
+        return false;
     }
 
     public void destroyWaygate(@Nullable Player p, @NotNull Gate gate, @NotNull BlockLocation destroyingBlock) {

@@ -38,8 +38,8 @@ public class Gate {
     private long activatedMillis;
     private long usedMillis;
 
+    private GridLocation exit;
     private final BlockLocation start;
-    private final GridLocation exit;
     private final Set<BlockLocation> coords;
 
     private transient Set<Menu> activeMenus;
@@ -171,13 +171,18 @@ public class Gate {
         return usedMillis;
     }
 
+    public GridLocation getExit() {
+        return exit;
+    }
+
+    public void setExit(GridLocation gridLocation) {
+        if (gridLocation != null)
+            exit = gridLocation;
+    }
+
     @SuppressWarnings("unused")
     public BlockLocation getStart() {
         return start;
-    }
-
-    public GridLocation getExit() {
-        return exit;
     }
 
     public Set<BlockLocation> getCoords() {
@@ -293,13 +298,13 @@ public class Gate {
         if (p.isInsideVehicle() && vehicle instanceof LivingEntity) {
             vehicle.eject();
             if (!(vehicle instanceof Player)) {
-                vehicle.teleport(to.getLocation());
+                vehicle.teleport(to.getTeleportLocation());
                 vehicle.setFireTicks(0);
                 Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> vehicle.addPassenger(p), 2L);
 
             }
         } else {
-            p.teleport(to.getLocation());
+            p.teleport(to.getTeleportLocation());
             p.setFireTicks(0);
         }
 
@@ -319,7 +324,7 @@ public class Gate {
         }
 
         if (entity.getType().isSpawnable()) {
-            entity.teleport(to.getLocation());
+            entity.teleport(to.getTeleportLocation());
         } else if (entity.getType() == EntityType.DROPPED_ITEM) {
             World world = to.getLocation().getWorld();
             if (world != null) {
@@ -350,11 +355,11 @@ public class Gate {
         // Teleport Vehicle
         vehicle.eject();
         if (!(vehicle instanceof Player)) {
-            vehicle.teleport(to.getLocation());
+            vehicle.teleport(to.getTeleportLocation());
             vehicle.setFireTicks(0);
             Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> {
                 for (Entity passenger : passengers) {
-                    passenger.teleport(to.getLocation());
+                    passenger.teleport(to.getTeleportLocation());
                     passenger.setFireTicks(0);
                 }
             }, 0L);
@@ -501,7 +506,7 @@ public class Gate {
         }
     }
 
-    private Axis getOrientation() {
+    public Axis getOrientation() {
         List<Block> blocks = this.getBlocks();
         if (blocks != null) {
             Block origin = blocks.get(0);
