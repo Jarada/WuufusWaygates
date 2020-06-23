@@ -1,4 +1,17 @@
 CHANGELOG
 
-1.0.0
+1.0.2 (06/23/20)
+- Gate Exits can now be modified. An Owner using a Gate Constructor on
+  a gate they own (or an Admin on any gate) can modify the gate's exit
+  location to their currently standing location.
+- Gates now teleport players to the center of a gate exit's block, and
+  not the edge.
+- Rewrote the gate orientation check for opening gates which should
+  prevent issues where some gates would spawn Nether Portal blocks in
+  the incorrect orientation to the gate.
+
+1.0.1 (06/18/20)
+- Supports 1.13 and 1.14
+
+1.0.0 (06/12/20)
 - First release
