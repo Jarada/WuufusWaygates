@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -146,8 +147,14 @@ public class WaygateListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onCreatureSpawnEvent(CreatureSpawnEvent e) {
         // Verify Spawn
-        if (e.getEntityType() != EntityType.PIG_ZOMBIE)
-            return;
+        if (Arrays.stream(EntityType.values()).anyMatch((t) -> t.name().equals("PIG_ZOMBIE"))) {
+            // 1.15- Support
+            if (e.getEntityType() != EntityType.valueOf("PIG_ZOMBIE"))
+                return;
+        } else {
+            if (e.getEntityType() != EntityType.ZOMBIFIED_PIGLIN)
+                return;
+        }
 
         if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NETHER_PORTAL)
             return;
