@@ -1,5 +1,8 @@
 CHANGELOG
 
+1.0.3 (06/28/20)
+- 1.16 support
+
 1.0.2 (06/23/20)
 - Gate Exits can now be modified. An Owner using a Gate Constructor on
   a gate they own (or an Admin on any gate) can modify the gate's exit
