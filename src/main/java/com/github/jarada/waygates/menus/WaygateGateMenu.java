@@ -57,6 +57,7 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         buildGates();
 
         addGateOwnerToMenu(false);
+        addGateIconToMenu();
         addNetworkToMenu();
 
         if (page > 1) {
@@ -78,8 +79,12 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         addCloseToMenu();
     }
 
+    private void addGateIconToMenu() {
+        setOption(10, currentWaygate, false);
+    }
+
     private void addNetworkToMenu() {
-        addNetworkToMenu(10, currentWaygate.getNetwork(), false);
+        addNetworkToMenu(11, currentWaygate.getNetwork(), false);
     }
 
     public void setOption(int slot, String name, ItemStack icon) {

@@ -193,6 +193,10 @@ public abstract class Menu {
     }
 
     public void setOption(int slot, Gate gate) {
+        setOption(slot, gate, true);
+    }
+
+    public void setOption(int slot, Gate gate, boolean selectable) {
         Location loc = gate.getExit().getLocation();
         String displayName = Msg.MENU_COLOR_GATE.toString() + gate.getName();
 
@@ -221,10 +225,14 @@ public abstract class Menu {
         if (gate.getDescription() != null && gate.getDescription().length() > 0)
             lore.addAll(Arrays.asList(Util.getWrappedLore(gate.getDescription(), 25)));
 
-        optionNames[slot] = Util.color(displayName);
-
+        String colouredName = Util.color(displayName);
         ItemStack icon = new ItemStack(gate.getIcon(), 1);
-        optionIcons[slot] = Util.setItemNameAndLore(icon, optionNames[slot], lore);
+        ItemStack itemLore = Util.setItemNameAndLore(icon, optionNames[slot], lore);
+
+        if (selectable) {
+            optionNames[slot] = colouredName;
+            optionIcons[slot] = itemLore;
+        }
     }
 
 }
