@@ -2,6 +2,7 @@ package com.github.jarada.waygates;
 
 import com.github.jarada.waygates.data.*;
 import com.github.jarada.waygates.types.GateCreationResult;
+import com.github.jarada.waygates.types.GateMaxIndicator;
 import com.github.jarada.waygates.types.GateOrientation;
 import com.github.jarada.waygates.util.FloodUtil;
 import com.github.jarada.waygates.util.GateUtil;
@@ -23,6 +24,7 @@ public class WaygateManager {
 
     private final Map<Network, List<Gate>>    gates;
     private final Map<BlockLocation, Gate>    locationGateMap;
+    private final Map<String, List<Gate>>     playerGateMap;
     private final Map<String, List<Gate>>     worldGateMap;
     private final List<String>                worldDeletion;
 
@@ -30,6 +32,7 @@ public class WaygateManager {
         pm = PluginMain.getPluginInstance();
         gates = new LinkedHashMap<>();
         locationGateMap = new LinkedHashMap<>();
+        playerGateMap = new LinkedHashMap<>();
         worldGateMap = new LinkedHashMap<>();
         worldDeletion = new ArrayList<>();
     }
@@ -49,6 +52,11 @@ public class WaygateManager {
         }
         this.gates.get(gate.getNetwork()).add(gate);
 
+        if (!this.playerGateMap.containsKey(gate.getOwner().toString())) {
+            this.playerGateMap.put(gate.getOwner().toString(), new ArrayList<>());
+        }
+        this.playerGateMap.get(gate.getOwner().toString()).add(gate);
+
         if (!this.worldGateMap.containsKey(gate.getWorldName())) {
             this.worldGateMap.put(gate.getWorldName(), new ArrayList<>());
         }
@@ -60,6 +68,12 @@ public class WaygateManager {
             this.gates.get(gate.getNetwork()).remove(gate);
             if (!gate.getNetwork().isSystem() && this.gates.get(gate.getNetwork()).size() == 0) {
                 this.gates.remove(gate.getNetwork());
+            }
+        }
+        if (this.playerGateMap.containsKey(gate.getOwner().toString())) {
+            this.playerGateMap.get(gate.getOwner().toString()).remove(gate);
+            if (this.playerGateMap.get(gate.getOwner().toString()).size() == 0) {
+                this.playerGateMap.remove(gate.getOwner().toString());
             }
         }
         if (this.worldGateMap.containsKey(gate.getWorldName())) {
@@ -195,6 +209,24 @@ public class WaygateManager {
         return false;
     }
 
+    /* Gate Player Permission Check */
+
+    public GateMaxIndicator getGateMaxIndicatorForPlayer(Player p) {
+        int count = (playerGateMap.containsKey(p.getUniqueId().toString())) ? playerGateMap.get(p.getUniqueId().toString()).size() : 0;
+        int allowedGates = 0;
+
+        // Permission Loop
+        if (!p.hasPermission("wg.admin") && !p.isOp())
+            for(int i = 100; i > 0; i--){
+                if(p.hasPermission("wg.create.gate.amount." + i)){
+                    allowedGates = i;
+                    break;
+                }
+            }
+
+        return new GateMaxIndicator(count, allowedGates);
+    }
+
     /* Gate Getters */
 
     public ArrayList<Gate> getConnectedGates(Gate gate, boolean hiddenComparator) {
@@ -307,6 +339,13 @@ public class WaygateManager {
             if (!existing.getOwner().equals(p.getUniqueId()))
                 Msg.GATE_ALREADY_EXISTS.sendTo(p);
             return GateCreationResult.RESULT_EXISTING_GATE_FOUND;
+        }
+
+        // Check to see if we can make a gate from the permission set
+        GateMaxIndicator gateMaxIndicator = getGateMaxIndicatorForPlayer(p);
+        if (!gateMaxIndicator.canCreate()) {
+            Msg.GATE_MAX_REACHED.sendTo(p, gateMaxIndicator.getAmountAllowed());
+            return GateCreationResult.RESULT_MAX_GATES_REACHED;
         }
 
         // Alright, let's check if we can actually make something out of this
