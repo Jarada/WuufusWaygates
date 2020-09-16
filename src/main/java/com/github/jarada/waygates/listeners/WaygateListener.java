@@ -185,47 +185,48 @@ public class WaygateListener implements Listener {
         ItemStack is = event.getItem();
         boolean mainHand = is != null && is.equals(player.getInventory().getItemInMainHand());
 
-        if (mainHand) {
-            // Only owner can modify gate
-            if (gate.getOwner().equals(player.getUniqueId()) || player.hasPermission("wp.admin")) {
-                // Check
-                Material m = is.getType();
-                if (m == Material.WRITTEN_BOOK) {
-                    BookMeta bm = (BookMeta) is.getItemMeta();
+        if (!mainHand)
+            return;
+        
+        // Only owner can modify gate
+        if (gate.getOwner().equals(player.getUniqueId()) || player.hasPermission("wp.admin")) {
+            // Check
+            Material m = is.getType();
+            if (m == Material.WRITTEN_BOOK) {
+                BookMeta bm = (BookMeta) is.getItemMeta();
 
-                    if (bm == null || bm.hasDisplayName() || bm.hasLore())
-                        return;
+                if (bm == null || bm.hasDisplayName() || bm.hasLore())
+                    return;
 
-                    StringBuilder content = new StringBuilder();
+                StringBuilder content = new StringBuilder();
 
-                    for (int page = 1; page <= bm.getPageCount(); page++) {
-                        content.append(bm.getPage(page));
+                for (int page = 1; page <= bm.getPageCount(); page++) {
+                    content.append(bm.getPage(page));
 
-                        if (page != bm.getPageCount())
-                            content.append(" ");
-                    }
-
-                    if (content.length() > dm.WG_DESC_MAX_LENGTH)
-                        content = new StringBuilder(content.substring(0, dm.WG_DESC_MAX_LENGTH));
-
-                    player.closeInventory();
-                    gate.setDescription(content.toString());
-                    Msg.GATE_DESC_UPDATED_BOOK.sendTo(player, gate.getName(), bm.getTitle());
-                } else {
-                    if (is.hasItemMeta())
-                        return;
-
-                    gate.setIcon(m);
-                    Msg.GATE_SET_ICON.sendTo(player, gate.getName(), m.toString());
+                    if (page != bm.getPageCount())
+                        content.append(" ");
                 }
 
-                is.setAmount(is.getAmount() - 1);
-                player.getInventory().setItemInMainHand(is);
-                dm.saveWaygate(gate, false);
-                Util.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+                if (content.length() > dm.WG_DESC_MAX_LENGTH)
+                    content = new StringBuilder(content.substring(0, dm.WG_DESC_MAX_LENGTH));
+
+                player.closeInventory();
+                gate.setDescription(content.toString());
+                Msg.GATE_DESC_UPDATED_BOOK.sendTo(player, gate.getName(), bm.getTitle());
             } else {
-                Msg.NO_PERMS.sendTo(player);
+                if (is.hasItemMeta())
+                    return;
+
+                gate.setIcon(m);
+                Msg.GATE_SET_ICON.sendTo(player, gate.getName(), m.toString());
             }
+
+            is.setAmount(is.getAmount() - 1);
+            player.getInventory().setItemInMainHand(is);
+            dm.saveWaygate(gate, false);
+            Util.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
+        } else {
+            Msg.NO_PERMS.sendTo(player);
         }
     }
 
