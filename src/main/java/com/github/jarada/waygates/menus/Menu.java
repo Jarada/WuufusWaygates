@@ -131,12 +131,18 @@ public abstract class Menu {
     }
 
     void addNetworkToMenu(int slot, Network nw, boolean showSelected) {
-        String displayName = (nw.isSystem()) ?
+        String networkName = (nw.isSystem()) ?
                 Msg.MENU_COLOR_SYSTEM_NETWORK.toString() + Util.stripColor(nw.getName()) :
                 Msg.MENU_COLOR_NETWORK.toString() + Util.stripColor(nw.getName());
         int gateCount = WaygateManager.getManager().countOfGatesInNetwork(p, nw, false);
+        String displayName = networkName;
 
         List<String> lore = new ArrayList<>();
+        if (!showSelected) {
+            // Current Waygate Network Display
+            displayName = Msg.MENU_TITLE_GATE_NETWORK.toString();
+            lore.add(Util.color(networkName));
+        }
         if (nw.isSystem()) {
             if (nw.equals(Network.getVoidNetwork()))
                 lore.add(Util.color(Msg.NETWORK_SYSTEM_VOID.toString()));
@@ -193,23 +199,22 @@ public abstract class Menu {
     }
 
     public void setOption(int slot, Gate gate) {
-        setOption(slot, gate, true);
-    }
-
-    public void setOption(int slot, Gate gate, boolean selectable) {
         Location loc = gate.getExit().getLocation();
-        String displayName = Msg.MENU_COLOR_GATE.toString() + gate.getName();
+        String gateName = Msg.MENU_COLOR_GATE.toString() + gate.getName();
 
         if (gate.isOwnerPrivate() && gate.isOwnerHidden())
-            displayName += String.format(" %s", Msg.MENU_GATE_RESTRICTED.toString());
+            gateName += String.format(" %s", Msg.MENU_GATE_RESTRICTED.toString());
         else if (gate.isOwnerPrivate())
-            displayName += String.format(" %s", Msg.MENU_GATE_PRIVATE.toString());
+            gateName += String.format(" %s", Msg.MENU_GATE_PRIVATE.toString());
         else if (gate.isOwnerHidden())
-            displayName += String.format(" %s", Msg.MENU_GATE_HIDDEN.toString());
-
-
+            gateName += String.format(" %s", Msg.MENU_GATE_HIDDEN.toString());
+        String displayName = gateName;
 
         List<String> lore = new ArrayList<>();
+        if (gate == currentWaygate) {
+            displayName = Msg.MENU_TITLE_GATE_INFO.toString();
+            lore.add(Util.color(gateName));
+        }
         if (loc.getWorld() != null)
             lore.add(Util.color(Msg.MENU_LORE_GATE_1.toString(loc.getWorld().getName())));
         else
@@ -227,12 +232,10 @@ public abstract class Menu {
 
         String colouredName = Util.color(displayName);
         ItemStack icon = new ItemStack(gate.getIcon(), 1);
-        ItemStack itemLore = Util.setItemNameAndLore(icon, optionNames[slot], lore);
+        ItemStack itemLore = Util.setItemNameAndLore(icon, colouredName, lore);
 
-        if (selectable) {
-            optionNames[slot] = colouredName;
-            optionIcons[slot] = itemLore;
-        }
+        optionNames[slot] = colouredName;
+        optionIcons[slot] = itemLore;
     }
 
 }

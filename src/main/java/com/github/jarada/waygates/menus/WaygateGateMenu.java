@@ -80,7 +80,8 @@ public class WaygateGateMenu extends WaygateAccessMenu {
     }
 
     private void addGateIconToMenu() {
-        setOption(10, currentWaygate, false);
+        setOption(10, currentWaygate);
+        optionWaygates[10] = null;
     }
 
     private void addNetworkToMenu() {
