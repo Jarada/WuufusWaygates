@@ -1,5 +1,8 @@
 CHANGELOG
 
+1.0.5 (09/16/20)
+- Fix for preventing offhand item use in 1.0.4
+
 1.0.4 (09/16/20)
 - Add support for limiting number of Waygates through permissions
 - Add gate icon and info to the Waygate Menu
