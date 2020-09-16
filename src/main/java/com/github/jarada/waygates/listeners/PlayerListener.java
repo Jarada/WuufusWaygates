@@ -42,7 +42,7 @@ public class PlayerListener implements Listener {
         if (is == null || event.getClickedBlock() == null)
             return;
 
-        if (!mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_CONSTRUCTOR)) {
+        if (mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_CONSTRUCTOR)) {
             if (!p.hasPermission("wg.create.gate"))
                 return;
 
@@ -61,7 +61,7 @@ public class PlayerListener implements Listener {
                 is.setAmount(is.getAmount() - 1);
                 p.getInventory().setItemInMainHand(is);
             }
-        } else if (!mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_KEY)) {
+        } else if (mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_KEY)) {
             if (!p.hasPermission("wg.key.use"))
                 return;
 
