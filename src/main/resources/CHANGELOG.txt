@@ -1,5 +1,11 @@
 CHANGELOG
 
+1.0.4 (09/16/20)
+- Add support for limiting number of Waygates through permissions
+- Add gate icon and info to the Waygate Menu
+- Fixes bug where setting a Waygate icon with a stack of items in
+  offhand duplicates items to main hand
+
 1.0.3 (06/28/20)
 - 1.16 support
 
