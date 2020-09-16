@@ -34,12 +34,18 @@ public class PlayerListener implements Listener {
         Player p = event.getPlayer();
         Action a = event.getAction();
         ItemStack is = event.getItem();
+        boolean mainHand = is != null && is.equals(p.getInventory().getItemInMainHand());
 
         if (a == Action.PHYSICAL || p.hasMetadata("InMenu"))
             return;
 
         if (is == null || event.getClickedBlock() == null)
             return;
+
+        if (!mainHand) {
+            event.setCancelled(true);
+            return;
+        }
 
         if (!p.isSneaking() && is.isSimilar(dm.WAYGATE_CONSTRUCTOR)) {
             if (!p.hasPermission("wg.create.gate"))
