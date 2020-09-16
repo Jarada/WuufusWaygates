@@ -1,5 +1,8 @@
 CHANGELOG
 
+1.0.6 (09/16/20)
+- Fix for issue on creating/interacting with gates in 1.0.5
+
 1.0.5 (09/16/20)
 - Fix for preventing offhand item use in 1.0.4
 
