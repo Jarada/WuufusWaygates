@@ -1,5 +1,10 @@
 CHANGELOG
 
+1.1.0 (10/03/20)
+- Add support for Always On Waygates
+- The Destination of a Waygate will always appear at the front of the
+  gate access list
+
 1.0.6 (09/16/20)
 - Fix for issue on creating/interacting with gates in 1.0.5
 
