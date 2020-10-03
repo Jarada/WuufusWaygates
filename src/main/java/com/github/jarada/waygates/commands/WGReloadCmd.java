@@ -13,7 +13,9 @@ public class WGReloadCmd implements PluginCommand {
         DataManager.getManager().reload();
 
         for (Gate gate : WaygateManager.getManager().getAllGates()) {
-            gate.deactivate();
+            if (!gate.isAlwaysOn()) {
+                gate.deactivate();
+            }
         }
 
         Msg.RELOADED.sendTo(sender);

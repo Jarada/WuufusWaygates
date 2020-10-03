@@ -66,19 +66,19 @@ public class WaygateManager {
     private void removeFromGates(Gate gate) {
         if (this.gates.containsKey(gate.getNetwork())) {
             this.gates.get(gate.getNetwork()).remove(gate);
-            if (!gate.getNetwork().isSystem() && this.gates.get(gate.getNetwork()).size() == 0) {
+            if (!gate.getNetwork().isSystem() && this.gates.get(gate.getNetwork()).isEmpty()) {
                 this.gates.remove(gate.getNetwork());
             }
         }
         if (this.playerGateMap.containsKey(gate.getOwner().toString())) {
             this.playerGateMap.get(gate.getOwner().toString()).remove(gate);
-            if (this.playerGateMap.get(gate.getOwner().toString()).size() == 0) {
+            if (this.playerGateMap.get(gate.getOwner().toString()).isEmpty()) {
                 this.playerGateMap.remove(gate.getOwner().toString());
             }
         }
         if (this.worldGateMap.containsKey(gate.getWorldName())) {
             this.worldGateMap.get(gate.getWorldName()).remove(gate);
-            if (this.worldGateMap.get(gate.getWorldName()).size() == 0) {
+            if (this.worldGateMap.get(gate.getWorldName()).isEmpty()) {
                 this.worldGateMap.remove(gate.getWorldName());
             }
         }
@@ -114,12 +114,15 @@ public class WaygateManager {
     }
 
     public void loadGates(List<Gate> gates) {
-        if (this.gates.keySet().size() == 0)
+        if (this.gates.isEmpty())
             for (Network systemNetwork : Network.systemNetworks())
                 this.gates.put(systemNetwork, new ArrayList<>());
         for (Gate gate : gates) {
             recordGate(gate, true);
-            gate.deactivate();
+            if (gate.isAlwaysOn() && gate.getActiveDestination() != null)
+                gate.activateOnLoad();
+            else
+                gate.deactivate();
         }
         pm.getLogger().info(String.format("Loaded %d gates in %d world(s)", gates.size(), worldGateMap.keySet().size()));
     }
@@ -137,11 +140,11 @@ public class WaygateManager {
 
         // Close gates active to this gate, network has changed
         for (Gate toClose : getGatesInNetwork(prevNetwork)) {
-            if (toClose.isActive() && toClose.getActiveDestination().equals(gate.getExit())) {
+            if (toClose.isActive() && toClose.getActiveDestination().equals(gate)) {
                 // Close!
                 toClose.deactivate();
             }
-            if (toClose.getFixedDestination() != null && toClose.getFixedDestination() == gate) {
+            if (toClose.getFixedDestination() != null && toClose.getFixedDestination().equals(gate)) {
                 // Remove destination
                 toClose.setFixedDestination(null);
                 DataManager.getManager().saveWaygate(toClose, false);
@@ -232,7 +235,7 @@ public class WaygateManager {
     public ArrayList<Gate> getConnectedGates(Gate gate, boolean hiddenComparator) {
         ArrayList<Gate> gates = new ArrayList<>(this.gates.get(gate.getNetwork()));
         gates.remove(gate);
-        return sortedGates(gates, hiddenComparator);
+        return sortedGates(gates, gate.getActiveDestination(), hiddenComparator);
     }
 
     public ArrayList<Gate> getAllGatesInWorld(String worldName, boolean accurate) {
@@ -258,11 +261,19 @@ public class WaygateManager {
     }
 
     public ArrayList<Gate> sortedGates(ArrayList<Gate> unsorted) {
-        return sortedGates(unsorted, false);
+        return sortedGates(unsorted, null, false);
     }
 
-    public ArrayList<Gate> sortedGates(ArrayList<Gate> unsorted, final boolean hiddenComparator) {
+    public ArrayList<Gate> sortedGates(ArrayList<Gate> unsorted, Gate accessGate, final boolean hiddenComparator) {
         unsorted.sort((o1, o2) -> {
+            if (accessGate != null) {
+                // Put Access Gate First
+                if (o1 == accessGate)
+                    return -1;
+                else if (o2 == accessGate)
+                    return 1;
+            }
+
             if (hiddenComparator) {
                 boolean hiddenA = o1.isOwnerHidden();
                 boolean hiddenB = o2.isOwnerHidden();

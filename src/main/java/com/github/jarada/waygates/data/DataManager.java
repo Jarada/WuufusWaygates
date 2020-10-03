@@ -264,6 +264,11 @@ public class DataManager {
             if (gate.getDestinationUuid() != null) {
                 gate.setFixedDestination(gateMap.get(gate.getDestinationUuid()));
             }
+
+            // Set Active Destination
+            if (gate.getActiveDestinationUuid() != null) {
+                gate.setActiveDestination(gateMap.get(gate.getActiveDestinationUuid()));
+            }
         }
 
         // Save

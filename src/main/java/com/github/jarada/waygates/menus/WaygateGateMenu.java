@@ -26,8 +26,8 @@ public class WaygateGateMenu extends WaygateAccessMenu {
             Bukkit.getScheduler().runTask(pm, () -> {
                 if (currentWaygate.isActive())
                     currentWaygate.deactivate();
-                GateActivationResult result = currentWaygate.activate(selectedGate.getExit());
-                if (result == GateActivationResult.RESULT_ACTIVATED)
+                GateActivationResult result = currentWaygate.activate(selectedGate);
+                if (result == GateActivationResult.RESULT_ACTIVATED || currentWaygate.isAlwaysOn())
                     mm.saveUpdateToGate();
                 p.closeInventory();
                 if (result == GateActivationResult.RESULT_NOT_INTACT) {
@@ -40,10 +40,14 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         } else {
             if (optionNames[slot].equals("Settings")) {
                 Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateSettingsMenu());
-            } else if (optionNames[slot].equals("Close")) {
+            } else if (optionNames[slot].equals("Deactivate")) {
                 Bukkit.getScheduler().runTask(pm, () -> {
                     if (currentWaygate.isActive())
-                        currentWaygate.deactivate();
+                        currentWaygate.deactivate(true);
+                    mm.close();
+                });
+            } else if (optionNames[slot].equals("Close")) {
+                Bukkit.getScheduler().runTask(pm, () -> {
                     mm.close();
                 });
             } else {
@@ -72,9 +76,11 @@ public class WaygateGateMenu extends WaygateAccessMenu {
             addNextToMenu();
         }
 
-        if (currentWaygate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")) {
-            addItemToMenu(16, Material.LEVER, Msg.MENU_TITLE_SETTINGS.toString(), "Settings");
-        }
+        if (currentWaygate.isActive())
+            addDeactivateGateToMenu();
+
+        if (currentWaygate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin"))
+            addItemToMenu(currentWaygate.isActive() ? 15 : 16, Material.LEVER, Msg.MENU_TITLE_SETTINGS.toString(), "Settings");
 
         addCloseToMenu();
     }
@@ -86,6 +92,10 @@ public class WaygateGateMenu extends WaygateAccessMenu {
 
     private void addNetworkToMenu() {
         addNetworkToMenu(11, currentWaygate.getNetwork(), false);
+    }
+
+    private void addDeactivateGateToMenu() {
+        addItemToMenu(16, Material.CRIMSON_DOOR, Msg.MENU_TITLE_DEACTIVATE.toString(), "Deactivate");
     }
 
     public void setOption(int slot, String name, ItemStack icon) {

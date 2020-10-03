@@ -4,7 +4,6 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
-import com.github.jarada.waygates.data.GridLocation;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.types.GateCreationResult;
@@ -90,8 +89,6 @@ public class PlayerListener implements Listener {
         BlockLocation to = new BlockLocation(e.getTo());
         if (from.equals(to))
             return;
-
-        // Verify InMenu
 
         // Verify Gate
         Gate gate = gm.getGateAtLocation(to);

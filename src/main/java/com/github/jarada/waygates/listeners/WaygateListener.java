@@ -251,7 +251,7 @@ public class WaygateListener implements Listener {
 
                     DataManager dm = DataManager.getManager();
                     WaygateManager wm = WaygateManager.getManager();
-                    GateActivationResult result = gate.activate(gate.getFixedDestination().getExit());
+                    GateActivationResult result = gate.activate(gate.getFixedDestination());
 
                     if (result == GateActivationResult.RESULT_ACTIVATED)
                         dm.saveWaygate(gate, false);

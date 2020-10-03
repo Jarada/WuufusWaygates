@@ -10,7 +10,6 @@ import com.github.jarada.waygates.util.Util;
 import com.google.gson.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.*;
@@ -32,8 +31,11 @@ public class Gate {
     private transient Gate destination;
     private String destinationUuid;
 
+    private transient Gate activeDestination;
+    private String activeDestinationUuid;
+
     private Material icon;
-    private boolean ownerPrivate, ownerHidden;
+    private boolean ownerPrivate, ownerHidden, alwaysOn;
     private final long createdMillis;
     private long activatedMillis;
     private long usedMillis;
@@ -43,7 +45,7 @@ public class Gate {
     private final Set<BlockLocation> coords;
 
     private transient Set<Menu> activeMenus;
-    private transient GridLocation activeDestination;
+    private transient GridLocation activeLocation;
     private transient BukkitTask activeTask;
 
     public Gate(UUID owner, Set<BlockLocation> coords, BlockLocation start, GridLocation exit) {
@@ -128,6 +130,24 @@ public class Gate {
         this.destinationUuid = destinationUuid;
     }
 
+    public Gate getActiveDestination() {
+        return activeDestination;
+    }
+
+    public void setActiveDestination(Gate activeDestination) {
+        this.activeDestination = activeDestination;
+    }
+
+    public String getActiveDestinationUuid() {
+        if (activeDestinationUuid == null && getActiveDestination() != null)
+            return getActiveDestination().getUUID().toString();
+        return activeDestinationUuid;
+    }
+
+    public void setActiveDestinationUuid(String activeDestinationUuid) {
+        this.activeDestinationUuid = activeDestinationUuid;
+    }
+
     public Material getIcon() {
         if (icon == null)
             return Material.ENDER_PEARL;
@@ -154,6 +174,16 @@ public class Gate {
 
     public void setOwnerHidden(boolean ownerHidden) {
         this.ownerHidden = ownerHidden;
+    }
+
+    public boolean isAlwaysOn() {
+        return alwaysOn;
+    }
+
+    public void setAlwaysOn(boolean alwaysOn) {
+        this.alwaysOn = alwaysOn;
+        if (!alwaysOn && isActive())
+            deactivate();
     }
 
     @SuppressWarnings("unused")
@@ -189,8 +219,8 @@ public class Gate {
         return coords;
     }
 
-    public GridLocation getActiveDestination() {
-        return activeDestination;
+    public GridLocation getActiveLocation() {
+        return activeLocation;
     }
 
     public String getWorldName() {
@@ -224,36 +254,61 @@ public class Gate {
 
     /* Transport */
 
-    public GateActivationResult activate(GridLocation location) {
+    public GateActivationResult activate(Gate destination) {
         // Verify Intact
         if (!isIntact()) {
             return GateActivationResult.RESULT_NOT_INTACT;
         }
 
         // Verify Location
+        GridLocation location = destination.getExit();
         if (location.getWorld() == null) {
             return GateActivationResult.RESULT_NOT_FOUND;
         }
 
-        activeDestination = location;
         activatedMillis = System.currentTimeMillis();
+        setupActiveDestination(destination);
         open();
 
-        long activationTime = 20 * DataManager.getManager().WG_GATE_ACTIVATION_TIME;
-        activeTask = Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), () -> {
-            activeTask = null;
-            activeDestination = null;
-            close();
-        }, activationTime);
+        if (!isAlwaysOn()) {
+            long activationTime = 20 * DataManager.getManager().WG_GATE_ACTIVATION_TIME;
+            activeTask = Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), () -> {
+                activeTask = null;
+                activeLocation = null;
+                close();
+            }, activationTime);
+        }
         return GateActivationResult.RESULT_ACTIVATED;
     }
 
+    public boolean activateOnLoad() {
+        if (isAlwaysOn() && getActiveDestination() != null) {
+            setupActiveDestination(getActiveDestination());
+            open();
+            return true;
+        }
+        return false;
+    }
+
     public void deactivate() {
+        deactivate(false);
+    }
+
+    public void deactivate(boolean saveGate) {
         if (activeTask != null)
             activeTask.cancel();
         activeTask = null;
-        activeDestination = null;
+        setupActiveDestination(null);
         close();
+
+        if (saveGate && isAlwaysOn())
+            DataManager.getManager().saveWaygate(this, false);
+    }
+
+    private void setupActiveDestination(Gate destination) {
+        activeDestination = destination;
+        activeDestinationUuid = (destination != null && isAlwaysOn()) ? destination.getUUID().toString() : null;
+        activeLocation = (destination != null) ? destination.getExit() : null;
     }
 
     public boolean verify(Player p) {
@@ -271,10 +326,10 @@ public class Gate {
         usedMillis = System.currentTimeMillis();
 
         // Verify
-        BlockLocation to = (activeDestination != null) ? activeDestination : exit;
+        BlockLocation to = (activeLocation != null) ? activeLocation : exit;
         if (to.getWorld() == null) {
             // Abort! Abort!
-            deactivate();
+            deactivate(true);
             return null;
         }
         Util.checkChunkLoad(to.getWorld().getBlockAt(to.getLocation()));
@@ -309,7 +364,7 @@ public class Gate {
         }
 
         if (to != exit)
-            Util.playSound(activeDestination.getLocation(), Sound.ENTITY_GHAST_SHOOT);
+            Util.playSound(activeLocation.getLocation(), Sound.ENTITY_GHAST_SHOOT);
 
         // Include Leashed Entities
         for (LivingEntity leashedEntity : leashed)
@@ -371,7 +426,7 @@ public class Gate {
     }
 
     public boolean isActive() {
-        return activeDestination != null;
+        return activeLocation != null;
     }
 
     /* Leashed Transport */
