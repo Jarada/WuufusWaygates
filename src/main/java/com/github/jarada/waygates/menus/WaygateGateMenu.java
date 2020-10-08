@@ -9,6 +9,8 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class WaygateGateMenu extends WaygateAccessMenu {
@@ -95,7 +97,11 @@ public class WaygateGateMenu extends WaygateAccessMenu {
     }
 
     private void addDeactivateGateToMenu() {
-        addItemToMenu(16, Material.CRIMSON_DOOR, Msg.MENU_TITLE_DEACTIVATE.toString(), "Deactivate");
+        Material icon = Material.ACACIA_DOOR; // 1.15 support
+        if (Arrays.stream(Material.values()).anyMatch(t -> t.name().equals("CRIMSON_DOOR"))) {
+            icon = Material.CRIMSON_DOOR;
+        }
+        addItemToMenu(16, icon, Msg.MENU_TITLE_DEACTIVATE.toString(), "Deactivate");
     }
 
     public void setOption(int slot, String name, ItemStack icon) {
