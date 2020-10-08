@@ -352,11 +352,26 @@ public class WaygateManager {
             return GateCreationResult.RESULT_EXISTING_GATE_FOUND;
         }
 
+        // Check if gates of radius 1 are found
+        // This prevents gates being formed right next to each other
+        // As well as clears a bug where gates form from a wall
+        if (!getGatesNearLocation(blockLocation, 1).isEmpty())
+            return GateCreationResult.RESULT_EXISTING_NEARBY_GATE_FOUND;
+
         // Check to see if we can make a gate from the permission set
         GateMaxIndicator gateMaxIndicator = getGateMaxIndicatorForPlayer(p);
         if (!gateMaxIndicator.canCreate()) {
             Msg.GATE_MAX_REACHED.sendTo(p, gateMaxIndicator.getAmountAllowed());
             return GateCreationResult.RESULT_MAX_GATES_REACHED;
+        }
+
+        // Check if gates of minimal distance radius are found
+        // We do this after permissions check to ensure players don't spend time
+        // trying to fit gates into a radius, only to realise they can't build any
+        int minimalRadius = DataManager.getManager().WG_GATE_MINIMAL_DISTANCE;
+        if (minimalRadius > 1 && !getGatesNearLocation(blockLocation, minimalRadius).isEmpty()) {
+            Msg.GATE_TOO_CLOSE.sendTo(p, minimalRadius);
+            return GateCreationResult.RESULT_EXISTING_NEARBY_GATE_FOUND;
         }
 
         // Alright, let's check if we can actually make something out of this

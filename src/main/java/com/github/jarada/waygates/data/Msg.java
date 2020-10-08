@@ -33,6 +33,7 @@ public enum Msg {
     GATE_NO_FRAME("&cError: &fThere is no frame for the gate, or it is too big."),
     GATE_SET_ICON("&6%s: &fWaygate icon set to &a%s&f."),
     GATE_SET_NAME("&6Enter new name for Waygate (max %d characters):"),
+    GATE_TOO_CLOSE("&cError: &fThis block is too close to other gate(s). You can only build gates more than %d blocks from other gates."),
     LIST_GATE("&6Gate &f%s &f(%s&f)&6 owned by &f%s &6in &aX: &f%d, &aY: &f%d, &aZ: &f%d"),
     LIST_GATE_WORLDS("&6Gate &f%s (%s)&6 owned by &f%s &6in &aX: &f%d, &aY: &f%d, &aZ: &f%d, &aWorld: &f%s"),
     LIST_NONE_FOUND("&cError: &fNo gates found!"),

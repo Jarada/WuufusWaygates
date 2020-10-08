@@ -43,6 +43,7 @@ public class DataManager {
     public int                          WG_NAME_MAX_LENGTH, WG_DESC_MAX_LENGTH;
     public int                          WG_NETWORK_NAME_MAX_LENGTH;
     public int                          WG_GATE_ACTIVATION_TIME;
+    public int                          WG_GATE_MINIMAL_DISTANCE;
     public boolean                      WG_CONSTRUCTOR_CONSUMES;
     public boolean                      WG_KEY_PERMANENT;
     public boolean                      WG_ZOMBIE_PIGMAN_ALLOWED;
@@ -83,6 +84,7 @@ public class DataManager {
         WG_DESC_MAX_LENGTH = config.getInt("Waygates.WG_DESC_MAX_LENGTH");
         WG_NETWORK_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NETWORK_NAME_MAX_LENGTH"));
         WG_GATE_ACTIVATION_TIME = Integer.min(300, Integer.max(5, config.getInt("Waygates.WG_GATE_ACTIVATION_TIME")));
+        WG_GATE_MINIMAL_DISTANCE = Integer.min(50, Integer.max(1, config.getInt("Waygates.WG_GATE_MINIMAL_DISTANCE")));
         WG_CONSTRUCTOR_CONSUMES = config.getBoolean("Waygates.WG_CONSTRUCTOR_CONSUMES");
         WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT");
         WG_ZOMBIE_PIGMAN_ALLOWED = config.getBoolean("Waygates.WG_ZOMBIE_PIGMAN_ALLOWED");
