@@ -2,6 +2,7 @@ package com.github.jarada.waygates.menus;
 
 import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
+import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.types.GateActivationResult;
@@ -37,6 +38,12 @@ public class WaygateGateMenu extends WaygateAccessMenu {
                             new BlockLocation(currentWaygate.getCenterBlock().getLocation()));
                 } else if (result == GateActivationResult.RESULT_NOT_FOUND) {
                     Msg.GATE_EXIT_FAILURE.sendTo(p);
+                } else if (result == GateActivationResult.RESULT_ACTIVATED && DataManager.getManager().WG_KEY_CONSUMES && !DataManager.getManager().WG_KEY_PERMANENT) {
+                    if (!p.hasPermission("wg.admin") && p.getInventory().getItemInMainHand().isSimilar(DataManager.getManager().WAYGATE_KEY)) {
+                        ItemStack is = p.getInventory().getItemInMainHand();
+                        is.setAmount(is.getAmount() - 1);
+                        p.getInventory().setItemInMainHand(is);
+                    }
                 }
             });
         } else {
