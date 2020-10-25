@@ -101,7 +101,7 @@ public class WaygateKeyListener implements Listener {
         DataManager dm = DataManager.getManager();
 
         // If WG_KEY_PERMANENT is true, gives players with
-        // "wp.key.permanent" a Waygate Key if they don't have one
+        // "wg.key.permanent" a Waygate Key if they don't have one
         if (dm.WG_KEY_PERMANENT && p.hasPermission("wg.key.permanent")) {
             PlayerInventory inv = p.getInventory();
 

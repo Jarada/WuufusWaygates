@@ -189,7 +189,7 @@ public class WaygateListener implements Listener {
             return;
         
         // Only owner can modify gate
-        if (gate.getOwner().equals(player.getUniqueId()) || player.hasPermission("wp.admin")) {
+        if (gate.getOwner().equals(player.getUniqueId()) || player.hasPermission("wg.admin")) {
             // Check
             Material m = is.getType();
             if (m == Material.WRITTEN_BOOK) {
