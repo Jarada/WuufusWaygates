@@ -49,8 +49,14 @@
    wg.command.*:
      description: Use all commands
      children:
+       wg.command.item.*: true
        wg.command.reload: true
        wg.command.world.*: true
+   wg.command.item.*:
+     description: Commands to gain items
+     children:
+       wg.command.item.constructor: true
+       wg.command.item.key: true
    wg.command.reload:
      description: Reload Config
    wg.command.world.*:

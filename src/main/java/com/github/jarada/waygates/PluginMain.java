@@ -1,9 +1,6 @@
 package com.github.jarada.waygates;
 
-import com.github.jarada.waygates.commands.PluginCommand;
-import com.github.jarada.waygates.commands.WGDeleteCmd;
-import com.github.jarada.waygates.commands.WGListCmd;
-import com.github.jarada.waygates.commands.WGReloadCmd;
+import com.github.jarada.waygates.commands.*;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.listeners.VehicleListener;
@@ -39,7 +36,9 @@ public class PluginMain extends JavaPlugin {
         DataManager.getManager().loadWaygates();
 
         commands = new HashMap<>();
+        commands.put("constructor", new WGConstructorCmd());
         commands.put("delete", new WGDeleteCmd());
+        commands.put("key", new WGKeyCmd());
         commands.put("list", new WGListCmd());
         commands.put("reload", new WGReloadCmd());
 
