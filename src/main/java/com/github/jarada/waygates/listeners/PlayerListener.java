@@ -4,16 +4,19 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
+import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.types.GateCreationResult;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -98,6 +101,24 @@ public class PlayerListener implements Listener {
         // Transport!
         gate.teleport(p);
         dm.saveWaygate(gate, false);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerCraft(CraftItemEvent e) {
+        HumanEntity he = e.getWhoClicked();
+        if (he instanceof Player) {
+            // Verify Player
+            Player p = (Player) he;
+            if (!Util.isPlayer(p) || p.isDead())
+                return;
+
+            // Verify Recipe
+            if ((e.getRecipe().getResult().isSimilar(dm.WAYGATE_CONSTRUCTOR) && !p.hasPermission("wg.craft.constructor")) ||
+                (e.getRecipe().getResult().isSimilar(dm.WAYGATE_KEY) && !p.hasPermission("wg.craft.key"))) {
+                e.setCancelled(true);
+                Msg.NO_PERMS.sendTo(p);
+            }
+        }
     }
 
 }

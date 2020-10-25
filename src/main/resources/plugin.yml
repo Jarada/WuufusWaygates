@@ -17,6 +17,11 @@
    wg.travel:
      default: true
      description: Can travel anywhere
+   wg.craft.*:
+     description: Grants access to craft Waygate Constructors and Waygate Keys
+     children:
+       wg.craft.constructor: true
+       wg.craft.key: true
    wg.key.*:
      description: Grants access to use Waygate Keys to use gate controls
      children:
@@ -71,6 +76,7 @@
      description: Standard permission set
      children:
        wg.travel: true
+       wg.craft.*: true
        wg.key.use: true
        wg.assign.*: true
        wg.create.gate: true
