@@ -125,7 +125,9 @@ public class DataManager {
 
             ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, "waygateconstructor"), WAYGATE_CONSTRUCTOR);
             sr.shape("RRR", "RGR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('G', Material.GOLD_NUGGET);
-            Bukkit.addRecipe(sr);
+            boolean recipeResult = Bukkit.addRecipe(sr);
+            if (!recipeResult)
+                pm.getLogger().warning("Unable to load recipe! Waygate Constructors will be uncraftable");
 
             lore = new ArrayList<>();
             Msg[] keyLore = {Msg.LORE_KEY_1, Msg.LORE_KEY_2, Msg.LORE_KEY_3, Msg.LORE_KEY_4};
@@ -142,7 +144,9 @@ public class DataManager {
 
             sr = new ShapedRecipe(new NamespacedKey(pm, "waygatekey"), WAYGATE_KEY);
             sr.shape("RRR", "RKR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('K', Material.FEATHER);
-            Bukkit.addRecipe(sr);
+            recipeResult = Bukkit.addRecipe(sr);
+            if (!recipeResult)
+                pm.getLogger().warning("Unable to load recipe! Waygate Keys will be uncraftable");
         }
     }
 
