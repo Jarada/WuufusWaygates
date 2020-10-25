@@ -1,5 +1,14 @@
 CHANGELOG
 
+1.1.2 (10/25/20)
+- Add flag for Waygate Key consumption on gate activation
+- Add permissions for crafting Waygate Constructors and Waygate Keys
+- Add commands for spawning Waygate Constructors and Waygate Keys
+- Fix bug where admins couldn't modify gate icons or set descriptions
+  for gates they do not own
+- A warning will now be displayed if recipes cannot be added to the
+  server
+
 1.1.1 (10/08/20)
 - Add support for a minimal radius limit for Waygate placement
 - Fix for issue accessing active Waygates in Minecraft 1.15 and below
