@@ -1,5 +1,10 @@
 CHANGELOG
 
+1.1.3 (11/19/20)
+- Fix for config Blocks Required being overwritten by defaults
+- Fix for timed gates not clearing state when deactivating
+- Added update checker to report in console when update is available
+
 1.1.2 (10/25/20)
 - Add flag for Waygate Key consumption on gate activation
 - Add permissions for crafting Waygate Constructors and Waygate Keys
