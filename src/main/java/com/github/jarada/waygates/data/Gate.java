@@ -274,8 +274,7 @@ public class Gate {
             long activationTime = 20 * DataManager.getManager().WG_GATE_ACTIVATION_TIME;
             activeTask = Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), () -> {
                 activeTask = null;
-                activeLocation = null;
-                close();
+                deactivate();
             }, activationTime);
         }
         return GateActivationResult.RESULT_ACTIVATED;
