@@ -100,6 +100,9 @@ public class DataManager {
                 }
                 BLOCKS_REQUIRED.add(requirement);
             }
+            if (BLOCKS_REQUIRED.isEmpty())
+                throw new NullPointerException();
+            config.addDefault("Waygates.BLOCKS_REQUIRED", null);
         } catch (NullPointerException e) {
             // Using Static Default
             pm.getLogger().warning("Using Static Default for Blocks Required");
