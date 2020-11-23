@@ -40,23 +40,9 @@ public class ItemStackUtil {
                 return false;
 
             if (o1.getType() == Material.PLAYER_HEAD && o2.getType() == Material.PLAYER_HEAD) {
-                if (o1.hasItemMeta() && !o2.hasItemMeta() || !o1.hasItemMeta() && o2.hasItemMeta())
-                    return false;
-
-                if (o1.getItemMeta() instanceof SkullMeta && !(o2.getItemMeta() instanceof SkullMeta) ||
-                        !(o1.getItemMeta() instanceof SkullMeta) && o2.getItemMeta() instanceof SkullMeta)
-                    return false;
-
-                if (o1.getItemMeta() instanceof SkullMeta && o2.getItemMeta() instanceof SkullMeta) {
-                    SkullMeta im1 = (SkullMeta) o1.getItemMeta();
-                    SkullMeta im2 = (SkullMeta) o2.getItemMeta();
-                    if (!(Objects.equals(im1.getDisplayName(), im2.getDisplayName()) &&
-                            Objects.equals(im1.getLore(), im2.getLore()) &&
-                            Objects.equals(im1.getOwningPlayer(), im2.getOwningPlayer()))){
-                        return false;
-                    }
-                    continue;
-                }
+                // We verify the inventory on other items, player heads just cause problems
+                // So providing the two items are player heads that will do for us
+                continue;
             }
 
             if (!(Objects.equals(o1, o2)))
