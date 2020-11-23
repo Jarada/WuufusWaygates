@@ -1,5 +1,9 @@
 CHANGELOG
 
+1.1.4 (11/23/20)
+- Fix for instances where the gate menu stopped working due to player
+  head comparisons
+
 1.1.3 (11/19/20)
 - Fix for config Blocks Required being overwritten by defaults
 - Fix for timed gates not clearing state when deactivating
