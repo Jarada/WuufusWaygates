@@ -175,7 +175,8 @@ public class WaygateManager {
 
     @SuppressWarnings("unused")
     public List<Gate> getGatesNearLocation(BlockLocation blockLocation) {
-        return getGatesNearLocation(blockLocation, 3);
+        // Radius is maximum distance gate frame blocks can be clicked
+        return getGatesNearLocation(blockLocation, 5);
     }
 
     public List<Gate> getGatesNearLocation(BlockLocation blockLocation, final int radius) {
