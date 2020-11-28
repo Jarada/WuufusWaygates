@@ -1,5 +1,9 @@
 CHANGELOG
 
+1.1.5 (11/28/20)
+- Fix for bug where larger gates wouldn't reopen menus when typing
+  into chat during gate settings adjustments or network creation
+
 1.1.4 (11/23/20)
 - Fix for instances where the gate menu stopped working due to player
   head comparisons
