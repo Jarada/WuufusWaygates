@@ -54,12 +54,12 @@ public class WaygateNetworkInviteCallback extends ChatCallback {
     public void callback() {
         if (invite != null && !failedExists) {
             if (isPlayerNearGate())
-                new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork().openWaygateNetworkManageMenu();
+                new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork().openWaygateNetworkInviteMenu();
             else
                 new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork();
         } else {
             if (isPlayerNearGate())
-                new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkManageMenu();
+                new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkInviteMenu();
         }
     }
 }

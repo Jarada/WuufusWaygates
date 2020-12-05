@@ -45,6 +45,9 @@ public class WaygateNetworkMenu extends Menu {
                     new ChatListener(new WaygateNetworkCreateCallback(p, currentWaygate));
                 });
                 break;
+            case "Invite":
+                Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateNetworkInviteMenu());
+                break;
             case "Manage":
                 Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateNetworkManageMenu());
                 break;
@@ -84,8 +87,11 @@ public class WaygateNetworkMenu extends Menu {
         if (Network.isAbleToCreateNetworks(p))
             addAddNetworkToMenu();
 
-        if (!currentWaygate.getNetwork().isSystem() && (currentWaygate.getNetwork().getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")))
+        if (!currentWaygate.getNetwork().isSystem() && (currentWaygate.getNetwork().getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin"))) {
             addManageNetworkToMenu();
+            if (currentWaygate.getNetwork().isInvite())
+                addManageNetworkInvitesToMenu();
+        }
 
         addCloseToMenu();
     }
@@ -97,6 +103,10 @@ public class WaygateNetworkMenu extends Menu {
 
     void addAddNetworkToMenu() {
         addItemToMenu(9, Material.WRITABLE_BOOK, Msg.MENU_TITLE_NETWORK_CREATE.toString(), "Create");
+    }
+
+    void addManageNetworkInvitesToMenu() {
+        addItemToMenu(15, Material.CAMPFIRE, Msg.MENU_TITLE_NETWORK_INVITE_MANAGE.toString(), "Invite");
     }
 
     void addManageNetworkToMenu() {

@@ -2,6 +2,7 @@ package com.github.jarada.waygates.data;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.data.json.*;
+import com.github.jarada.waygates.listeners.IconListener;
 import com.github.jarada.waygates.menus.Menu;
 import com.github.jarada.waygates.types.GateActivationResult;
 import com.github.jarada.waygates.types.GateOrientation;
@@ -45,6 +46,7 @@ public class Gate {
     private final Set<BlockLocation> coords;
 
     private transient Set<Menu> activeMenus;
+    private transient Set<IconListener> activeIconListeners;
     private transient GridLocation activeLocation;
     private transient BukkitTask activeTask;
 
@@ -250,6 +252,36 @@ public class Gate {
             for (Menu activeMenu : activeMenus)
                 activeMenu.close();
         }
+    }
+
+    /* Icon Listeners */
+
+    public void addIconListener(IconListener listener) {
+        if (activeIconListeners == null)
+            activeIconListeners = new HashSet<>();
+        activeIconListeners.add(listener);
+    }
+
+    public void removeIconListener(IconListener listener) {
+        if (activeIconListeners != null)
+            activeIconListeners.remove(listener);
+    }
+
+    public Optional<IconListener> getIconListenerForPlayer(Player player) {
+        if (activeIconListeners != null) {
+            return activeIconListeners.stream()
+                    .filter(x -> x.isForPlayer(player))
+                    .findAny();
+        }
+        return Optional.empty();
+    }
+
+    public void clearIconListeners() {
+        if (activeIconListeners != null) {
+            for (IconListener listener : activeIconListeners)
+                listener.expire();
+        }
+        activeIconListeners = null;
     }
 
     /* Transport */

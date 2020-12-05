@@ -130,6 +130,16 @@ public abstract class Menu {
         }
     }
 
+    void addNetworkOwnerToMenu(int slot, boolean editable) {
+        if (currentWaygate.getNetwork().getOwner() != null) {
+            OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getNetwork().getOwner());
+            List<String> lore = new ArrayList<>();
+            lore.add(Util.color(editable ? Msg.MENU_TEXT_EDITABLE.toString(owner.getName()) : Msg.MENU_TEXT_STANDARD.toString(owner.getName())));
+            ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_NETWORK_OWNER.toString()), lore);
+            setOption(slot, "Owner", is);
+        }
+    }
+
     void addNetworkToMenu(int slot, Network nw, boolean showSelected) {
         String networkName = (nw.isSystem()) ?
                 Msg.MENU_COLOR_SYSTEM_NETWORK.toString() + Util.stripColor(nw.getName()) :

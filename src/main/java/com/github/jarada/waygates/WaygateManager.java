@@ -478,8 +478,9 @@ public class WaygateManager {
         // Close Gate
         gate.deactivate();
 
-        // Clear Menus
+        // Clear Menus and Listeners
         gate.closeActiveMenus();
+        gate.clearIconListeners();
     }
 
     public boolean isWorldAwaitingDeletion(String worldName) {

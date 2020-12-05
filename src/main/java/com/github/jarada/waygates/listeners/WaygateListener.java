@@ -27,6 +27,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class WaygateListener implements Listener {
 
@@ -187,6 +188,13 @@ public class WaygateListener implements Listener {
 
         if (!mainHand)
             return;
+
+        // Check to see if we have an icon listener for this player
+        Optional<IconListener> listener = gate.getIconListenerForPlayer(player);
+        if (listener.isPresent()) {
+            listener.get().notify(player, is.getType());
+            return;
+        }
         
         // Only owner can modify gate
         if (gate.getOwner().equals(player.getUniqueId()) || player.hasPermission("wg.admin")) {

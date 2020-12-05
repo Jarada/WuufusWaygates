@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Network {
 
@@ -124,6 +125,12 @@ public class Network {
         );
     }
 
+    public static List<Material> systemIcons() {
+        List<Material> icons = systemNetworks().stream().map(Network::getIcon).collect(Collectors.toList());
+        icons.addAll(Arrays.asList(Material.RAIL, Material.DETECTOR_RAIL, Material.ACTIVATOR_RAIL, Material.POWERED_RAIL));
+        return icons;
+    }
+
     public static boolean isAbleToCreateNetworks(Player owner) {
         for (NetworkType networkType : NetworkType.values()) {
             if (networkType == NetworkType.SYSTEM || networkType == NetworkType.SYSTEM_VOID)
@@ -167,6 +174,11 @@ public class Network {
             this.name = name;
     }
 
+    public boolean isSystemIcon() {
+        if (icon == null) return false;
+        return systemIcons().stream().anyMatch(x -> x.equals(icon));
+    }
+
     public Material getIcon() {
         if (icon == null) {
             if (isPrivate())
@@ -178,6 +190,11 @@ public class Network {
             return Material.POWERED_RAIL;
         }
         return icon;
+    }
+
+    public void setIcon(Material icon) {
+        if (!isSystem())
+            this.icon = icon;
     }
 
     private void prepareInvitedUsers() {

@@ -175,6 +175,13 @@ public class MenuManager implements Listener {
         open(new WaygateNetworkTypeMenu(this, player, currentWaygate, name));
     }
 
+    public void openWaygateNetworkInviteMenu() {
+        if (currentWaygate == null)
+            return;
+
+        open(new WaygateNetworkInviteMenu(this, player, currentWaygate));
+    }
+
     public void openWaygateNetworkManageMenu() {
         if (currentWaygate == null)
             return;

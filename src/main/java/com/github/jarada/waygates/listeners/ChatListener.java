@@ -27,7 +27,7 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onChatEvent(AsyncPlayerChatEvent e){
         // Verify Player
-        if (e.getPlayer().equals(chatCallback.getPlayer())) {
+        if (e.getPlayer().equals(chatCallback.getPlayer()) && !timeout.isCancelled()) {
             timeout.cancel();
             e.setCancelled(true);
 
