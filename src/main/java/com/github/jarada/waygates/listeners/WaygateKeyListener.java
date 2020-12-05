@@ -84,20 +84,20 @@ public class WaygateKeyListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent joinEvent) {
-        giveBeacon(joinEvent.getPlayer());
+        giveKey(joinEvent.getPlayer());
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent respawnEvent) {
-        giveBeacon(respawnEvent.getPlayer());
+        giveKey(respawnEvent.getPlayer());
     }
 
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent changeEvent) {
-        giveBeacon(changeEvent.getPlayer());
+        giveKey(changeEvent.getPlayer());
     }
 
-    public void giveBeacon(Player p) {
+    public void giveKey(Player p) {
         DataManager dm = DataManager.getManager();
 
         // If WG_KEY_PERMANENT is true, gives players with
