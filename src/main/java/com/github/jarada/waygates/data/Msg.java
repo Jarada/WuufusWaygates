@@ -23,6 +23,7 @@ public enum Msg {
     GATE_CHANGE_OWNER_FAILED("&cError: &fUnable to find an online player matching that name"),
     GATE_CHANGE_OWNER_SUCCESS("&aSuccess: &fWaygate %s is now owned by %s!"),
     GATE_CREATED("&aSuccess: &fWaygate online and can be used and edited using a Waygate Key"),
+    GATE_CREATED_IMPRINT("&aSuccess: &fWaygate %s recreated using cached imprint and can be used and edited using a Waygate Key"),
     GATE_DESC_UPDATED_BOOK("&6%s: &fScanned &a%s&f. Waygate description set."),
     GATE_DESTROYED("&cGate Disruption: &fWaygate %s has been disrupted and can no longer function"),
     GATE_EXIT_FAILURE("&cError: &fThe exit to this gate cannot be found! Gate shutdown has commenced."),

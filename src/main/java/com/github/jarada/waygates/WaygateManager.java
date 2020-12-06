@@ -24,6 +24,7 @@ public class WaygateManager {
 
     private final Map<Network, List<Gate>>    gates;
     private final Map<BlockLocation, Gate>    locationGateMap;
+    private final Map<BlockLocation, Gate>    imprintGateMap;
     private final Map<String, List<Gate>>     playerGateMap;
     private final Map<String, List<Gate>>     worldGateMap;
     private final List<String>                worldDeletion;
@@ -32,6 +33,7 @@ public class WaygateManager {
         pm = PluginMain.getPluginInstance();
         gates = new LinkedHashMap<>();
         locationGateMap = new LinkedHashMap<>();
+        imprintGateMap = new LinkedHashMap<>();
         playerGateMap = new LinkedHashMap<>();
         worldGateMap = new LinkedHashMap<>();
         worldDeletion = new ArrayList<>();
@@ -413,8 +415,13 @@ public class WaygateManager {
             coords.add(new BlockLocation(block.getLocation()));
         }
 
-        // Create the Gate and Fill
-        Gate gate = new Gate(p.getUniqueId(), coords, new BlockLocation(startBlock.getLocation()), exit);
+        // Create the Gate (perhaps from imprint) and Fill
+        boolean imprint = false;
+        Gate gate = retrieveCachedImprint(p, coords);
+        if (gate != null)
+            imprint = true;
+        else
+            gate = new Gate(p.getUniqueId(), coords, new BlockLocation(startBlock.getLocation()), exit);
         gate.deactivate();
 
         // Record Gate
@@ -427,7 +434,10 @@ public class WaygateManager {
         // NB Add Gate Creation Sound FX (CG Stored in UGate)
 
         // Inform Player
-        Msg.GATE_CREATED.sendTo(p);
+        if (imprint)
+            Msg.GATE_CREATED_IMPRINT.sendTo(p, gate.getName());
+        else
+            Msg.GATE_CREATED.sendTo(p);
 
         return GateCreationResult.RESULT_GATE_CREATED;
     }
@@ -481,6 +491,9 @@ public class WaygateManager {
         // Clear Menus and Listeners
         gate.closeActiveMenus();
         gate.clearIconListeners();
+
+        // Set Imprint
+        cacheImprint(gate);
     }
 
     public boolean isWorldAwaitingDeletion(String worldName) {
@@ -494,6 +507,31 @@ public class WaygateManager {
 
     public void clearWorldForDeletion(String worldName) {
         worldDeletion.remove(worldName);
+    }
+
+    /* Gate Imprinting */
+
+    public void cacheImprint(Gate gate) {
+        Set<BlockLocation> blockLocations = gate.getCoords();
+        for (BlockLocation blockLocation : blockLocations) {
+            this.imprintGateMap.put(blockLocation, gate);
+        }
+    }
+
+    public Gate retrieveCachedImprint(Player p, Set<BlockLocation> blockLocations) {
+        Optional<BlockLocation> validBlock = imprintGateMap.keySet().stream()
+                .filter(blockLocations::contains).findAny();
+        if (validBlock.isPresent()) {
+            Gate gate = imprintGateMap.get(validBlock.get());
+            if ((gate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")) &&
+                    gate.getCoords().equals(blockLocations)) {
+                gate.getCoords().forEach(imprintGateMap::remove);
+                return gate;
+            } else {
+                gate.getCoords().forEach(imprintGateMap::remove);
+            }
+        }
+        return null;
     }
 
 }
