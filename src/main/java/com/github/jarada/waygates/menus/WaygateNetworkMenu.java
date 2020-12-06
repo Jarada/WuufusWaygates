@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class WaygateNetworkMenu extends Menu {
@@ -106,7 +107,11 @@ public class WaygateNetworkMenu extends Menu {
     }
 
     void addManageNetworkInvitesToMenu() {
-        addItemToMenu(15, Material.CAMPFIRE, Msg.MENU_TITLE_NETWORK_INVITE_MANAGE.toString(), "Invite");
+        Material icon = Material.TORCH; // 1.13 support
+        if (Arrays.stream(Material.values()).anyMatch(t -> t.name().equals("CAMPFIRE"))) {
+            icon = Material.CAMPFIRE;
+        }
+        addItemToMenu(15, icon, Msg.MENU_TITLE_NETWORK_INVITE_MANAGE.toString(), "Invite");
     }
 
     void addManageNetworkToMenu() {
