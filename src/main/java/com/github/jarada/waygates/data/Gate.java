@@ -579,7 +579,7 @@ public class Gate {
 
             if (blockMaterial != Material.NETHER_PORTAL && !Util.isMaterialAir(blockMaterial)) continue;
 
-            block.setType(material);
+            block.setType(material, Util.isMaterialAir(blockMaterial));
 
             // Apply orientation
             if (material != Material.NETHER_PORTAL) continue;
