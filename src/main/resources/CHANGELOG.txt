@@ -1,5 +1,15 @@
 CHANGELOG
 
+1.2.0 (12/16/20)
+- Added Improved Network Customisation: can rename and change icon of
+  custom networks
+- Split Inviting players to a Network to its own menu
+- Added Gate Imprints; if a gate is destroyed and recreated in the same
+  pattern as before by the same owner, the gate will reform itself from
+  a stored imprint, providing the server hasn't been restarted
+- Made a change that now stops the breaking glass effect when gates
+  deactivate
+
 1.1.5 (11/28/20)
 - Fix for bug where larger gates wouldn't reopen menus when typing
   into chat during gate settings adjustments or network creation
