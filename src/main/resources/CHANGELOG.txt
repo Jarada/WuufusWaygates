@@ -1,5 +1,9 @@
 CHANGELOG
 
+1.2.1 (01/02/2021)
+- Added support for NBT Tags being added to items for integration with plugins that require NBT tags to
+  identify items.
+
 1.2.0 (12/16/20)
 - Added Improved Network Customisation: can rename and change icon of
   custom networks
