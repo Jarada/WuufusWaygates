@@ -4,6 +4,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.util.Util;
 import com.google.common.base.Charsets;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -121,14 +122,17 @@ public class DataManager {
                 if (msg.toString().length() > 0)
                     lore.add(Util.color(msg.toString()));
 
-            WAYGATE_CONSTRUCTOR = Util.setItemNameAndLore(new ItemStack(Material.GOLD_NUGGET, 1), Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
+            final String waygateConstructorKey = "waygateconstructor";
+            WAYGATE_CONSTRUCTOR = Util.setItemNameAndLore(
+                NBTItemManager.getNBTItem(new ItemStack(Material.GOLD_NUGGET, 1), waygateConstructorKey),
+                Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
             ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
             if (activatorMeta != null) {
                 activatorMeta.addEnchant(glow, 1, true);
                 WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
             }
 
-            ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, "waygateconstructor"), WAYGATE_CONSTRUCTOR);
+            ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, waygateConstructorKey), WAYGATE_CONSTRUCTOR);
             sr.shape("RRR", "RGR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('G', Material.GOLD_NUGGET);
             boolean recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
@@ -140,14 +144,17 @@ public class DataManager {
                 if (msg.toString().length() > 0)
                     lore.add(Util.color(msg.toString()));
 
-            WAYGATE_KEY = Util.setItemNameAndLore(new ItemStack(Material.FEATHER, 1), Msg.LORE_KEY_NAME.toString(), lore);
+            final String waygateKeyKey = "waygatekey";
+            WAYGATE_KEY = Util.setItemNameAndLore(
+                    NBTItemManager.getNBTItem(new ItemStack(Material.FEATHER, 1), waygateKeyKey),
+                    Msg.LORE_KEY_NAME.toString(), lore);
             ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
             if (keyMeta != null) {
                 keyMeta.addEnchant(glow, 1, true);
                 WAYGATE_KEY.setItemMeta(keyMeta);
             }
 
-            sr = new ShapedRecipe(new NamespacedKey(pm, "waygatekey"), WAYGATE_KEY);
+            sr = new ShapedRecipe(new NamespacedKey(pm, waygateKeyKey), WAYGATE_KEY);
             sr.shape("RRR", "RKR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('K', Material.FEATHER);
             recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
@@ -380,6 +387,20 @@ public class DataManager {
         @Override
         public boolean accept(File dir, String name) {
             return new File(dir, name).isDirectory();
+        }
+
+    }
+
+    static class NBTItemManager {
+
+        public static ItemStack getNBTItem(ItemStack item, String key) {
+            if (Bukkit.getPluginManager().isPluginEnabled("NBTAPI")) {
+                NBTItem nbtItem = new NBTItem(item);
+                nbtItem.setByte("DoesNotConvert", (byte) 1);
+                nbtItem.setByte(key, (byte) 1);
+                return nbtItem.getItem();
+            }
+            return item;
         }
 
     }

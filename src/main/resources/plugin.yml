@@ -4,6 +4,8 @@
  version: ${project.version}
  prefix: WuufusWaygates
  api-version: 1.13
+ softdepend:
+   - NBTAPI
  commands:
    wg:
      description: Waygates top-level command
