@@ -115,7 +115,11 @@ public abstract class Menu {
     }
 
     void addItemToMenu(int slot, Material icon, String name, String optionName, List<String> lore) {
-        ItemStack is = new ItemStack(icon, 1);
+        addItemToMenu(slot, icon, 1, name, optionName, lore);
+    }
+
+    void addItemToMenu(int slot, Material icon, int amount, String name, String optionName, List<String> lore) {
+        ItemStack is = new ItemStack(icon, amount);
         Util.setItemNameAndLore(is, Util.color(name), lore);
         setOption(slot, optionName, is);
     }
@@ -188,7 +192,7 @@ public abstract class Menu {
     }
 
     void addPageToMenu() {
-        addItemToMenu(13, Material.BOOK, Msg.MENU_TITLE_PAGE.toString(), "Page");
+        addItemToMenu(13, Material.BOOK, Math.min(page, 64), Msg.MENU_TITLE_PAGE.toString(), "Page", null);
     }
 
     void addNextToMenu() {
