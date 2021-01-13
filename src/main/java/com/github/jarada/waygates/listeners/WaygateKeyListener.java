@@ -1,5 +1,6 @@
 package com.github.jarada.waygates.listeners;
 
+import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.BlockLocation;
 import com.github.jarada.waygates.data.DataManager;
@@ -7,6 +8,7 @@ import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.menus.MenuManager;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,10 +37,13 @@ public class WaygateKeyListener implements Listener {
         Gate gate = WaygateManager.getManager().getGateAtLocation(new BlockLocation(b.getLocation()));
         if (gate != null) {
             if (p.hasPermission("wg.key.use") && (a == Action.RIGHT_CLICK_BLOCK || a == Action.RIGHT_CLICK_AIR)) {
-                if (gate.isOwnerPrivate() && !(gate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.bypass")))
+                if (gate.isOwnerPrivate() && !(gate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.bypass"))) {
                     Msg.GATE_ACCESS_DENIED.sendTo(p);
-                else
-                    new MenuManager(p, gate).openWaygateMenu();
+                } else {
+                    // Give it a tick delay as opening a menu straight away can interfere with offhand placement
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () ->
+                            new MenuManager(p, gate).openWaygateMenu(), 1L);
+                }
             }
         }
     }
