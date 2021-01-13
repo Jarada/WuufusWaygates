@@ -1,6 +1,16 @@
 CHANGELOG
 
-1.2.1 (01/02/2021)
+1.2.2 (01/13/21)
+- Added new command aliases: `/wayg` and `/waygates` to offset other plugins like WorldGuard with same
+  command.
+- Added new permission alias: `wg.all` for `wg.*` to offset other plugins like WorldGuard with same
+  permission structure.
+- Fixed issue where teleporting on a horse in a 3 block high gate caused suffocation and sometimes the
+  horse did not properly appear on the other side without a reconnect.
+- Fixed issue where using a Waygate Key on the inside frame of a gate while carrying torches moved the
+  torch stack count down inadvertently.
+
+1.2.1 (01/02/21)
 - Added support for NBT Tags being added to items for integration with plugins that require NBT tags to
   identify items.
 
