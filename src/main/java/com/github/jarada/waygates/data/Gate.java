@@ -382,13 +382,7 @@ public class Gate {
         // Teleport Player
         Util.playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT);
         if (p.isInsideVehicle() && vehicle instanceof LivingEntity) {
-            vehicle.eject();
-            if (!(vehicle instanceof Player)) {
-                vehicle.teleport(to.getTeleportLocation());
-                vehicle.setFireTicks(0);
-                Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> vehicle.addPassenger(p), 2L);
-
-            }
+            executeTeleportVehicle(to, vehicle);
         } else {
             p.teleport(to.getTeleportLocation());
             p.setFireTicks(0);
@@ -439,10 +433,15 @@ public class Gate {
         }
 
         // Teleport Vehicle
+        executeTeleportVehicle(to, vehicle);
+    }
+
+    private void executeTeleportVehicle(BlockLocation to, Entity vehicle) {
+        final List<Entity> passengers = vehicle.getPassengers();
+
+        // Teleport Vehicle
         vehicle.eject();
         if (!(vehicle instanceof Player)) {
-            vehicle.teleport(to.getTeleportLocation());
-            vehicle.setFireTicks(0);
             Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> {
                 for (Entity passenger : passengers) {
                     passenger.teleport(to.getTeleportLocation());
@@ -450,8 +449,11 @@ public class Gate {
                 }
             }, 0L);
             Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () -> {
-                for (Entity passenger : passengers)
+                vehicle.teleport(to.getTeleportLocation());
+                vehicle.setFireTicks(0);
+                for (Entity passenger : passengers) {
                     vehicle.addPassenger(passenger);
+                }
             }, 2L);
         }
     }

@@ -76,6 +76,10 @@ public class BlockLocation {
         this.z = z;
     }
 
+    public double distance(BlockLocation to) {
+        return this.getLocation().distance(to.getLocation());
+    }
+
     @Override
     public int hashCode() {
         int result = x + y + z;
