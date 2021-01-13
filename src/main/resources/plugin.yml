@@ -10,8 +10,14 @@
    wg:
      description: Waygates top-level command
      usage: /wg <reload>
+     aliases: [wayg, waygates]
  permissions:
    wg.*:
+     description: Grants all plugin permissions
+     children:
+       wg.admin: true
+       wg.command.*: true
+   wg.all:
      description: Grants all plugin permissions
      children:
        wg.admin: true
