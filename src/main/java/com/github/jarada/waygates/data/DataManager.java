@@ -28,6 +28,9 @@ public class DataManager {
     private static final String WORLDS_FOLDER_FILENAME = "worlds";
     private static final String NETWORKS_FOLDER_FILENAME = "networks";
 
+    private static final String WAYGATE_CONSTRUCTOR_KEY = "waygateconstructor";
+    private static final String WAYGATE_KEY_KEY = "waygatekey";
+
     private static DataManager          dm;
     private final PluginMain            pm;
     private final WaygateManager        wm;
@@ -124,9 +127,9 @@ public class DataManager {
                 if (msg.toString().length() > 0)
                     lore.add(Util.color(msg.toString()));
 
-            final String waygateConstructorKey = "waygateconstructor";
+
             WAYGATE_CONSTRUCTOR = Util.setItemNameAndLore(
-                NBTItemManager.getNBTItem(new ItemStack(Material.GOLD_NUGGET, 1), waygateConstructorKey),
+                NBTItemManager.getNBTItem(new ItemStack(Material.GOLD_NUGGET, 1), WAYGATE_CONSTRUCTOR_KEY),
                 Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
             ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
             if (activatorMeta != null) {
@@ -134,7 +137,7 @@ public class DataManager {
                 WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
             }
 
-            ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, waygateConstructorKey), WAYGATE_CONSTRUCTOR);
+            ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, WAYGATE_CONSTRUCTOR_KEY), WAYGATE_CONSTRUCTOR);
             sr.shape("RRR", "RGR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('G', Material.GOLD_NUGGET);
             boolean recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
@@ -146,9 +149,8 @@ public class DataManager {
                 if (msg.toString().length() > 0)
                     lore.add(Util.color(msg.toString()));
 
-            final String waygateKeyKey = "waygatekey";
             WAYGATE_KEY = Util.setItemNameAndLore(
-                    NBTItemManager.getNBTItem(new ItemStack(Material.FEATHER, 1), waygateKeyKey),
+                    NBTItemManager.getNBTItem(new ItemStack(Material.FEATHER, 1), WAYGATE_KEY_KEY),
                     Msg.LORE_KEY_NAME.toString(), lore);
             ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
             if (keyMeta != null) {
@@ -156,7 +158,7 @@ public class DataManager {
                 WAYGATE_KEY.setItemMeta(keyMeta);
             }
 
-            sr = new ShapedRecipe(new NamespacedKey(pm, waygateKeyKey), WAYGATE_KEY);
+            sr = new ShapedRecipe(new NamespacedKey(pm, WAYGATE_KEY_KEY), WAYGATE_KEY);
             sr.shape("RRR", "RKR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('K', Material.FEATHER);
             recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
@@ -171,6 +173,54 @@ public class DataManager {
 
     public String getMsg(Msg msg) {
         return messages.get(msg);
+    }
+
+    public ItemStack getLockForGate(Gate gate) {
+        List<String> lore = getLockLoreForGate(gate);
+        ItemStack lock = Util.setItemNameAndLore(
+                NBTItemManager.getLockNBTItem(new ItemStack(Material.FEATHER, 1), WAYGATE_KEY_KEY,
+                        gate.getUUID().toString()),
+                Msg.LORE_KEY_LOCK_NAME.toString(gate.getName()), lore);
+        ItemMeta keyMeta = lock.getItemMeta();
+        if (keyMeta != null) {
+            Glow glow = new Glow(new NamespacedKey(pm, "waygateglow"));
+            keyMeta.addEnchant(glow, 1, true);
+            lock.setItemMeta(keyMeta);
+        }
+
+        return lock;
+    }
+
+    public List<String> getLockLoreForGate(Gate gate) {
+        ArrayList<String> lore = new ArrayList<>();
+        Msg[] keyLore = {Msg.LORE_KEY_LOCK_1, Msg.LORE_KEY_LOCK_2,
+                Msg.LORE_KEY_LOCK_3, Msg.LORE_KEY_LOCK_4};
+        for (Msg msg : keyLore) {
+            if (msg.toString().length() > 0) {
+                lore.add(Util.color(msg.toString()));
+            }
+        }
+        if (!NBTItemManager.isNBTEnabled())
+            lore.add(Util.color(Util.getGateUUIDLore(gate.getUUID().toString())));
+        return lore;
+    }
+
+    public boolean isLockKeyValid(Gate gate, ItemStack is) {
+        ItemMeta im = is.getItemMeta();
+        if (im == null)
+            return false;
+
+        List<String> keyLore = getLockLoreForGate(gate);
+        boolean loreValid = im.getDisplayName().equals(Util.color(Msg.LORE_KEY_LOCK_NAME.toString(gate.getName()))) &&
+                im.getLore() != null && im.getLore().size() == keyLore.size() &&
+                im.getLore().stream().allMatch(x -> {
+                    if (keyLore.contains(x)) {
+                        keyLore.remove(x);
+                        return true;
+                    }
+                    return false;
+                });
+        return keyLore.isEmpty() && loreValid && NBTItemManager.isLockNBTItem(is, gate.getUUID().toString());
     }
 
     public Map<Material, Integer> getDefaultBlocksRequired() {
@@ -395,14 +445,34 @@ public class DataManager {
 
     static class NBTItemManager {
 
+        public static boolean isNBTEnabled() {
+            return Bukkit.getPluginManager().isPluginEnabled("NBTAPI");
+        }
+
         public static ItemStack getNBTItem(ItemStack item, String key) {
-            if (Bukkit.getPluginManager().isPluginEnabled("NBTAPI")) {
+            if (isNBTEnabled()) {
                 NBTItem nbtItem = new NBTItem(item);
                 nbtItem.setByte("DoesNotConvert", (byte) 1);
                 nbtItem.setByte(key, (byte) 1);
                 return nbtItem.getItem();
             }
             return item;
+        }
+
+        public static ItemStack getLockNBTItem(ItemStack item, String key, String uuid) {
+            if (isNBTEnabled()) {
+                NBTItem nbtItem = new NBTItem(getNBTItem(item, key));
+                nbtItem.setByte(String.format("WG-%s", uuid), (byte) 1);
+                return nbtItem.getItem();
+            }
+            return item;
+        }
+
+        public static boolean isLockNBTItem(ItemStack item, String uuid) {
+            if (isNBTEnabled()) {
+                return new NBTItem(item).hasKey(String.format("WG-%s", uuid));
+            }
+            return true;
         }
 
     }

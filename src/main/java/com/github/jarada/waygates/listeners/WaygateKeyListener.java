@@ -37,7 +37,8 @@ public class WaygateKeyListener implements Listener {
         Gate gate = WaygateManager.getManager().getGateAtLocation(new BlockLocation(b.getLocation()));
         if (gate != null) {
             if (p.hasPermission("wg.key.use") && (a == Action.RIGHT_CLICK_BLOCK || a == Action.RIGHT_CLICK_AIR)) {
-                if (gate.isOwnerPrivate() && !(gate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.bypass"))) {
+                if (gate.isOwnerPrivate() && !(gate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.bypass")
+                        || useEvent.isLockedKey())) {
                     Msg.GATE_ACCESS_DENIED.sendTo(p);
                 } else {
                     // Give it a tick delay as opening a menu straight away can interfere with offhand placement

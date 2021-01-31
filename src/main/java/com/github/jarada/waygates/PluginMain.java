@@ -40,6 +40,7 @@ public class PluginMain extends JavaPlugin {
         commands.put("delete", new WGDeleteCmd());
         commands.put("key", new WGKeyCmd());
         commands.put("list", new WGListCmd());
+        commands.put("lock", new WGLockCmd());
         commands.put("reload", new WGReloadCmd());
 
         try {

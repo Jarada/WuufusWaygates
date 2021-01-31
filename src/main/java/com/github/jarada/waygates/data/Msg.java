@@ -11,6 +11,7 @@ import java.util.logging.Level;
 public enum Msg {
 
     /* WAYGATES */
+    CMD_INVALID_GATES("&cError: Expected to find 1 gate, found %d gates. Move so you are closer to your chosen gate."),
     CMD_NO_CONSOLE("&cError: &fCommand unavailable to CONSOLE."),
     DELETE_WORLD_ACTION("&fRemoving %d gates from world: %s..."),
     DELETE_WORLD_COMPLETED("&aSuccess: &fAll gates removed from world: %s!"),
@@ -52,6 +53,11 @@ public enum Msg {
     LORE_KEY_2("&fmanipulate Waygates, to"),
     LORE_KEY_3("&fuse and modify them."),
     LORE_KEY_4(""),
+    LORE_KEY_LOCK_NAME("&aWaygate Key (%s)"),
+    LORE_KEY_LOCK_1("&fAllows you to access and"),
+    LORE_KEY_LOCK_2("&fmanipulate the named Gate."),
+    LORE_KEY_LOCK_3(""),
+    LORE_KEY_LOCK_4(""),
     MAX_LENGTH_EXCEEDED("&cMax length (&f%s&c) exceeded."),
     MENU_COLOR_GATE("&6"),
     MENU_COLOR_NETWORK("&6"),

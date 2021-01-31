@@ -44,6 +44,10 @@ public class Util {
         return WordUtils.wrap(description, maxLineLength, "\n", true).split("\\n");
     }
 
+    public static String getGateUUIDLore(String uuid) {
+        return String.format("&0%s", uuid);
+    }
+
     /* Materials */
 
     @SuppressWarnings("deprecation")

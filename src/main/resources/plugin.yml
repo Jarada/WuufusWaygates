@@ -65,6 +65,7 @@
      children:
        wg.command.item.constructor: true
        wg.command.item.key: true
+       wg.command.item.lock: true
    wg.command.reload:
      description: Reload Config
    wg.command.world.*:

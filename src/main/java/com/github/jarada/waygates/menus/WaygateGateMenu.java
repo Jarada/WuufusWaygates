@@ -10,6 +10,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,9 +39,11 @@ public class WaygateGateMenu extends WaygateAccessMenu {
                             new BlockLocation(currentWaygate.getCenterBlock().getLocation()));
                 } else if (result == GateActivationResult.RESULT_NOT_FOUND) {
                     Msg.GATE_EXIT_FAILURE.sendTo(p);
-                } else if (result == GateActivationResult.RESULT_ACTIVATED && DataManager.getManager().WG_KEY_CONSUMES && !DataManager.getManager().WG_KEY_PERMANENT) {
-                    if (!p.hasPermission("wg.admin") && p.getInventory().getItemInMainHand().isSimilar(DataManager.getManager().WAYGATE_KEY)) {
-                        ItemStack is = p.getInventory().getItemInMainHand();
+                } else if (result == GateActivationResult.RESULT_ACTIVATED && DataManager.getManager().WG_KEY_CONSUMES &&
+                        !DataManager.getManager().WG_KEY_PERMANENT && !p.hasPermission("wg.admin")) {
+                    ItemStack is = p.getInventory().getItemInMainHand();
+                    if (is.isSimilar(DataManager.getManager().WAYGATE_KEY) ||
+                            DataManager.getManager().isLockKeyValid(currentWaygate, is)) {
                         is.setAmount(is.getAmount() - 1);
                         p.getInventory().setItemInMainHand(is);
                     }

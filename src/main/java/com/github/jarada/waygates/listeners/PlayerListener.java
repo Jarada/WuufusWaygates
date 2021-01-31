@@ -20,6 +20,7 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class PlayerListener implements Listener {
 
@@ -63,13 +64,25 @@ public class PlayerListener implements Listener {
                 is.setAmount(is.getAmount() - 1);
                 p.getInventory().setItemInMainHand(is);
             }
-        } else if (mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_KEY)) {
+        } else if (mainHand && !p.isSneaking()) {
             if (!p.hasPermission("wg.key.use"))
                 return;
 
-            // Use Gate Key
-            Bukkit.getPluginManager().callEvent(new WaygateKeyUseEvent(p, a, event.getClickedBlock()));
-            event.setCancelled(true);
+            WaygateKeyUseEvent keyUseEvent = null;
+            if (is.isSimilar(dm.WAYGATE_KEY)) {
+                keyUseEvent = new WaygateKeyUseEvent(p, a, event.getClickedBlock());
+            } else {
+                // Verify Gate Availability and Lock
+                Gate gate = WaygateManager.getManager().getGateAtLocation(new BlockLocation(event.getClickedBlock().getLocation()));
+                if (gate != null && dm.isLockKeyValid(gate, is))
+                    keyUseEvent = new WaygateKeyUseEvent(p, a, event.getClickedBlock()).withLockedKey();
+            }
+
+            if (keyUseEvent != null) {
+                // Use Gate Key
+                Bukkit.getPluginManager().callEvent(keyUseEvent);
+                event.setCancelled(true);
+            }
         } else if (p.isSneaking() && (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
             BlockLocation gateLocation = new BlockLocation(event.getClickedBlock().getLocation());
             Gate gate = WaygateManager.getManager().getGateAtLocation(gateLocation);
