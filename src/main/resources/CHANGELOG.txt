@@ -1,5 +1,10 @@
 CHANGELOG
 
+1.2.3 (01/31/21)
+- Added config option to allow travel through private gates (usually restricted to owners, admins or
+  bypass players).
+- Added Waygate Key Locks that allow creation of keys that only activate a single Waygate.
+
 1.2.2 (01/13/21)
 - Added new command aliases: `/wayg` and `/waygates` to offset other plugins like WorldGuard with same
   command.
