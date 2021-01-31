@@ -348,8 +348,8 @@ public class Gate {
             return false;
 
         // Verify Permission
-        return p.hasPermission("wg.travel") && (!isOwnerPrivate() || getOwner().equals(p.getUniqueId()) ||
-                p.hasPermission("wg.bypass"));
+        return p.hasPermission("wg.travel") && (DataManager.getManager().WG_PRIVATE_GATES_ALLOW_TRAVEL ||
+                !isOwnerPrivate() || getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.bypass"));
     }
 
     private BlockLocation preTeleportChecks() {

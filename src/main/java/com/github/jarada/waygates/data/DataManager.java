@@ -49,6 +49,7 @@ public class DataManager {
     public boolean                      WG_KEY_CONSUMES;
     public boolean                      WG_KEY_PERMANENT;
     public boolean                      WG_ZOMBIE_PIGMAN_ALLOWED;
+    public boolean                      WG_PRIVATE_GATES_ALLOW_TRAVEL;
 
     public DataManager() {
         pm = PluginMain.getPluginInstance();
@@ -91,6 +92,7 @@ public class DataManager {
         WG_KEY_CONSUMES = config.getBoolean("Waygates.WG_KEY_CONSUMES");
         WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT");
         WG_ZOMBIE_PIGMAN_ALLOWED = config.getBoolean("Waygates.WG_ZOMBIE_PIGMAN_ALLOWED");
+        WG_PRIVATE_GATES_ALLOW_TRAVEL = config.getBoolean("Waygates.WG_PRIVATE_GATES_ALLOW_TRAVEL");
 
         BLOCKS_REQUIRED = new ArrayList<>();
         try {
