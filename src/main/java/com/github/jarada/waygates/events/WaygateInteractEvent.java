@@ -1,6 +1,7 @@
 package com.github.jarada.waygates.events;
 
 import com.github.jarada.waygates.data.Gate;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -15,12 +16,14 @@ public class WaygateInteractEvent extends Event implements Cancellable {
 
     private final Player p;
     private final Gate wg;
+    private final Block bl;
     private final Action a;
     private final ItemStack item;
 
-    public WaygateInteractEvent(Player p, Gate wg, Action a, ItemStack item) {
+    public WaygateInteractEvent(Player p, Gate wg, Block bl, Action a, ItemStack item) {
         this.p = p;
         this.wg = wg;
+        this.bl = bl;
         this.a = a;
         this.item = item;
     }
@@ -31,6 +34,10 @@ public class WaygateInteractEvent extends Event implements Cancellable {
 
     public Gate getWaygate() {
         return wg;
+    }
+
+    public Block getClickedBlock() {
+        return bl;
     }
 
     public Action getAction() {

@@ -87,7 +87,7 @@ public class PlayerListener implements Listener {
             BlockLocation gateLocation = new BlockLocation(event.getClickedBlock().getLocation());
             Gate gate = WaygateManager.getManager().getGateAtLocation(gateLocation);
             if (gate != null) {
-                Bukkit.getPluginManager().callEvent(new WaygateInteractEvent(p, gate, a, is));
+                Bukkit.getPluginManager().callEvent(new WaygateInteractEvent(p, gate, event.getClickedBlock(), a, is));
                 event.setCancelled(true);
             }
         }
