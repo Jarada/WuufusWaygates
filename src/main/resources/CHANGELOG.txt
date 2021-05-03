@@ -1,5 +1,9 @@
 CHANGELOG
 
+1.2.4 (05/03/21)
+- Fixed issue where setting a Waygate's icon under laggy conditions could be manipulated for item
+  duplication.
+
 1.2.3 (01/31/21)
 - Added config option to allow travel through private gates (usually restricted to owners, admins or
   bypass players).
