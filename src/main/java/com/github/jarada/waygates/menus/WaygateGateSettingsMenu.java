@@ -56,6 +56,9 @@ public class WaygateGateSettingsMenu extends Menu {
                 } else if (optionNames[slot].equals("AlwaysOn")) {
                     currentWaygate.setAlwaysOn(!currentWaygate.isAlwaysOn());
                     mm.saveUpdateToGate();
+                } else if (optionNames[slot].equals("Effect")) {
+                    currentWaygate.loopActivationEffect();
+                    mm.saveUpdateToGate();
                 }
                 super.onInventoryClick(clickEvent);
                 break;
@@ -87,6 +90,11 @@ public class WaygateGateSettingsMenu extends Menu {
 
         if (p.hasPermission("wg.assign.alwayson")) {
             addAlwaysOnToMenu(slot);
+            slot += 1;
+        }
+
+        if (p.hasPermission("wg.assign.effect")) {
+            addEffectToMenu(slot);
         }
 
         addGateOwnerToMenu(true);
@@ -146,6 +154,16 @@ public class WaygateGateSettingsMenu extends Menu {
             if (msg.toString().length() > 0)
                 lore.add(Util.color(msg.toString()));
         addItemToMenu(slot, Material.FLINT_AND_STEEL, Msg.MENU_TITLE_ALWAYS_ON.toString(), "AlwaysOn", lore);
+    }
+
+    void addEffectToMenu(int slot) {
+        List<String> lore = new ArrayList<>();
+        lore.add(Util.color(currentWaygate.getActivationEffect().toString()));
+        Msg[] effectLore = {Msg.MENU_LORE_ACTIVATION_EFFECT_1, Msg.MENU_LORE_ACTIVATION_EFFECT_2, Msg.MENU_LORE_ACTIVATION_EFFECT_3};
+        for (Msg msg : effectLore)
+            if (msg.toString().length() > 0)
+                lore.add(Util.color(msg.toString()));
+        addItemToMenu(slot, Material.ENCHANTING_TABLE, Msg.MENU_TITLE_ACTIVATION_EFFECT.toString(), "Effect", lore);
     }
 
 }

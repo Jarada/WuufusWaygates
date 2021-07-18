@@ -22,6 +22,8 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
@@ -292,6 +294,39 @@ public class WaygateListener implements Listener {
                         wm.destroyWaygate(gate);
                 }
             }
+    }
+
+    /* Gate Effects */
+
+    @EventHandler
+    public void onChunkLoad(ChunkLoadEvent e) {
+        WaygateManager wm = WaygateManager.getManager();
+        List<Gate> gates = wm.getGatesInChunk(e.getChunk());
+        for (Gate gate : gates) {
+            gate.getActivationEffect().loadChunk(gate);
+        }
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent e) {
+        WaygateManager wm = WaygateManager.getManager();
+        List<Gate> gates = wm.getGatesInChunk(e.getChunk());
+        for (Gate gate : gates) {
+            gate.getActivationEffect().unloadChunk(gate);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockWaterMove(BlockFromToEvent e) {
+        if (e.getBlock().getType() == Material.WATER) {
+            // If water block is spreading in gate
+            BlockLocation blockLocation = new BlockLocation(e.getBlock().getLocation());
+            Gate gate = gm.getGateAtLocation(blockLocation);
+            if (gate != null) {
+                // Prevent it
+                e.setCancelled(true);
+            }
+        }
     }
 
     /* Clearance */

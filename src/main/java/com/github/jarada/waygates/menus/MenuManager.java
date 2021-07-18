@@ -19,6 +19,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MenuManager implements Listener {
 
@@ -116,9 +117,10 @@ public class MenuManager implements Listener {
         return accessGate.getOwner().equals(player.getUniqueId());
     }
 
-    private ArrayList<Gate> loadAccessList() {
-        ArrayList<Gate> accessList = (!currentWaygate.getNetwork().isVoid() || canBypass()) ?
-                wm.getConnectedGates(currentWaygate, currentWaygate.getNetwork().isFixed()) : new ArrayList<>();
+    private List<Gate> loadAccessList() {
+        List<Gate> accessList = (!currentWaygate.getNetwork().isVoid() || canBypass()) ?
+                wm.getConnectedGates(currentWaygate, currentWaygate.getNetwork().isFixed()) :
+                new ArrayList<>();
         // Remove Hidden Gates if not owner or bypass
         accessList.removeIf(accessGate -> accessGate.isOwnerHidden() && !(isOwner(accessGate) || canBypass()));
         return accessList;
