@@ -248,7 +248,7 @@ public class DataManager {
             requiredBlocks.add(groupedBlocks);
         }
 
-        if (requiredBlocks.size() == 0) {
+        if (requiredBlocks.isEmpty()) {
             pm.getLogger().warning("Using default blocks for Waygate Construction");
             ArrayList<Map<Material, Integer>> defaultBlocks = new ArrayList<>();
             defaultBlocks.add(getDefaultBlocksRequired());

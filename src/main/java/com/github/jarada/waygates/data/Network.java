@@ -200,7 +200,7 @@ public class Network {
     private void prepareInvitedUsers() {
         if (invitedUsers == null)
             invitedUsers = new ArrayList<>();
-        else if (invitedUsers.size() == 0)
+        else if (invitedUsers.isEmpty())
             invitedUsers = null;
     }
 
