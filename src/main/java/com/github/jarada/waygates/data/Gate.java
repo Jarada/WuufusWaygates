@@ -11,8 +11,6 @@ import com.github.jarada.waygates.util.Util;
 import com.google.gson.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
@@ -172,9 +170,13 @@ public class Gate {
     }
 
     public void loopActivationEffect() {
+        if (isActive())
+            close();
         if (activationEffect == null)
             setActivationEffect(getActivationEffect());
         setActivationEffect(activationEffect.next());
+        if (isActive())
+            open();
     }
 
     public boolean isOwnerPrivate() {
@@ -397,8 +399,8 @@ public class Gate {
         }
 
         // Teleport Player
-        Util.playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT);
-        if (p.isInsideVehicle() && vehicle instanceof LivingEntity) {
+        getActivationEffect().playTeleportSound(p.getLocation());
+        if (p.isInsideVehicle() && (vehicle instanceof LivingEntity || vehicle instanceof Boat)) {
             executeTeleportVehicle(to, vehicle);
         } else {
             p.teleport(to.getTeleportLocation());
@@ -406,7 +408,7 @@ public class Gate {
         }
 
         if (to != exit)
-            Util.playSound(activeLocation.getLocation(), Sound.ENTITY_GHAST_SHOOT);
+            getActivationEffect().playTeleportSound(activeLocation.getLocation());
 
         // Include Leashed Entities
         for (LivingEntity leashedEntity : leashed)
@@ -422,6 +424,7 @@ public class Gate {
 
         if (entity.getType().isSpawnable()) {
             entity.teleport(to.getTeleportLocation());
+            entity.setFireTicks(0);
         } else if (entity.getType() == EntityType.DROPPED_ITEM) {
             World world = to.getLocation().getWorld();
             if (world != null) {
