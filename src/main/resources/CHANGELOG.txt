@@ -1,5 +1,10 @@
 CHANGELOG
 
+1.3.0 (08/21/21)
+- Added Gate Effects: Magic and Water
+- Added new permission: wg.assign.effect
+- Fixed issue where Nether Gates placed right next to Waygates would not function
+
 1.2.4 (05/03/21)
 - Fixed issue where setting a Waygate's icon under laggy conditions could be manipulated for item
   duplication.
