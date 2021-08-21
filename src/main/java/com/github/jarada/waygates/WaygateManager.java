@@ -214,7 +214,7 @@ public class WaygateManager {
     }
 
     public boolean isGateNearby(BlockLocation blockLocation) {
-        return isGateNearby(blockLocation, 3);
+        return isGateNearby(blockLocation, 1);
     }
 
     public boolean isGateNearby(BlockLocation blockLocation, final int radius) {

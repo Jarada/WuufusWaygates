@@ -164,7 +164,7 @@ public class WaygateListener implements Listener {
             return;
 
         // Verify Gate
-        if (!gm.isGateNearby(new BlockLocation(e.getLocation())))
+        if (!gm.isGateNearby(new BlockLocation(e.getLocation()), 3))
             return;
 
         // Check Settings
