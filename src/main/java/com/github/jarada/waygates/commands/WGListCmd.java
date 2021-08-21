@@ -48,7 +48,7 @@ public class WGListCmd implements PluginCommand {
         if (worldName != null) {
             // Get a list of gates in the specified world
             gates = WaygateManager.getManager().getAllGatesInWorld(worldName, true);
-            if (gates.size() == 0) {
+            if (gates.isEmpty()) {
                 gates = WaygateManager.getManager().getAllGatesInWorld(worldName, false);
                 accurate = false;
             }
@@ -57,7 +57,7 @@ public class WGListCmd implements PluginCommand {
             gates = WaygateManager.getManager().getAllGates();
         }
 
-        if (gates.size() == 0) {
+        if (gates.isEmpty()) {
             if (worldName != null)
                 Msg.LIST_NONE_FOUND_WORLD.sendTo(sender, worldName);
             else

@@ -11,8 +11,6 @@ import com.github.jarada.waygates.util.Util;
 import com.google.gson.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
@@ -36,6 +34,7 @@ public class Gate {
     private String activeDestinationUuid;
 
     private Material icon;
+    private GateActivationEffect activationEffect;
     private boolean ownerPrivate, ownerHidden, alwaysOn;
     private final long createdMillis;
     private long activatedMillis;
@@ -158,6 +157,26 @@ public class Gate {
 
     public void setIcon(Material icon) {
         this.icon = icon;
+    }
+
+    public GateActivationEffect getActivationEffect() {
+        if (activationEffect == null)
+            return GateActivationEffect.NETHER;
+        return activationEffect;
+    }
+
+    public void setActivationEffect(GateActivationEffect activationEffect) {
+        this.activationEffect = activationEffect;
+    }
+
+    public void loopActivationEffect() {
+        if (isActive())
+            close();
+        if (activationEffect == null)
+            setActivationEffect(getActivationEffect());
+        setActivationEffect(activationEffect.next());
+        if (isActive())
+            open();
     }
 
     public boolean isOwnerPrivate() {
@@ -380,8 +399,8 @@ public class Gate {
         }
 
         // Teleport Player
-        Util.playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT);
-        if (p.isInsideVehicle() && vehicle instanceof LivingEntity) {
+        getActivationEffect().playTeleportSound(p.getLocation());
+        if (p.isInsideVehicle() && (vehicle instanceof LivingEntity || vehicle instanceof Boat)) {
             executeTeleportVehicle(to, vehicle);
         } else {
             p.teleport(to.getTeleportLocation());
@@ -389,7 +408,7 @@ public class Gate {
         }
 
         if (to != exit)
-            Util.playSound(activeLocation.getLocation(), Sound.ENTITY_GHAST_SHOOT);
+            getActivationEffect().playTeleportSound(activeLocation.getLocation());
 
         // Include Leashed Entities
         for (LivingEntity leashedEntity : leashed)
@@ -405,6 +424,7 @@ public class Gate {
 
         if (entity.getType().isSpawnable()) {
             entity.teleport(to.getTeleportLocation());
+            entity.setFireTicks(0);
         } else if (entity.getType() == EntityType.DROPPED_ITEM) {
             World world = to.getLocation().getWorld();
             if (world != null) {
@@ -566,34 +586,6 @@ public class Gate {
         return this.coords.equals(currentCoords);
     }
 
-    public void setContent(Material material)
-    {
-        List<Block> blocks = this.getBlocks();
-        if (blocks == null) return;
-
-        // Orientation check
-        Axis axis = getOrientation();
-
-        // Set Content
-        for (Block block : blocks)
-        {
-            Material blockMaterial = block.getType();
-
-            if (blockMaterial != Material.NETHER_PORTAL && !Util.isMaterialAir(blockMaterial)) continue;
-
-            block.setType(material, Util.isMaterialAir(blockMaterial));
-
-            // Apply orientation
-            if (material != Material.NETHER_PORTAL) continue;
-
-            BlockData data = block.getBlockData();
-            if (data instanceof Orientable) {
-                ((Orientable) data).setAxis(axis);
-                block.setBlockData(data);
-            }
-        }
-    }
-
     public Axis getOrientation() {
         List<Block> blocks = this.getBlocks();
         if (blocks != null) {
@@ -608,11 +600,11 @@ public class Gate {
     }
 
     private void open() {
-        this.setContent(Material.NETHER_PORTAL);
+        getActivationEffect().activateGate(this);
     }
 
     private void close() {
-        this.setContent(Material.AIR);
+        getActivationEffect().deactivateGate(this);
     }
 
     /* Serialization */

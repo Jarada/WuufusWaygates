@@ -182,23 +182,39 @@ public class WaygateManager {
     }
 
     public List<Gate> getGatesNearLocation(BlockLocation blockLocation, final int radius) {
-        ArrayList<Gate> gates = new ArrayList<>();
+        ArrayList<Gate> gatesList = new ArrayList<>();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
                 for (int dz = -radius; dz <= radius; dz++) {
                     BlockLocation search = new BlockLocation(blockLocation.getWorldName(),
                             blockLocation.getX() + dx, blockLocation.getY() + dy, blockLocation.getZ() + dz);
                     Gate gate = getGateAtLocation(search);
-                    if (gate != null && !gates.contains(gate))
-                        gates.add(gate);
+                    if (gate != null && !gatesList.contains(gate))
+                        gatesList.add(gate);
                 }
             }
         }
-        return sortedGates(gates);
+        return sortedGates(gatesList);
+    }
+
+    public List<Gate> getGatesInChunk(Chunk chunk) {
+        ArrayList<Gate> gatesList = new ArrayList<>();
+        int xStart = chunk.getX();
+        int zStart = chunk.getZ();
+        for (int x = xStart; x < xStart + 16; x++) {
+            for (int z = zStart; z < zStart + 16; z++) {
+                for (int y = 0; y <= chunk.getWorld().getMaxHeight(); y++) {
+                    Gate gate = getGateAtLocation(new BlockLocation(chunk.getWorld().getName(), x, y, z));
+                    if (gate != null && !gatesList.contains(gate))
+                        gatesList.add(gate);
+                }
+            }
+        }
+        return sortedGates(gatesList);
     }
 
     public boolean isGateNearby(BlockLocation blockLocation) {
-        return isGateNearby(blockLocation, 3);
+        return isGateNearby(blockLocation, 1);
     }
 
     public boolean isGateNearby(BlockLocation blockLocation, final int radius) {
@@ -235,39 +251,39 @@ public class WaygateManager {
 
     /* Gate Getters */
 
-    public ArrayList<Gate> getConnectedGates(Gate gate, boolean hiddenComparator) {
+    public List<Gate> getConnectedGates(Gate gate, boolean hiddenComparator) {
         ArrayList<Gate> gates = new ArrayList<>(this.gates.get(gate.getNetwork()));
         gates.remove(gate);
         return sortedGates(gates, gate.getActiveDestination(), hiddenComparator);
     }
 
-    public ArrayList<Gate> getAllGatesInWorld(String worldName, boolean accurate) {
-        ArrayList<Gate> gates = new ArrayList<>();
+    public List<Gate> getAllGatesInWorld(String worldName, boolean accurate) {
+        ArrayList<Gate> gatesList = new ArrayList<>();
         if (accurate && worldGateMap.containsKey(worldName)) {
-            gates.addAll(worldGateMap.get(worldName));
+            gatesList.addAll(worldGateMap.get(worldName));
         } else if (!accurate) {
             for (String storedWorldName : worldGateMap.keySet()) {
                 if (storedWorldName.equalsIgnoreCase(worldName)) {
-                    gates.addAll(worldGateMap.get(storedWorldName));
+                    gatesList.addAll(worldGateMap.get(storedWorldName));
                 }
             }
         }
-        return sortedGates(gates);
+        return sortedGates(gatesList);
     }
 
-    public ArrayList<Gate> getAllGates() {
-        ArrayList<Gate> gates = new ArrayList<>();
+    public List<Gate> getAllGates() {
+        ArrayList<Gate> gatesList = new ArrayList<>();
         for (List<Gate> networkGates : this.gates.values()) {
-            gates.addAll(networkGates);
+            gatesList.addAll(networkGates);
         }
-        return sortedGates(gates);
+        return sortedGates(gatesList);
     }
 
-    public ArrayList<Gate> sortedGates(ArrayList<Gate> unsorted) {
+    public List<Gate> sortedGates(List<Gate> unsorted) {
         return sortedGates(unsorted, null, false);
     }
 
-    public ArrayList<Gate> sortedGates(ArrayList<Gate> unsorted, Gate accessGate, final boolean hiddenComparator) {
+    public List<Gate> sortedGates(List<Gate> unsorted, Gate accessGate, final boolean hiddenComparator) {
         unsorted.sort((o1, o2) -> {
             if (accessGate != null) {
                 // Put Access Gate First

@@ -35,6 +35,10 @@ public class BlockLocation {
         return getLocation().add(0.5, 0, 0.5);
     }
 
+    public Location getCentralLocation() {
+        return getLocation().add(0.5, 0.5, 0.5);
+    }
+
     public World getWorld() {
         if (worldName != null)
             return Bukkit.getWorld(worldName);

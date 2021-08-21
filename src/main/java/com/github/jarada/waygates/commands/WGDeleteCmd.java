@@ -31,7 +31,7 @@ public class WGDeleteCmd implements PluginCommand {
         // See if we have gates in that world
         WaygateManager wm = WaygateManager.getManager();
         List<Gate> gates = wm.getAllGatesInWorld(worldName, true);
-        if (gates.size() == 0) {
+        if (gates.isEmpty()) {
             Msg.DELETE_WORLD_EMPTY.sendTo(sender);
             return;
         }
