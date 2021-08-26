@@ -39,9 +39,7 @@ public enum GateActivationEffect {
         private void initialiseParticleEffects(Gate gate) {
             if (loadedGates.contains(gate)) return;
             loadedGates.add(gate);
-            PluginMain.getPluginInstance().getLogger().info(dataManager.WG_GATE_EFFECT_PARTICLES.getSize().toString());
             if (dataManager.WG_GATE_EFFECT_PARTICLES.getSize() > 0) {
-                PluginMain.getPluginInstance().getLogger().info("Blah");
                 runnable = new BukkitRunnable() {
                     @Override
                     public void run() {
