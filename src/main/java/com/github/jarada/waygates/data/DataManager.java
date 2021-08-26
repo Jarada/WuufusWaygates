@@ -47,6 +47,7 @@ public class DataManager {
     public int                          WG_NAME_MAX_LENGTH, WG_DESC_MAX_LENGTH;
     public int                          WG_NETWORK_NAME_MAX_LENGTH;
     public int                          WG_GATE_ACTIVATION_TIME;
+    public GateActivationParticles      WG_GATE_EFFECT_PARTICLES;
     public int                          WG_GATE_MINIMAL_DISTANCE;
     public boolean                      WG_CONSTRUCTOR_CONSUMES;
     public boolean                      WG_KEY_CONSUMES;
@@ -96,6 +97,15 @@ public class DataManager {
         WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT");
         WG_ZOMBIE_PIGMAN_ALLOWED = config.getBoolean("Waygates.WG_ZOMBIE_PIGMAN_ALLOWED");
         WG_PRIVATE_GATES_ALLOW_TRAVEL = config.getBoolean("Waygates.WG_PRIVATE_GATES_ALLOW_TRAVEL");
+
+        config.addDefault("Waygates.WG_GATE_EFFECT_PARTICLES", "normal");
+        try {
+            WG_GATE_EFFECT_PARTICLES = GateActivationParticles.valueOf(Objects.requireNonNull(config.getString("Waygates.WG_GATE_EFFECT_PARTICLES")).toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            // Using Static Default
+            WG_GATE_EFFECT_PARTICLES = GateActivationParticles.NORMAL;
+            pm.getLogger().warning("Invalid Effects Particle Size in Config, using normal!");
+        }
 
         BLOCKS_REQUIRED = new ArrayList<>();
         try {

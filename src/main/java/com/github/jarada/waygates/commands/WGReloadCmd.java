@@ -15,6 +15,8 @@ public class WGReloadCmd implements PluginCommand {
         for (Gate gate : WaygateManager.getManager().getAllGates()) {
             if (!gate.isAlwaysOn()) {
                 gate.deactivate();
+            } else {
+                gate.reopen();
             }
         }
 

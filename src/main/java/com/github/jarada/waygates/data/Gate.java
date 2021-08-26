@@ -35,7 +35,10 @@ public class Gate {
 
     private Material icon;
     private GateActivationEffect activationEffect;
-    private boolean ownerPrivate, ownerHidden, alwaysOn;
+    private boolean ownerPrivate;
+    private boolean ownerHidden;
+    private boolean alwaysOn;
+    
     private final long createdMillis;
     private long activatedMillis;
     private long usedMillis;
@@ -322,7 +325,7 @@ public class Gate {
         open();
 
         if (!isAlwaysOn()) {
-            long activationTime = 20 * DataManager.getManager().WG_GATE_ACTIVATION_TIME;
+            long activationTime = (long) 20 * DataManager.getManager().WG_GATE_ACTIVATION_TIME;
             activeTask = Bukkit.getScheduler().runTaskLater(PluginMain.getPluginInstance(), () -> {
                 activeTask = null;
                 deactivate();
@@ -331,17 +334,22 @@ public class Gate {
         return GateActivationResult.RESULT_ACTIVATED;
     }
 
-    public boolean activateOnLoad() {
+    public void activateOnLoad() {
         if (isAlwaysOn() && getActiveDestination() != null) {
             setupActiveDestination(getActiveDestination());
             open();
-            return true;
         }
-        return false;
     }
 
     public void deactivate() {
         deactivate(false);
+    }
+
+    public void reopen() {
+        if (isActive()) {
+            close();
+            open();
+        }
     }
 
     public void deactivate(boolean saveGate) {

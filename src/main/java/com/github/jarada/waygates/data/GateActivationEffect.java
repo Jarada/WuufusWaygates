@@ -8,10 +8,12 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.Orientable;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public enum GateActivationEffect {
 
@@ -27,13 +29,6 @@ public enum GateActivationEffect {
         }
 
         @Override
-        public void deactivateGate(Gate gate) {
-            super.deactivateGate(gate);
-            activeGates.remove(gate);
-            loadedGates.remove(gate);
-        }
-
-        @Override
         public void loadChunk(Gate gate) {
             super.loadChunk(gate);
             if (activeGates.contains(gate)) {
@@ -41,32 +36,31 @@ public enum GateActivationEffect {
             }
         }
 
-        @Override
-        public void unloadChunk(Gate gate) {
-            super.unloadChunk(gate);
-            loadedGates.remove(gate);
-        }
-
         private void initialiseParticleEffects(Gate gate) {
+            if (loadedGates.contains(gate)) return;
             loadedGates.add(gate);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
+            PluginMain.getPluginInstance().getLogger().info(dataManager.WG_GATE_EFFECT_PARTICLES.getSize().toString());
+            if (dataManager.WG_GATE_EFFECT_PARTICLES.getSize() > 0) {
+                PluginMain.getPluginInstance().getLogger().info("Blah");
+                runnable = new BukkitRunnable() {
+                    @Override
+                    public void run() {
 
-                    if (!loadedGates.contains(gate)) {
-                        cancel();
-                        return;
+                        try {
+                            for (BlockLocation blockLocation : gate.getCoords()) {
+                                Location adjustedLocation = blockLocation.getCentralLocation();
+                                Objects.requireNonNull(blockLocation.getLocation().getWorld())
+                                        .spawnParticle(Particle.ENCHANTMENT_TABLE, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                                blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                                blockLocation.getLocation().getWorld().spawnParticle(Particle.PORTAL, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            }
+                        } catch (NullPointerException e) {
+                            // Pass
+                        }
                     }
 
-                    for (BlockLocation blockLocation : gate.getCoords()) {
-                        Location adjustedLocation = blockLocation.getCentralLocation();
-                        blockLocation.getLocation().getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, adjustedLocation, 2, getOffsetX(gate), getOffsetY(gate), getOffsetZ(gate), 0.8);
-                        blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL, adjustedLocation, 1, getOffsetX(gate), getOffsetY(gate), getOffsetZ(gate), 0.8);
-                        blockLocation.getLocation().getWorld().spawnParticle(Particle.PORTAL, adjustedLocation, 2, getOffsetX(gate), getOffsetY(gate), getOffsetZ(gate), 0.8);
-                    }
-                }
-                
-            }.runTaskTimer(PluginMain.getPluginInstance(), 10, 10);
+                }.runTaskTimer(PluginMain.getPluginInstance(), 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
+            }
         }
 
         @Override
@@ -102,13 +96,6 @@ public enum GateActivationEffect {
         }
 
         @Override
-        public void deactivateGate(Gate gate) {
-            super.deactivateGate(gate);
-            activeGates.remove(gate);
-            loadedGates.remove(gate);
-        }
-
-        @Override
         public void loadChunk(Gate gate) {
             super.loadChunk(gate);
             if (activeGates.contains(gate)) {
@@ -117,34 +104,32 @@ public enum GateActivationEffect {
         }
 
         @Override
-        public void unloadChunk(Gate gate) {
-            super.unloadChunk(gate);
-            loadedGates.remove(gate);
-        }
-
-        @Override
         protected boolean isBlockMaterialChangeable(Material material) {
             return Util.isMaterialAir(material) || material == Material.WATER;
         }
 
         private void initialiseParticleEffects(Gate gate) {
+            if (loadedGates.contains(gate)) return;
             loadedGates.add(gate);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
+            if (dataManager.WG_GATE_EFFECT_PARTICLES.getSize() > 0) {
+                runnable = new BukkitRunnable() {
 
-                    if (!loadedGates.contains(gate)) {
-                        cancel();
-                        return;
-                    }
-                    
-                    for (BlockLocation blockLocation : gate.getCoords()) {
-                        Location adjustedLocation = blockLocation.getCentralLocation();
-                        blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL_MOB, adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
-                    }
-                }
+                    @Override
+                    public void run() {
 
-            }.runTaskTimer(PluginMain.getPluginInstance(), 10, 10);
+                        try {
+                            for (BlockLocation blockLocation : gate.getCoords()) {
+                                Location adjustedLocation = blockLocation.getCentralLocation();
+                                Objects.requireNonNull(blockLocation.getLocation().getWorld()).spawnParticle(Particle.SPELL_MOB, adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
+                            }
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }.runTaskTimer(PluginMain.getPluginInstance(), 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
+
+            }
         }
 
         @Override
@@ -155,8 +140,11 @@ public enum GateActivationEffect {
 
     protected List<Gate> activeGates = new ArrayList<>();
     protected List<Gate> loadedGates = new ArrayList<>();
+    protected BukkitTask runnable;
 
-    private static GateActivationEffect[] vals = values();
+    private static final GateActivationEffect[] vals = values();
+    private static final DataManager dataManager = DataManager.getManager();
+    private static final double offsetY = 0.075;
 
     public GateActivationEffect next()
     {
@@ -169,14 +157,20 @@ public enum GateActivationEffect {
 
     public void deactivateGate(Gate gate) {
         setContent(gate, Material.AIR);
+        activeGates.remove(gate);
+        loadedGates.remove(gate);
+        if (runnable != null && !runnable.isCancelled())
+            runnable.cancel();
     }
 
     public void loadChunk(Gate gate) {
-
+        // To Be Overridden
     }
 
     public void unloadChunk(Gate gate) {
-
+        loadedGates.remove(gate);
+        if (runnable != null && !runnable.isCancelled())
+            runnable.cancel();
     }
 
     public void setContent(@NotNull Gate gate, Material material)
@@ -218,10 +212,6 @@ public enum GateActivationEffect {
     protected double getOffsetX(Gate gate) {
         Axis axis = gate.getOrientation();
         return (Axis.X.equals(axis)) ? 0.075 : 0.75;
-    }
-
-    protected double getOffsetY(Gate gate) {
-        return 0.075;
     }
 
     protected double getOffsetZ(Gate gate) {
