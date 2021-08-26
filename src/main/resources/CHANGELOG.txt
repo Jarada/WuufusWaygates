@@ -4,6 +4,7 @@ CHANGELOG
 - Added Gate Effects: Magic and Water
 - Added new permission: wg.assign.effect
 - Fixed issue where Nether Gates placed right next to Waygates would not function
+- Fixed issue where boats would not travel correctly through Waygates
 
 1.2.4 (05/03/21)
 - Fixed issue where setting a Waygate's icon under laggy conditions could be manipulated for item
