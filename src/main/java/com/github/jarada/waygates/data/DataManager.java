@@ -49,6 +49,7 @@ public class DataManager {
     public int                          WG_GATE_ACTIVATION_TIME;
     public GateActivationParticles      WG_GATE_EFFECT_PARTICLES;
     public int                          WG_GATE_MINIMAL_DISTANCE;
+    public boolean                      WG_GATE_ICON_CHANGE_CONSUMES;
     public boolean                      WG_CONSTRUCTOR_CONSUMES;
     public boolean                      WG_KEY_CONSUMES;
     public boolean                      WG_KEY_PERMANENT;
@@ -92,6 +93,7 @@ public class DataManager {
         WG_NETWORK_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NETWORK_NAME_MAX_LENGTH"));
         WG_GATE_ACTIVATION_TIME = Integer.min(300, Integer.max(5, config.getInt("Waygates.WG_GATE_ACTIVATION_TIME")));
         WG_GATE_MINIMAL_DISTANCE = Integer.min(50, Integer.max(1, config.getInt("Waygates.WG_GATE_MINIMAL_DISTANCE")));
+        WG_GATE_ICON_CHANGE_CONSUMES = config.getBoolean("Waygates.WG_GATE_ICON_CHANGE_CONSUMES");
         WG_CONSTRUCTOR_CONSUMES = config.getBoolean("Waygates.WG_CONSTRUCTOR_CONSUMES");
         WG_KEY_CONSUMES = config.getBoolean("Waygates.WG_KEY_CONSUMES");
         WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT");

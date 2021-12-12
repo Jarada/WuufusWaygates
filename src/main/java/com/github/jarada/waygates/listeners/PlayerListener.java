@@ -83,6 +83,9 @@ public class PlayerListener implements Listener {
                 event.setCancelled(true);
             }
         } else if (p.isSneaking() && (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+            if (!p.hasPermission("wg.icon.change"))
+                return;
+
             BlockLocation gateLocation = new BlockLocation(event.getClickedBlock().getLocation());
             Gate gate = WaygateManager.getManager().getGateAtLocation(gateLocation);
             if (gate != null) {

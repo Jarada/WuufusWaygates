@@ -236,30 +236,38 @@ public class WaygateListener implements Listener {
                 toSend = Msg.GATE_SET_ICON.toString(gate.getName(), m.toString());
             }
 
-            // Check for item duplication but during lag
-            if (is.equals(player.getInventory().getItemInMainHand())) {
-                is.setAmount(is.getAmount() - 1);
-                player.getInventory().setItemInMainHand(is);
+            boolean gateChanged = true;
+            // If icon changes consume
+            if (dm.WG_GATE_ICON_CHANGE_CONSUMES) {
+                // Check for item duplication but during lag
+                if (is.equals(player.getInventory().getItemInMainHand())) {
+                    is.setAmount(is.getAmount() - 1);
+                    player.getInventory().setItemInMainHand(is);
+                } else {
+                    gateChanged = false;
+                    if (previous != null) {
+                        if (previous.getClass().equals(Material.class)) {
+                            gate.setIcon((Material) previous);
+                        } else {
+                            gate.setDescription((String) previous);
+                        }
+                    } else {
+                        gate.setDescription(null);
+                    }
+
+                    WaygateManager wm = WaygateManager.getManager();
+                    PluginMain pm = PluginMain.getPluginInstance();
+                    wm.destroyWaygate(player, gate, new BlockLocation(event.getClickedBlock().getLocation()));
+                    pm.getLogger().warning(String.format("Player %s no longer has item in main hand as expected; " +
+                            "possible manipulation during lag", player.getName()));
+                }
+            }
+            if (gateChanged) {
                 dm.saveWaygate(gate, false);
                 player.sendMessage(Util.color(toSend));
                 Util.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
-            } else {
-                if (previous != null) {
-                    if (previous.getClass().equals(Material.class)) {
-                        gate.setIcon((Material) previous);
-                    } else {
-                        gate.setDescription((String) previous);
-                    }
-                } else {
-                    gate.setDescription(null);
-                }
-                
-                WaygateManager wm = WaygateManager.getManager();
-                PluginMain pm = PluginMain.getPluginInstance();
-                wm.destroyWaygate(player, gate, new BlockLocation(event.getClickedBlock().getLocation()));
-                pm.getLogger().warning(String.format("Player %s no longer has item in main hand as expected; " +
-                        "possible manipulation during lag", player.getName()));
             }
+
         } else {
             Msg.NO_PERMS.sendTo(player);
         }
