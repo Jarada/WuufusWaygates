@@ -315,8 +315,7 @@ public class Gate {
         }
 
         // Verify Location
-        GridLocation location = destination.getExit();
-        if (location.getWorld() == null) {
+        if (!isDestinationAvailable(destination)) {
             return GateActivationResult.RESULT_NOT_FOUND;
         }
 
@@ -334,11 +333,14 @@ public class Gate {
         return GateActivationResult.RESULT_ACTIVATED;
     }
 
-    public void activateOnLoad() {
-        if (isAlwaysOn() && getActiveDestination() != null) {
+    public boolean activateOnLoad() {
+        if (isAlwaysOn() && getWorld() != null && getActiveDestination() != null &&
+                isActiveDestinationAvailable()) {
             setupActiveDestination(getActiveDestination());
             open();
+            return true;
         }
+        return false;
     }
 
     public void deactivate() {
@@ -367,6 +369,15 @@ public class Gate {
         activeDestination = destination;
         activeDestinationUuid = (destination != null && isAlwaysOn()) ? destination.getUUID().toString() : null;
         activeLocation = (destination != null) ? destination.getExit() : null;
+    }
+
+    private boolean isDestinationAvailable(Gate destination) {
+        GridLocation location = destination.getExit();
+        return location.getWorld() != null;
+    }
+
+    private boolean isActiveDestinationAvailable() {
+        return isDestinationAvailable(getActiveDestination());
     }
 
     public boolean verify(Player p) {

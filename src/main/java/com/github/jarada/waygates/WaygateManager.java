@@ -121,12 +121,12 @@ public class WaygateManager {
                 this.gates.put(systemNetwork, new ArrayList<>());
         for (Gate gate : gates) {
             recordGate(gate, true);
-            if (gate.isAlwaysOn() && gate.getActiveDestination() != null)
-                gate.activateOnLoad();
-            else
+            if (!gate.activateOnLoad()) {
                 gate.deactivate();
+            }
         }
-        pm.getLogger().info(String.format("Loaded %d gates in %d world(s)", gates.size(), worldGateMap.keySet().size()));
+        pm.getLogger().info(String.format("Loaded %d gates in %d world(s)", this.gates.size(),
+                worldGateMap.keySet().size()));
     }
 
     public void changeGateNetwork(Gate gate, Network network, boolean saveNetwork) {

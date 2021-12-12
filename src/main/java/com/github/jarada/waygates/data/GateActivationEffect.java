@@ -23,7 +23,7 @@ public enum GateActivationEffect {
         public void activateGate(Gate gate) {
             activeGates.add(gate);
             Util.playSound(gate.getCenterBlock().getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE);
-            if (gate.getActiveLocation().getLocation().getChunk().isLoaded()) {
+            if (gate.getCenterBlock().getLocation().getChunk().isLoaded()) {
                 initialiseParticleEffects(gate);
             }
         }
@@ -88,7 +88,7 @@ public enum GateActivationEffect {
             activeGates.add(gate);
             setContent(gate, Material.WATER);
             Util.playSound(gate.getCenterBlock().getLocation(), Sound.AMBIENT_UNDERWATER_ENTER);
-            if (gate.getActiveLocation().getLocation().getChunk().isLoaded()) {
+            if (gate.getCenterBlock().getLocation().getChunk().isLoaded()) {
                 initialiseParticleEffects(gate);
             }
         }
