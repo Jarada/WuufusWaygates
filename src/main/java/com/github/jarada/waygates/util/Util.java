@@ -147,7 +147,7 @@ public class Util {
     public static void playSound(Location loc, Sound sound) {
         World world = loc.getWorld();
         if (world != null)
-            world.playSound(loc, sound, 10F, 1F);
+            world.playSound(loc, sound, 1.5F, 1F);
     }
     
     /* Key */
