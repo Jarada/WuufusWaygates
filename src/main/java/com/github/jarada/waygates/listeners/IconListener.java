@@ -9,17 +9,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 public class IconListener implements MenuExpirable {
 
     private PluginMain pm;
     private IconCallback iconCallback;
+    private Player player;
     private Gate listeningGate;
     private final BukkitTask timeout;
 
-    public IconListener(IconCallback iconCallback) {
+    public IconListener(@NotNull IconCallback iconCallback) {
         this.pm = PluginMain.getPluginInstance();
         this.iconCallback = iconCallback;
+        this.player = iconCallback.getPlayer();
         this.listeningGate = iconCallback.getCurrentWaygate();
         this.listeningGate.addIconListener(this);
         MenuManager.setExpirable(iconCallback.getPlayer(), this);
@@ -67,11 +70,12 @@ public class IconListener implements MenuExpirable {
     }
 
     private void destroy() {
-        MenuManager.clearExpirable(iconCallback.getPlayer());
+        MenuManager.clearExpirable(player);
         listeningGate.removeIconListener(this);
         this.pm = null;
         this.iconCallback = null;
         this.listeningGate = null;
+        this.player = null;
     }
 
 }

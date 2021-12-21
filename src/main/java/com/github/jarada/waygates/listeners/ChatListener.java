@@ -5,23 +5,27 @@ import com.github.jarada.waygates.callbacks.ChatCallback;
 import com.github.jarada.waygates.menus.MenuExpirable;
 import com.github.jarada.waygates.menus.MenuManager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 public class ChatListener implements Listener, MenuExpirable {
 
     private PluginMain pm;
     private ChatCallback chatCallback;
+    private Player player;
     private final BukkitTask timeout;
 
-    public ChatListener(ChatCallback chatCallback) {
+    public ChatListener(@NotNull ChatCallback chatCallback) {
         this.pm = PluginMain.getPluginInstance();
         this.chatCallback = chatCallback;
+        this.player = chatCallback.getPlayer();
         Bukkit.getPluginManager().registerEvents(this, pm);
-        MenuManager.setExpirable(chatCallback.getPlayer(), this);
+        MenuManager.setExpirable(player, this);
 
         // 20L is 1 second, we give 30s
         timeout = Bukkit.getScheduler().runTaskLater(pm, this::finish, 600L);
@@ -63,9 +67,10 @@ public class ChatListener implements Listener, MenuExpirable {
     }
 
     private void destroy() {
-        MenuManager.clearExpirable(chatCallback.getPlayer());
+        MenuManager.clearExpirable(player);
         this.pm = null;
         this.chatCallback = null;
+        this.player = null;
         HandlerList.unregisterAll(this);
     }
 
