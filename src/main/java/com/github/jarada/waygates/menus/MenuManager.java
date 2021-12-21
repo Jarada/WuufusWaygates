@@ -19,9 +19,14 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MenuManager implements Listener {
+
+    private static final String IN_MENU = "InMenu";
+    private static final Map<Player, MenuExpirable> expirableMap = new HashMap<>();
 
     private PluginMain                  pm;
     private WaygateManager              wm;
@@ -75,7 +80,10 @@ public class MenuManager implements Listener {
     }
 
     private void open(@NotNull Menu menu) {
-        player.setMetadata("InMenu", new FixedMetadataValue(PluginMain.getPluginInstance(), true));
+        if (expirableMap.containsKey(player))
+            expirableMap.get(player).expire();
+
+        player.setMetadata(IN_MENU, new FixedMetadataValue(PluginMain.getPluginInstance(), true));
         activeMenu = menu;
 
         if (activeInventory != null) {
@@ -96,7 +104,7 @@ public class MenuManager implements Listener {
     }
 
     private void destroy() {
-        player.removeMetadata("InMenu", pm);
+        player.removeMetadata(IN_MENU, pm);
         HandlerList.unregisterAll(this);
 
         pm = null;
@@ -189,6 +197,16 @@ public class MenuManager implements Listener {
             return;
 
         open(new WaygateNetworkSettingsMenu(this, player, currentWaygate));
+    }
+
+    /* Menu Expirable */
+
+    public static void setExpirable(Player player, MenuExpirable expirable) {
+        MenuManager.expirableMap.put(player, expirable);
+    }
+
+    public static void clearExpirable(Player player) {
+        MenuManager.expirableMap.remove(player);
     }
 
 }

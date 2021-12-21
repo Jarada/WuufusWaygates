@@ -46,4 +46,11 @@ public class WaygateNetworkRenameCallback extends ChatCallback {
                 new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkManageMenu();
         }
     }
+
+    @Override
+    public void expire() {
+        if (name != null) {
+            new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork();
+        }
+    }
 }

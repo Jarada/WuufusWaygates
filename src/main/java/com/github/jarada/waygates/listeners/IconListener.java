@@ -3,13 +3,14 @@ package com.github.jarada.waygates.listeners;
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.callbacks.IconCallback;
 import com.github.jarada.waygates.data.Gate;
+import com.github.jarada.waygates.menus.MenuExpirable;
+import com.github.jarada.waygates.menus.MenuManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitTask;
 
-public class IconListener {
+public class IconListener implements MenuExpirable {
 
     private PluginMain pm;
     private IconCallback iconCallback;
@@ -21,9 +22,10 @@ public class IconListener {
         this.iconCallback = iconCallback;
         this.listeningGate = iconCallback.getCurrentWaygate();
         this.listeningGate.addIconListener(this);
+        MenuManager.setExpirable(iconCallback.getPlayer(), this);
 
         // 20L is 1 second, we give 30s
-        timeout = Bukkit.getScheduler().runTaskLater(pm, this::destroy, 600L);
+        timeout = Bukkit.getScheduler().runTaskLater(pm, this::finish, 600L);
     }
 
     public boolean isForPlayer(Player player) {
@@ -46,22 +48,27 @@ public class IconListener {
 
             // Destroy
             listeningGate.removeIconListener(this);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(pm, this::destroy, 20L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(pm, this::finish, 20L);
         }
     }
 
+    @Override
     public void expire() {
         timeout.cancel();
-        clear();
+        iconCallback.expire();
+        destroy();
+    }
+
+    private void finish() {
+        if (iconCallback != null) {
+            iconCallback.callback();
+            destroy();
+        }
     }
 
     private void destroy() {
-        iconCallback.callback();
+        MenuManager.clearExpirable(iconCallback.getPlayer());
         listeningGate.removeIconListener(this);
-        clear();
-    }
-
-    private void clear() {
         this.pm = null;
         this.iconCallback = null;
         this.listeningGate = null;

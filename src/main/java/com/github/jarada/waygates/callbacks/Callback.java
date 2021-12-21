@@ -10,8 +10,7 @@ public abstract class Callback<T> {
     private final Player player;
     private final Gate currentWaygate;
     private final WaygateManager waygateManager;
-
-    // TODO CANCEL TIMEOUT ON MENU OPEN
+    
     public Callback(Player player, Gate currentWaygate) {
         this.player = player;
         this.currentWaygate = currentWaygate;
@@ -38,5 +37,7 @@ public abstract class Callback<T> {
     public abstract void failure();
 
     public abstract void callback();
+
+    public abstract void expire();
 
 }

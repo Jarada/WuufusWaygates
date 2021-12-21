@@ -37,4 +37,9 @@ public class WaygateNetworkCreateCallback extends ChatCallback {
         if (isPlayerNearGate())
             new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkTypeMenu(name);
     }
+
+    @Override
+    public void expire() {
+        // Do Nothing
+    }
 }

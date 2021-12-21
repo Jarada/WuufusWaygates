@@ -55,4 +55,11 @@ public class WaygateOwnerChangeCallback extends ChatCallback {
                 new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateSettingsMenu();
         }
     }
+
+    @Override
+    public void expire() {
+        if (ownerChange != null) {
+            new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToGate();
+        }
+    }
 }

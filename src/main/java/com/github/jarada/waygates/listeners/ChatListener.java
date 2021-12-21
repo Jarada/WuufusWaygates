@@ -2,6 +2,8 @@ package com.github.jarada.waygates.listeners;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.callbacks.ChatCallback;
+import com.github.jarada.waygates.menus.MenuExpirable;
+import com.github.jarada.waygates.menus.MenuManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -9,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-public class ChatListener implements Listener {
+public class ChatListener implements Listener, MenuExpirable {
 
     private PluginMain pm;
     private ChatCallback chatCallback;
@@ -19,9 +21,10 @@ public class ChatListener implements Listener {
         this.pm = PluginMain.getPluginInstance();
         this.chatCallback = chatCallback;
         Bukkit.getPluginManager().registerEvents(this, pm);
+        MenuManager.setExpirable(chatCallback.getPlayer(), this);
 
         // 20L is 1 second, we give 30s
-        timeout = Bukkit.getScheduler().runTaskLater(pm, this::destroy, 600L);
+        timeout = Bukkit.getScheduler().runTaskLater(pm, this::finish, 600L);
     }
 
     @EventHandler
@@ -41,12 +44,26 @@ public class ChatListener implements Listener {
             }
 
             // Destroy
-            Bukkit.getScheduler().scheduleSyncDelayedTask(pm, this::destroy, 20L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(pm, this::finish, 20L);
         }
     }
 
+    public void finish() {
+        if (chatCallback != null) {
+            chatCallback.callback();
+            destroy();
+        }
+    }
+
+    @Override
+    public void expire() {
+        timeout.cancel();
+        chatCallback.expire();
+        destroy();
+    }
+
     private void destroy() {
-        chatCallback.callback();
+        MenuManager.clearExpirable(chatCallback.getPlayer());
         this.pm = null;
         this.chatCallback = null;
         HandlerList.unregisterAll(this);

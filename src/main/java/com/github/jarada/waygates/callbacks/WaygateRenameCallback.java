@@ -40,4 +40,9 @@ public class WaygateRenameCallback extends ChatCallback {
         else
             new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToGate();
     }
+
+    @Override
+    public void expire() {
+        new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToGate();
+    }
 }

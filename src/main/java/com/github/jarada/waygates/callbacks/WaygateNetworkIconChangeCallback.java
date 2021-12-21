@@ -48,4 +48,11 @@ public class WaygateNetworkIconChangeCallback extends IconCallback {
                 new MenuManager(getPlayer(), getCurrentWaygate()).openWaygateNetworkManageMenu();
         }
     }
+
+    @Override
+    public void expire() {
+        if (icon != null) {
+            new MenuManager(getPlayer(), getCurrentWaygate()).saveUpdateToNetwork();
+        }
+    }
 }
