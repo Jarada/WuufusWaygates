@@ -5,7 +5,8 @@
  prefix: WuufusWaygates
  api-version: 1.13
  softdepend:
-   - NBTAPI
+   - 'NBTAPI'
+   - 'Multiverse-Core'
  commands:
    wg:
      description: Waygates top-level command
