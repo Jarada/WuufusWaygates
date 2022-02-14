@@ -380,6 +380,14 @@ public class Gate {
         return isDestinationAvailable(getActiveDestination());
     }
 
+    public boolean isInLoadedChunks() {
+        for (Block block : getBlocks()) {
+            if (!block.getChunk().isLoaded())
+                return false;
+        }
+        return true;
+    }
+
     public boolean verify(Player p) {
         // Verify Active
         if (!isActive())

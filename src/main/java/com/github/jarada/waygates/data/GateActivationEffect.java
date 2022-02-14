@@ -7,7 +7,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.block.data.Orientable;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +22,7 @@ public enum GateActivationEffect {
         public void activateGate(Gate gate) {
             activeGates.add(gate);
             Util.playSound(gate.getCenterBlock().getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE);
-            if (gate.getCenterBlock().getLocation().getChunk().isLoaded()) {
+            if (gate.isInLoadedChunks()) {
                 initialiseParticleEffects(gate);
             }
         }
@@ -40,24 +39,19 @@ public enum GateActivationEffect {
             if (loadedGates.contains(gate)) return;
             loadedGates.add(gate);
             if (dataManager.WG_GATE_EFFECT_PARTICLES.getSize() > 0) {
-                runnable = new BukkitRunnable() {
-                    @Override
-                    public void run() {
-
-                        try {
-                            for (BlockLocation blockLocation : gate.getCoords()) {
-                                Location adjustedLocation = blockLocation.getCentralLocation();
-                                Objects.requireNonNull(blockLocation.getLocation().getWorld())
-                                        .spawnParticle(Particle.ENCHANTMENT_TABLE, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
-                                blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
-                                blockLocation.getLocation().getWorld().spawnParticle(Particle.PORTAL, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
-                            }
-                        } catch (NullPointerException e) {
-                            // Pass
+                runnable = Bukkit.getScheduler().runTaskTimer(PluginMain.getPluginInstance(), () -> {
+                    try {
+                        for (BlockLocation blockLocation : gate.getCoords()) {
+                            Location adjustedLocation = blockLocation.getCentralLocation();
+                            Objects.requireNonNull(blockLocation.getLocation().getWorld())
+                                    .spawnParticle(Particle.ENCHANTMENT_TABLE, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            blockLocation.getLocation().getWorld().spawnParticle(Particle.PORTAL, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
                         }
+                    } catch (NullPointerException e) {
+                        // Pass
                     }
-
-                }.runTaskTimer(PluginMain.getPluginInstance(), 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
+                }, 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
             }
         }
 
@@ -88,7 +82,7 @@ public enum GateActivationEffect {
             activeGates.add(gate);
             setContent(gate, Material.WATER);
             Util.playSound(gate.getCenterBlock().getLocation(), Sound.AMBIENT_UNDERWATER_ENTER);
-            if (gate.getCenterBlock().getLocation().getChunk().isLoaded()) {
+            if (gate.isInLoadedChunks()) {
                 initialiseParticleEffects(gate);
             }
         }
@@ -110,23 +104,16 @@ public enum GateActivationEffect {
             if (loadedGates.contains(gate)) return;
             loadedGates.add(gate);
             if (dataManager.WG_GATE_EFFECT_PARTICLES.getSize() > 0) {
-                runnable = new BukkitRunnable() {
-
-                    @Override
-                    public void run() {
-
-                        try {
-                            for (BlockLocation blockLocation : gate.getCoords()) {
-                                Location adjustedLocation = blockLocation.getCentralLocation();
-                                Objects.requireNonNull(blockLocation.getLocation().getWorld()).spawnParticle(Particle.SPELL_MOB, adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
-                            }
-                        } catch (NullPointerException e) {
-                            e.printStackTrace();
+                runnable = Bukkit.getScheduler().runTaskTimer(PluginMain.getPluginInstance(), () -> {
+                    try {
+                        for (BlockLocation blockLocation : gate.getCoords()) {
+                            Location adjustedLocation = blockLocation.getCentralLocation();
+                            Objects.requireNonNull(blockLocation.getLocation().getWorld()).spawnParticle(Particle.SPELL_MOB, adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
                         }
+                    } catch (NullPointerException e) {
+                        // Pass
                     }
-
-                }.runTaskTimer(PluginMain.getPluginInstance(), 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
-
+                }, 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
             }
         }
 

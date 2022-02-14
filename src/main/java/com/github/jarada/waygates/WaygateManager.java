@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class WaygateManager {
 
@@ -25,6 +26,7 @@ public class WaygateManager {
     private final Map<Network, List<Gate>>    gates;
     private final Map<BlockLocation, Gate>    locationGateMap;
     private final Map<BlockLocation, Gate>    imprintGateMap;
+    private final Map<String, List<Gate>>      chunkGateMap;
     private final Map<String, List<Gate>>     playerGateMap;
     private final Map<String, List<Gate>>     worldGateMap;
     private final List<String>                worldDeletion;
@@ -34,6 +36,7 @@ public class WaygateManager {
         gates = new LinkedHashMap<>();
         locationGateMap = new LinkedHashMap<>();
         imprintGateMap = new LinkedHashMap<>();
+        chunkGateMap = new LinkedHashMap<>();
         playerGateMap = new LinkedHashMap<>();
         worldGateMap = new LinkedHashMap<>();
         worldDeletion = new ArrayList<>();
@@ -63,6 +66,15 @@ public class WaygateManager {
             this.worldGateMap.put(gate.getWorldName(), new ArrayList<>());
         }
         this.worldGateMap.get(gate.getWorldName()).add(gate);
+
+        for (Block block : gate.getBlocks()) {
+            if (!this.chunkGateMap.containsKey(block.getChunk().toString())) {
+                this.chunkGateMap.put(block.getChunk().toString(), new ArrayList<>());
+            }
+            if (!this.chunkGateMap.get(block.getChunk().toString()).contains(gate)) {
+                this.chunkGateMap.get(block.getChunk().toString()).add(gate);
+            }
+        }
     }
 
     private void removeFromGates(Gate gate) {
@@ -82,6 +94,16 @@ public class WaygateManager {
             this.worldGateMap.get(gate.getWorldName()).remove(gate);
             if (this.worldGateMap.get(gate.getWorldName()).isEmpty()) {
                 this.worldGateMap.remove(gate.getWorldName());
+            }
+        }
+
+        for (Block block : gate.getBlocks()) {
+            if (this.chunkGateMap.containsKey(block.getChunk().toString()) &&
+                    this.chunkGateMap.get(block.getChunk().toString()).contains(gate)) {
+                this.chunkGateMap.get(block.getChunk().toString()).remove(gate);
+                if (this.chunkGateMap.get(block.getChunk().toString()).isEmpty()) {
+                    this.chunkGateMap.remove(block.getChunk().toString());
+                }
             }
         }
     }
@@ -198,19 +220,10 @@ public class WaygateManager {
     }
 
     public List<Gate> getGatesInChunk(Chunk chunk) {
-        ArrayList<Gate> gatesList = new ArrayList<>();
-        int xStart = chunk.getX();
-        int zStart = chunk.getZ();
-        for (int x = xStart; x < xStart + 16; x++) {
-            for (int z = zStart; z < zStart + 16; z++) {
-                for (int y = 0; y <= chunk.getWorld().getMaxHeight(); y++) {
-                    Gate gate = getGateAtLocation(new BlockLocation(chunk.getWorld().getName(), x, y, z));
-                    if (gate != null && !gatesList.contains(gate))
-                        gatesList.add(gate);
-                }
-            }
+        if (chunkGateMap.containsKey(chunk.toString())) {
+            return sortedGates(chunkGateMap.get(chunk.toString()));
         }
-        return sortedGates(gatesList);
+        return Collections.emptyList();
     }
 
     public boolean isGateNearby(BlockLocation blockLocation) {
