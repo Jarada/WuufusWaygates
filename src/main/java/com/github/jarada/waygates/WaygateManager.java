@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 public class WaygateManager {
 
@@ -52,6 +51,16 @@ public class WaygateManager {
     /* Gate Recording */
 
     private void addToGates(Gate gate) {
+        // Verify blocks
+        List<Block> blocks = gate.getBlocks();
+        if (blocks == null) {
+            String warning = "Unable to load Gate %s because World '%s' no longer exists. " +
+                    "To remove this warning please ensure the 'worlds' folder in the plugin folder only contains valid worlds.";
+            pm.getLogger().warning(String.format(warning, gate.getName(), gate.getWorldName()));
+            return;
+        }
+
+        // Add gate
         if (!this.gates.containsKey(gate.getNetwork())) {
             this.gates.put(gate.getNetwork(), new ArrayList<>());
         }
@@ -67,7 +76,7 @@ public class WaygateManager {
         }
         this.worldGateMap.get(gate.getWorldName()).add(gate);
 
-        for (Block block : gate.getBlocks()) {
+        for (Block block : blocks) {
             if (!this.chunkGateMap.containsKey(block.getChunk().toString())) {
                 this.chunkGateMap.put(block.getChunk().toString(), new ArrayList<>());
             }
@@ -265,9 +274,9 @@ public class WaygateManager {
     /* Gate Getters */
 
     public List<Gate> getConnectedGates(Gate gate, boolean hiddenComparator) {
-        ArrayList<Gate> gates = new ArrayList<>(this.gates.get(gate.getNetwork()));
-        gates.remove(gate);
-        return sortedGates(gates, gate.getActiveDestination(), hiddenComparator);
+        ArrayList<Gate> gatesList = new ArrayList<>(this.gates.get(gate.getNetwork()));
+        gatesList.remove(gate);
+        return sortedGates(gatesList, gate.getActiveDestination(), hiddenComparator);
     }
 
     public List<Gate> getAllGatesInWorld(String worldName, boolean accurate) {
@@ -275,9 +284,9 @@ public class WaygateManager {
         if (accurate && worldGateMap.containsKey(worldName)) {
             gatesList.addAll(worldGateMap.get(worldName));
         } else if (!accurate) {
-            for (String storedWorldName : worldGateMap.keySet()) {
-                if (storedWorldName.equalsIgnoreCase(worldName)) {
-                    gatesList.addAll(worldGateMap.get(storedWorldName));
+            for (Map.Entry<String, List<Gate>> storedWorldName : worldGateMap.entrySet()) {
+                if (storedWorldName.getKey().equalsIgnoreCase(worldName)) {
+                    gatesList.addAll(storedWorldName.getValue());
                 }
             }
         }
