@@ -238,7 +238,7 @@ public abstract class Menu {
             lore.add(Util.color(Msg.MENU_LORE_GATE_2.toString(owner.getName())));
         }
         
-        if (p.hasPermission("wg.see.cords") || sender.isOp()) 
+        if (p.hasPermission("wg.see.cords") || p.isOp()) 
             lore.add(Util.color(Msg.MENU_LORE_GATE_3.toString(loc.getBlockX())));
             lore.add(Util.color(Msg.MENU_LORE_GATE_4.toString(loc.getBlockY())));
             lore.add(Util.color(Msg.MENU_LORE_GATE_5.toString(loc.getBlockZ())));
