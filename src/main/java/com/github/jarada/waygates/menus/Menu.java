@@ -237,9 +237,11 @@ public abstract class Menu {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(gate.getOwner());
             lore.add(Util.color(Msg.MENU_LORE_GATE_2.toString(owner.getName())));
         }
-        lore.add(Util.color(Msg.MENU_LORE_GATE_3.toString(loc.getBlockX())));
-        lore.add(Util.color(Msg.MENU_LORE_GATE_4.toString(loc.getBlockY())));
-        lore.add(Util.color(Msg.MENU_LORE_GATE_5.toString(loc.getBlockZ())));
+        if (p.hasPermission("wg.view.coords")) {
+            lore.add(Util.color(Msg.MENU_LORE_GATE_3.toString(loc.getBlockX())));
+            lore.add(Util.color(Msg.MENU_LORE_GATE_4.toString(loc.getBlockY())));
+            lore.add(Util.color(Msg.MENU_LORE_GATE_5.toString(loc.getBlockZ())));
+        }
 
         if (gate.getDescription() != null && gate.getDescription().length() > 0)
             lore.addAll(Arrays.asList(Util.getWrappedLore(gate.getDescription(), 25)));

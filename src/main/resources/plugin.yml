@@ -59,6 +59,10 @@
        wg.assign.hidden: true
    wg.icon.change:
      description: Change icon on gates using items
+   wg.view.*:
+     description: View all restricted information
+     children:
+       wg.view.coords: true
    wg.command.*:
      description: Use all commands
      children:
@@ -103,6 +107,7 @@
        wg.create.network.private: true
        wg.create.network.invite: true
        wg.icon.change: true
+       wg.view.*: true
    wg.player.global:
      description: Global permission set
      children:
