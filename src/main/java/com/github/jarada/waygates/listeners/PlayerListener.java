@@ -59,7 +59,7 @@ public class PlayerListener implements Listener {
             }
 
             // Consume Waygate Constructor
-            if (dm.WG_CONSTRUCTOR_CONSUMES && canConsume && !p.hasPermission("wg.admin")) {
+            if (dm.WG_CONSTRUCTOR_CONSUMES && canConsume && !p.hasPermission("wg.keep.constructor")) {
                 is.setAmount(is.getAmount() - 1);
                 p.getInventory().setItemInMainHand(is);
             }

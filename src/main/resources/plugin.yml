@@ -116,9 +116,15 @@
        wg.network.*: true
    wg.bypass:
      description: Access private/hidden gates
+   wg.keep.*:
+     description: Avoid consumption of constructor and key
+     children:
+       wg.keep.constructor: true
+       wg.keep.key: true
    wg.admin:
      description: Admin permission set
      children:
        wg.player.global: true
        wg.create.network.fixed: true
        wg.bypass: true
+       wg.keep.*: true
