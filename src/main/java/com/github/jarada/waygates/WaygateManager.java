@@ -156,7 +156,7 @@ public class WaygateManager {
                 gate.deactivate();
             }
         }
-        pm.getLogger().info(String.format("Loaded %d gates in %d world(s)", this.gates.size(),
+        pm.getLogger().info(String.format("Loaded %d gates in %d world(s)", getAllGates().size(),
                 worldGateMap.keySet().size()));
     }
 
