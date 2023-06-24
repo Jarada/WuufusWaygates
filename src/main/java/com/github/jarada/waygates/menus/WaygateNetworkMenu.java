@@ -6,6 +6,7 @@ import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.data.Network;
 import com.github.jarada.waygates.listeners.ChatListener;
+import com.github.jarada.waygates.types.MenuSize;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -59,12 +60,17 @@ public class WaygateNetworkMenu extends Menu {
     }
 
     @Override
+    public int getDesiredMenuSize() {
+        return MenuSize.getAppropriateMenuSize(networkList.size());
+    }
+
+    @Override
     public void buildMenu() {
         initMenu();
         optionNetworks = new Network[size];
 
-        for (int slot = 0; slot < 9; slot++) {
-            int index = ((page - 1) * 9) + slot;
+        for (int slot = 0; slot < MenuSize.STEP_SIZE; slot++) {
+            int index = ((page - 1) * MenuSize.STEP_SIZE) + slot;
 
             if (index > networkList.size() - 1)
                 break;
@@ -77,11 +83,11 @@ public class WaygateNetworkMenu extends Menu {
             addPreviousToMenu();
         }
 
-        if (networkList.size() > 9) {
+        if (networkList.size() > getPageSize()) {
             addPageToMenu();
         }
 
-        if (networkList.size() > page * 9) {
+        if (networkList.size() > page * getPageSize()) {
             addNextToMenu();
         }
 
@@ -103,7 +109,7 @@ public class WaygateNetworkMenu extends Menu {
     }
 
     void addAddNetworkToMenu() {
-        addItemToMenu(9, Material.WRITABLE_BOOK, Msg.MENU_TITLE_NETWORK_CREATE.toString(), "Create");
+        addItemToMenu(getActionSlot(0), Material.WRITABLE_BOOK, Msg.MENU_TITLE_NETWORK_CREATE.toString(), "Create");
     }
 
     void addManageNetworkInvitesToMenu() {
@@ -111,10 +117,10 @@ public class WaygateNetworkMenu extends Menu {
         if (Arrays.stream(Material.values()).anyMatch(t -> t.name().equals("CAMPFIRE"))) {
             icon = Material.CAMPFIRE;
         }
-        addItemToMenu(15, icon, Msg.MENU_TITLE_NETWORK_INVITE_MANAGE.toString(), "Invite");
+        addItemToMenu(getActionSlot(6), icon, Msg.MENU_TITLE_NETWORK_INVITE_MANAGE.toString(), "Invite");
     }
 
     void addManageNetworkToMenu() {
-        addItemToMenu(16, Material.LEVER, Msg.MENU_TITLE_NETWORK_MANAGE.toString(), "Manage");
+        addItemToMenu(getActionSlot(7), Material.LEVER, Msg.MENU_TITLE_NETWORK_MANAGE.toString(), "Manage");
     }
 }

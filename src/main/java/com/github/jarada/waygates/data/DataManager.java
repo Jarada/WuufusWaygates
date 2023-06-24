@@ -2,6 +2,7 @@ package com.github.jarada.waygates.data;
 
 import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.PluginMain;
+import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.Util;
 import com.google.common.base.Charsets;
 import de.tr7zw.nbtapi.NBTItem;
@@ -44,6 +45,7 @@ public class DataManager {
 
     public int                          MAX_AREA;
     public List<Map<String, Integer>>   BLOCKS_REQUIRED;
+    public MenuSize                     MENU_SIZE;
     public int                          WG_NAME_MAX_LENGTH, WG_DESC_MAX_LENGTH;
     public int                          WG_NETWORK_NAME_MAX_LENGTH;
     public int                          WG_GATE_ACTIVATION_TIME;
@@ -107,6 +109,13 @@ public class DataManager {
             // Using Static Default
             WG_GATE_EFFECT_PARTICLES = GateActivationParticles.NORMAL;
             pm.getLogger().warning("Invalid Effects Particle Size in Config, using normal!");
+        }
+
+        try {
+            MENU_SIZE = MenuSize.valueOf(config.getString("Waygates.MENU_SIZE").toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            MENU_SIZE = MenuSize.COMPACT;
+            pm.getLogger().warning("Invalid Menu Size in Config, using compact!");
         }
 
         BLOCKS_REQUIRED = new ArrayList<>();

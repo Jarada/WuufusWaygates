@@ -5,6 +5,7 @@ import com.github.jarada.waygates.callbacks.WaygateRenameCallback;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.listeners.ChatListener;
+import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -63,6 +64,11 @@ public class WaygateGateSettingsMenu extends Menu {
                 super.onInventoryClick(clickEvent);
                 break;
         }
+    }
+
+    @Override
+    public int getDesiredMenuSize() {
+        return MenuSize.COMPACT.getMenuSize();
     }
 
     @Override

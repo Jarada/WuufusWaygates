@@ -1,8 +1,10 @@
 package com.github.jarada.waygates.menus;
 
 import com.github.jarada.waygates.data.Gate;
+import com.github.jarada.waygates.types.MenuSize;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class WaygateAccessMenu extends Menu {
@@ -22,11 +24,16 @@ public abstract class WaygateAccessMenu extends Menu {
         optionWaygates = null;
     }
 
+    @Override
+    public int getDesiredMenuSize() {
+        return MenuSize.getAppropriateMenuSize(accessList.size());
+    }
+
     void buildGates() {
         optionWaygates = new Gate[size];
 
-        for (int slot = 0; slot < 9; slot++) {
-            int index = ((page - 1) * 9) + slot;
+        for (int slot = 0; slot < (size - MenuSize.STEP_SIZE); slot++) {
+            int index = ((page - 1) * MenuSize.STEP_SIZE) + slot;
 
             if (index > accessList.size() - 1)
                 break;

@@ -4,6 +4,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.data.Network;
+import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.types.NetworkType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -52,6 +53,11 @@ public class WaygateNetworkTypeMenu extends Menu {
             }
         }
         super.onInventoryClick(clickEvent);
+    }
+
+    @Override
+    public int getDesiredMenuSize() {
+        return MenuSize.COMPACT.getMenuSize();
     }
 
     @Override

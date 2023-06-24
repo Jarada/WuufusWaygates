@@ -1,13 +1,10 @@
 package com.github.jarada.waygates.menus;
 
-import com.github.jarada.waygates.callbacks.WaygateNetworkIconChangeCallback;
 import com.github.jarada.waygates.callbacks.WaygateNetworkInviteCallback;
-import com.github.jarada.waygates.callbacks.WaygateNetworkOwnerChangeCallback;
-import com.github.jarada.waygates.callbacks.WaygateNetworkRenameCallback;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.listeners.ChatListener;
-import com.github.jarada.waygates.listeners.IconListener;
+import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -69,6 +66,11 @@ public class WaygateNetworkInviteMenu extends Menu {
     }
 
     @Override
+    public int getDesiredMenuSize() {
+        return MenuSize.getAppropriateMenuSize(invites.size());
+    }
+
+    @Override
     public void buildMenu() {
         initMenu();
         optionInvites = new OfflinePlayer[size];
@@ -78,8 +80,8 @@ public class WaygateNetworkInviteMenu extends Menu {
         if (currentWaygate.getNetwork().isInvite() || currentWaygate.getNetwork().isFixed())
             addInvitePlayerToMenu();
 
-        for (int slot = 0; slot < 9; slot++) {
-            int index = ((page - 1) * 9) + slot;
+        for (int slot = 0; slot < MenuSize.STEP_SIZE; slot++) {
+            int index = ((page - 1) * MenuSize.STEP_SIZE) + slot;
 
             if (index > invites.size() - 1)
                 break;
@@ -92,11 +94,11 @@ public class WaygateNetworkInviteMenu extends Menu {
             addPreviousToMenu();
         }
 
-        if (invites.size() > 9) {
+        if (invites.size() > getPageSize()) {
             addPageToMenu();
         }
 
-        if (invites.size() > page * 9) {
+        if (invites.size() > page * getPageSize()) {
             addNextToMenu();
         }
 
@@ -104,7 +106,7 @@ public class WaygateNetworkInviteMenu extends Menu {
     }
     
     private void addInvitePlayerToMenu() {
-        addItemToMenu(10, Material.WRITABLE_BOOK, Msg.MENU_TITLE_NETWORK_INVITE_ADD.toString(), "Invite");
+        addItemToMenu(getActionSlot(1), Material.WRITABLE_BOOK, Msg.MENU_TITLE_NETWORK_INVITE_ADD.toString(), "Invite");
     }
 
     private void addInvitedPlayerToMenu(int slot, OfflinePlayer invitedPlayer) {

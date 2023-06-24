@@ -8,6 +8,7 @@ import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.listeners.ChatListener;
 import com.github.jarada.waygates.listeners.IconListener;
+import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -57,6 +58,11 @@ public class WaygateNetworkSettingsMenu extends Menu {
                 super.onInventoryClick(clickEvent);
                 break;
         }
+    }
+
+    @Override
+    public int getDesiredMenuSize() {
+        return MenuSize.COMPACT.getMenuSize();
     }
 
     @Override

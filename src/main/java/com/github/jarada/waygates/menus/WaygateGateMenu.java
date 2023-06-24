@@ -80,11 +80,11 @@ public class WaygateGateMenu extends WaygateAccessMenu {
             addPreviousToMenu();
         }
 
-        if (accessList.size() > 9) {
+        if (accessList.size() > getPageSize()) {
             addPageToMenu();
         }
 
-        if (accessList.size() > page * 9) {
+        if (accessList.size() > page * getPageSize()) {
             addNextToMenu();
         }
 
@@ -92,18 +92,18 @@ public class WaygateGateMenu extends WaygateAccessMenu {
             addDeactivateGateToMenu();
 
         if (currentWaygate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin"))
-            addItemToMenu(currentWaygate.isActive() ? 15 : 16, Material.LEVER, Msg.MENU_TITLE_SETTINGS.toString(), "Settings");
+            addItemToMenu(currentWaygate.isActive() ? getActionSlot(6) : getActionSlot(7), Material.LEVER, Msg.MENU_TITLE_SETTINGS.toString(), "Settings");
 
         addCloseToMenu();
     }
 
     private void addGateIconToMenu() {
-        setOption(10, currentWaygate);
-        optionWaygates[10] = null;
+        setOption(getActionSlot(1), currentWaygate);
+        optionWaygates[getActionSlot(1)] = null;
     }
 
     private void addNetworkToMenu() {
-        addNetworkToMenu(11, currentWaygate.getNetwork(), false);
+        addNetworkToMenu(getActionSlot(2), currentWaygate.getNetwork(), false);
     }
 
     private void addDeactivateGateToMenu() {
@@ -111,7 +111,7 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         if (Arrays.stream(Material.values()).anyMatch(t -> t.name().equals("CRIMSON_DOOR"))) {
             icon = Material.CRIMSON_DOOR;
         }
-        addItemToMenu(16, icon, Msg.MENU_TITLE_DEACTIVATE.toString(), "Deactivate");
+        addItemToMenu(getActionSlot(7), icon, Msg.MENU_TITLE_DEACTIVATE.toString(), "Deactivate");
     }
 
     public void setOption(int slot, String name, ItemStack icon) {

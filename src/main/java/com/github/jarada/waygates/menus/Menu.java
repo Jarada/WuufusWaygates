@@ -2,9 +2,11 @@ package com.github.jarada.waygates.menus;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.WaygateManager;
+import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.data.Network;
+import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.ItemStackUtil;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
@@ -60,6 +62,15 @@ public abstract class Menu {
         return currentWaygate.getName();
     }
 
+    int getPageSize() {
+        return size - MenuSize.STEP_SIZE;
+    }
+
+    int getActionSlot(int pos) {
+        int reduction = MenuSize.STEP_SIZE - pos;
+        return size - reduction;
+    }
+
     void onInventoryClick(InventoryClickEvent clickEvent) {
         final int slot = clickEvent.getRawSlot();
 
@@ -104,8 +115,11 @@ public abstract class Menu {
 
     public abstract void buildMenu();
 
+    public abstract int getDesiredMenuSize();
+
     void initMenu() {
-        size = 18;
+        MenuSize menuSize = DataManager.getManager().MENU_SIZE;
+        size = (menuSize == MenuSize.RESIZE) ? getDesiredMenuSize() : menuSize.getMenuSize();
         optionNames = new String[size];
         optionIcons = new ItemStack[size];
     }
@@ -130,7 +144,7 @@ public abstract class Menu {
             List<String> lore = new ArrayList<>();
             lore.add(Util.color(editable ? Msg.MENU_TEXT_EDITABLE.toString(owner.getName()) : Msg.MENU_TEXT_STANDARD.toString(owner.getName())));
             ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_GATE_OWNER.toString()), lore);
-            setOption(9, "Owner", is);
+            setOption(getActionSlot(0), "Owner", is);
         }
     }
 
@@ -188,23 +202,23 @@ public abstract class Menu {
     }
 
     void addPreviousToMenu() {
-        addItemToMenu(12, Material.PAPER, Msg.MENU_TITLE_PREVIOUS.toString(), "Previous");
+        addItemToMenu(getActionSlot(3), Material.PAPER, Msg.MENU_TITLE_PREVIOUS.toString(), "Previous");
     }
 
     void addPageToMenu() {
-        addItemToMenu(13, Material.BOOK, Math.min(page, 64), Msg.MENU_TITLE_PAGE.toString(), "Page", null);
+        addItemToMenu(getActionSlot(4), Material.BOOK, Math.min(page, 64), Msg.MENU_TITLE_PAGE.toString(), "Page", null);
     }
 
     void addNextToMenu() {
-        addItemToMenu(14, Material.PAPER, Msg.MENU_TITLE_NEXT.toString(), "Next");
+        addItemToMenu(getActionSlot(5), Material.PAPER, Msg.MENU_TITLE_NEXT.toString(), "Next");
     }
 
     void addCancelToMenu() {
-        addItemToMenu(17, Material.DARK_OAK_DOOR, Msg.MENU_TITLE_CANCEL.toString(), "Cancel");
+        addItemToMenu(getActionSlot(8), Material.DARK_OAK_DOOR, Msg.MENU_TITLE_CANCEL.toString(), "Cancel");
     }
 
     void addCloseToMenu() {
-        addItemToMenu(17, Material.DARK_OAK_DOOR, Msg.MENU_TITLE_CLOSE.toString(), "Close");
+        addItemToMenu(getActionSlot(8), Material.DARK_OAK_DOOR, Msg.MENU_TITLE_CLOSE.toString(), "Close");
     }
 
     public void setOption(int slot, String name, ItemStack icon) {

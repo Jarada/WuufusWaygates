@@ -42,6 +42,7 @@ public class WaygateDestinationMenu extends WaygateAccessMenu {
         }
     }
 
+    @Override
     public void buildMenu() {
         initMenu();
         buildGates();
@@ -50,16 +51,16 @@ public class WaygateDestinationMenu extends WaygateAccessMenu {
             addPreviousToMenu();
         }
 
-        if (accessList.size() > 9) {
+        if (accessList.size() > getPageSize()) {
             addPageToMenu();
         }
 
-        if (accessList.size() > page * 9) {
+        if (accessList.size() > page * getPageSize()) {
             addNextToMenu();
         }
 
         if (currentWaygate.getFixedDestination() != null) {
-            addItemToMenu(16, Material.BARRIER, Msg.MENU_TITLE_DESTINATION_CLEAR.toString(), "Clear");
+            addItemToMenu(getActionSlot(7), Material.BARRIER, Msg.MENU_TITLE_DESTINATION_CLEAR.toString(), "Clear");
         }
 
         addCloseToMenu();

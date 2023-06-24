@@ -5,6 +5,7 @@ import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Network;
+import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.ItemStackUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -85,6 +86,13 @@ public class MenuManager implements Listener {
 
         player.setMetadata(IN_MENU, new FixedMetadataValue(PluginMain.getPluginInstance(), true));
         activeMenu = menu;
+
+        MenuSize menuSize = DataManager.getManager().MENU_SIZE;
+        if (menuSize == MenuSize.RESIZE && activeInventory != null) {
+            close();
+            activeInventory = null;
+            HandlerList.unregisterAll(this);
+        }
 
         if (activeInventory != null) {
             activeInventory.clear();
