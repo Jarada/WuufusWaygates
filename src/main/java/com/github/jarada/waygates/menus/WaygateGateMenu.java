@@ -1,10 +1,7 @@
 package com.github.jarada.waygates.menus;
 
 import com.github.jarada.waygates.WaygateManager;
-import com.github.jarada.waygates.data.BlockLocation;
-import com.github.jarada.waygates.data.DataManager;
-import com.github.jarada.waygates.data.Gate;
-import com.github.jarada.waygates.data.Msg;
+import com.github.jarada.waygates.data.*;
 import com.github.jarada.waygates.types.GateActivationResult;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -19,6 +16,11 @@ public class WaygateGateMenu extends WaygateAccessMenu {
 
     public WaygateGateMenu(MenuManager mm, Player p, Gate currentWaygate, List<Gate> accessList) {
         super(mm, p, currentWaygate, accessList);
+        setup();
+    }
+
+    public WaygateGateMenu(MenuManager mm, Player p, Controller controller, List<Gate> accessList) {
+        super(mm, p, controller, accessList, true);
         setup();
     }
 
@@ -52,6 +54,8 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         } else {
             if (optionNames[slot].equals("Settings")) {
                 Bukkit.getScheduler().runTask(pm, () -> mm.openWaygateSettingsMenu());
+            } else if (optionNames[slot].equals("Reconfigure")) {
+                Bukkit.getScheduler().runTask(pm, () -> mm.openControllerConfigureMenu());
             } else if (optionNames[slot].equals("Deactivate")) {
                 Bukkit.getScheduler().runTask(pm, () -> {
                     if (currentWaygate.isActive())
@@ -91,7 +95,9 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         if (currentWaygate.isActive())
             addDeactivateGateToMenu();
 
-        if (currentWaygate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin"))
+        if (currentController != null && (currentController.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")))
+            addItemToMenu(currentWaygate.isActive() ? getActionSlot(6) : getActionSlot(7), Material.LEVER, Msg.MENU_TITLE_RECONFIGURE_CONTROLLER.toString(), "Reconfigure");
+        else if (currentWaygate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin"))
             addItemToMenu(currentWaygate.isActive() ? getActionSlot(6) : getActionSlot(7), Material.LEVER, Msg.MENU_TITLE_SETTINGS.toString(), "Settings");
 
         addCloseToMenu();

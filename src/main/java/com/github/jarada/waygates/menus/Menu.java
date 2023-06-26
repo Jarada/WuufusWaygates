@@ -2,10 +2,7 @@ package com.github.jarada.waygates.menus;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.WaygateManager;
-import com.github.jarada.waygates.data.DataManager;
-import com.github.jarada.waygates.data.Gate;
-import com.github.jarada.waygates.data.Msg;
-import com.github.jarada.waygates.data.Network;
+import com.github.jarada.waygates.data.*;
 import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.ItemStackUtil;
 import com.github.jarada.waygates.util.Util;
@@ -28,6 +25,7 @@ public abstract class Menu {
     MenuManager   mm;
 
     Player        p;
+    Controller    currentController;
     Gate          currentWaygate;
 
     int           page;
@@ -35,11 +33,24 @@ public abstract class Menu {
     String[]      optionNames;
     ItemStack[]   optionIcons;
 
-    Menu(MenuManager mm, Player p, Gate currentWaygate) {
+    private Menu(MenuManager mm, Player p) {
         pm = PluginMain.getPluginInstance();
-
         this.mm = mm;
         this.p = p;
+    }
+
+    Menu(MenuManager mm, Player p, Controller currentController, boolean loadGate) {
+        this(mm, p);
+        this.currentController = currentController;
+        this.currentController.addActiveMenu(this);
+        if (currentController.getGate() != null && loadGate) {
+            this.currentWaygate = currentController.getGate();
+            this.currentWaygate.addActiveMenu(this);
+        }
+    }
+
+    Menu(MenuManager mm, Player p, Gate currentWaygate) {
+        this(mm, p);
         this.currentWaygate = currentWaygate;
         this.currentWaygate.addActiveMenu(this);
     }
@@ -50,7 +61,10 @@ public abstract class Menu {
     }
 
     protected void destroy() {
-        currentWaygate.removeActiveMenu(this);
+        if (currentController != null)
+            currentController.removeActiveMenu(this);
+        if (currentWaygate != null)
+            currentWaygate.removeActiveMenu(this);
         pm = null;
         p = null;
         currentWaygate = null;
@@ -59,6 +73,8 @@ public abstract class Menu {
     }
 
     String getMenuName() {
+        if (currentController != null && currentWaygate == null)
+            return Msg.MENU_HEADER_CONTROLLER_CONFIGURE.toString();
         return currentWaygate.getName();
     }
 
@@ -138,6 +154,16 @@ public abstract class Menu {
         setOption(slot, optionName, is);
     }
 
+    void addControllerOwnerToMenu() {
+        if (currentController.getOwner() != null) {
+            OfflinePlayer owner = Bukkit.getOfflinePlayer(currentController.getOwner());
+            List<String> lore = new ArrayList<>();
+            lore.add(Util.color(Msg.MENU_TEXT_STANDARD.toString(owner.getName())));
+            ItemStack is = Util.getHead(owner, Util.color(Msg.MENU_TITLE_CONTROLLER_OWNER.toString()), lore);
+            setOption(getActionSlot(0), "Owner", is);
+        }
+    }
+
     void addGateOwnerToMenu(boolean editable) {
         if (currentWaygate.getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(currentWaygate.getOwner());
@@ -162,7 +188,10 @@ public abstract class Menu {
         String networkName = (nw.isSystem()) ?
                 Msg.MENU_COLOR_SYSTEM_NETWORK.toString() + Util.stripColor(nw.getName()) :
                 Msg.MENU_COLOR_NETWORK.toString() + Util.stripColor(nw.getName());
-        int gateCount = WaygateManager.getManager().countOfGatesInNetwork(p, nw, false);
+        int gateCount = (currentController != null) ?
+                WaygateManager.getManager().countOfLocalOwnedGatesInNetwork(p, nw, currentController.getLocation(),
+                        DataManager.getManager().WG_CONTROLLER_DISTANCE) :
+                WaygateManager.getManager().countOfGatesInNetwork(p, nw, false);
         String displayName = networkName;
 
         List<String> lore = new ArrayList<>();

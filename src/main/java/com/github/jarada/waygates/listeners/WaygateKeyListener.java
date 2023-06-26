@@ -2,10 +2,7 @@ package com.github.jarada.waygates.listeners;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.WaygateManager;
-import com.github.jarada.waygates.data.BlockLocation;
-import com.github.jarada.waygates.data.DataManager;
-import com.github.jarada.waygates.data.Gate;
-import com.github.jarada.waygates.data.Msg;
+import com.github.jarada.waygates.data.*;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.menus.MenuManager;
 import org.bukkit.Bukkit;
@@ -44,6 +41,26 @@ public class WaygateKeyListener implements Listener {
                     // Give it a tick delay as opening a menu straight away can interfere with offhand placement
                     Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () ->
                             new MenuManager(p, gate).openWaygateMenu(), 1L);
+                }
+            }
+            return;
+        }
+
+        Controller controller = WaygateManager.getManager().getControllerAtLocation(new BlockLocation(b.getLocation()));
+        if (controller != null) {
+            if (p.hasPermission("wg.key.use") && a == Action.RIGHT_CLICK_BLOCK) {
+                if (controller.getGate() == null && !controller.getOwner().equals(p.getUniqueId()) ||
+                        controller.getGate() != null && controller.getGate().isOwnerPrivate() && !(controller.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.bypass")
+                                || useEvent.isLockedKey())) {
+                    Msg.GATE_ACCESS_DENIED.sendTo(p);
+                } else if (controller.getGate() == null) {
+                    // Give it a tick delay as opening a menu straight away can interfere with offhand placement
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () ->
+                            new MenuManager(p, controller).openControllerConfigureMenu(), 1L);
+                } else {
+                    // Give it a tick delay as opening a menu straight away can interfere with offhand placement
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () ->
+                            new MenuManager(p, controller).openWaygateMenu(), 1L);
                 }
             }
         }

@@ -35,6 +35,7 @@ public class WaygateNetworkMenu extends Menu {
                 WaygateManager.getManager().changeGateNetwork(currentWaygate, network, false);
                 mm.openWaygateSettingsMenu();
             });
+            return;
         }
 
         switch (optionNames[slot]) {

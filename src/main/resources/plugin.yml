@@ -40,6 +40,7 @@
    wg.create.*:
      description: Create gates and networks
      children:
+       wg.create.control: true
        wg.create.gate: true
        wg.create.network.*: true
    wg.create.network.*:
@@ -103,6 +104,7 @@
        wg.craft.*: true
        wg.key.use: true
        wg.assign.*: true
+       wg.create.control: true
        wg.create.gate: true
        wg.create.network.private: true
        wg.create.network.invite: true
@@ -119,6 +121,7 @@
    wg.keep.*:
      description: Avoid consumption of constructor and key
      children:
+       wg.keep.control.creator: true
        wg.keep.constructor: true
        wg.keep.key: true
    wg.admin:

@@ -1,5 +1,6 @@
 package com.github.jarada.waygates.menus;
 
+import com.github.jarada.waygates.data.Controller;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.types.MenuSize;
 import org.bukkit.entity.Player;
@@ -11,6 +12,11 @@ public abstract class WaygateAccessMenu extends Menu {
 
     List<Gate> accessList;
     Gate[]     optionWaygates;
+
+    WaygateAccessMenu(MenuManager mm, Player p, Controller currentController, List<Gate> accessList, boolean loadGate) {
+        super(mm, p, currentController, loadGate);
+        this.accessList = accessList;
+    }
 
     WaygateAccessMenu(MenuManager mm, Player p, Gate currentWaygate, List<Gate> accessList) {
         super(mm, p, currentWaygate);

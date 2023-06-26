@@ -12,9 +12,11 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import javax.naming.ldap.Control;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -31,6 +33,7 @@ public class DataManager {
 
     private static final String WAYGATE_CONSTRUCTOR_KEY = "waygateconstructor";
     private static final String WAYGATE_KEY_KEY = "waygatekey";
+    private static final String WAYGATE_CONTROL_KEY = "waygatecontrol";
 
     private static DataManager          dm;
     private final PluginMain            pm;
@@ -42,16 +45,19 @@ public class DataManager {
 
     public ItemStack                    WAYGATE_CONSTRUCTOR;
     public ItemStack                    WAYGATE_KEY;
+    public ItemStack                    WAYGATE_CONTROL;
 
     public int                          MAX_AREA;
     public List<Map<String, Integer>>   BLOCKS_REQUIRED;
     public MenuSize                     MENU_SIZE;
     public int                          WG_NAME_MAX_LENGTH, WG_DESC_MAX_LENGTH;
     public int                          WG_NETWORK_NAME_MAX_LENGTH;
+    public int                          WG_CONTROLLER_DISTANCE;
     public int                          WG_GATE_ACTIVATION_TIME;
     public GateActivationParticles      WG_GATE_EFFECT_PARTICLES;
     public int                          WG_GATE_MINIMAL_DISTANCE;
     public boolean                      WG_GATE_ICON_CHANGE_CONSUMES;
+    public boolean                      WG_CONTROL_CREATOR_CONSUMES;
     public boolean                      WG_CONSTRUCTOR_CONSUMES;
     public boolean                      WG_KEY_CONSUMES;
     public boolean                      WG_KEY_PERMANENT;
@@ -93,9 +99,11 @@ public class DataManager {
         WG_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NAME_MAX_LENGTH"));
         WG_DESC_MAX_LENGTH = config.getInt("Waygates.WG_DESC_MAX_LENGTH");
         WG_NETWORK_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NETWORK_NAME_MAX_LENGTH"));
+        WG_CONTROLLER_DISTANCE = Integer.min(150, Integer.max(1, config.getInt("Waygates.WG_CONTROLLER_DISTANCE")));
         WG_GATE_ACTIVATION_TIME = Integer.min(300, Integer.max(5, config.getInt("Waygates.WG_GATE_ACTIVATION_TIME")));
         WG_GATE_MINIMAL_DISTANCE = Integer.min(50, Integer.max(1, config.getInt("Waygates.WG_GATE_MINIMAL_DISTANCE")));
         WG_GATE_ICON_CHANGE_CONSUMES = config.getBoolean("Waygates.WG_GATE_ICON_CHANGE_CONSUMES");
+        WG_CONTROL_CREATOR_CONSUMES = config.getBoolean("Waygates.WG_CONTROL_CREATOR_CONSUMES");
         WG_CONSTRUCTOR_CONSUMES = config.getBoolean("Waygates.WG_CONSTRUCTOR_CONSUMES");
         WG_KEY_CONSUMES = config.getBoolean("Waygates.WG_KEY_CONSUMES");
         WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT");
@@ -184,6 +192,26 @@ public class DataManager {
             recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
                 pm.getLogger().warning("Unable to load recipe! Waygate Keys will be uncraftable");
+
+            lore = new ArrayList<>();
+            Msg[] controlLore = {Msg.LORE_CONTROL_1, Msg.LORE_CONTROL_2, Msg.LORE_CONTROL_3, Msg.LORE_CONTROL_4};
+            for (Msg msg : controlLore)
+                if (msg.toString().length() > 0)
+                    lore.add(Util.color(msg.toString()));
+
+            WAYGATE_CONTROL = Util.setItemNameAndLore(
+                    NBTItemManager.getNBTItem(new ItemStack(Material.STICK, 1), WAYGATE_CONTROL_KEY),
+                    Msg.LORE_CONTROL_NAME.toString(), lore);
+            ItemMeta controlMeta = WAYGATE_CONTROL.getItemMeta();
+            if (controlMeta != null) {
+                controlMeta.addEnchant(glow, 1, true);
+            }
+
+            sr = new ShapedRecipe(new NamespacedKey(pm, WAYGATE_CONTROL_KEY), WAYGATE_CONTROL);
+            sr.shape("CCC").setIngredient('C', new RecipeChoice.ExactChoice(WAYGATE_CONSTRUCTOR));
+            recipeResult = Bukkit.addRecipe(sr);
+            if (!recipeResult)
+                pm.getLogger().warning("Unable to load recipe! Waygate Controls will be uncraftable");
         }
     }
 
@@ -318,7 +346,8 @@ public class DataManager {
             }
         }
 
-        // Load Gates
+        // Load Gates and Controllers
+        List<Controller> controllers = new ArrayList<>();
         Map<String, Gate> gateMap = new HashMap<>();
         File[] _worldFiles = worldsFolder.listFiles(new WorldFolderFilenameFilter());
         if (_worldFiles != null) {
@@ -328,12 +357,22 @@ public class DataManager {
                 if (_gateFiles != null) {
                     ArrayList<File> gates = new ArrayList<>(Arrays.asList(_gateFiles));
                     for (File gateFile : gates) {
-                        try {
-                            Gate gate = Gate.fromJson(loadData(gateFile));
-                            gateMap.put(gate.getUUID().toString(), gate);
-                        } catch (Exception e) {
-                            pm.getLogger().warning(String.format("Unable to load Gate %s in World %s",
-                                    gateFile.getName(), worldFolder.getName()));
+                        if (gateFile.getName().startsWith("c-")) {
+                            try {
+                                Controller controller = Controller.fromJson(loadData(gateFile));
+                                controllers.add(controller);
+                            } catch (Exception e) {
+                                pm.getLogger().warning(String.format("Unable to load Controller %s in World %s",
+                                        gateFile.getName(), worldFolder.getName()));
+                            }
+                        } else {
+                            try {
+                                Gate gate = Gate.fromJson(loadData(gateFile));
+                                gateMap.put(gate.getUUID().toString(), gate);
+                            } catch (Exception e) {
+                                pm.getLogger().warning(String.format("Unable to load Gate %s in World %s",
+                                        gateFile.getName(), worldFolder.getName()));
+                            }
                         }
                     }
                 }
@@ -361,14 +400,30 @@ public class DataManager {
                 gate.setActiveDestination(gateMap.get(gate.getActiveDestinationUuid()));
             }
         }
+        controllers.forEach(controller -> {
+            if (controller.getGateUuid() != null) {
+                controller.setGate(gateMap.get(controller.getGateUuid()));
+            }
+        });
 
         // Save
         wm.loadGates(new ArrayList<>(gateMap.values()));
+        wm.loadControllers(controllers);
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean saveController(Controller controller) {
+        String world = controller.getWorldName();
+        File worldFolder = new File(worldsFolder, Util.getKey(world));
+        if (!worldFolder.exists())
+            worldFolder.mkdir();
+
+        return saveData(worldFolder, controller.getUUID(), controller.toJson(), "c-");
     }
 
     @SuppressWarnings("UnusedReturnValue")
     public boolean saveWaygate(Gate gate, boolean saveNetwork) {
-        String world = gate.getExit().getWorldName();
+        String world = gate.getWorldName();
         File worldFolder = new File(worldsFolder, Util.getKey(world));
         if (!worldFolder.exists())
             worldFolder.mkdir();
@@ -389,9 +444,27 @@ public class DataManager {
     }
 
     @SuppressWarnings("UnusedReturnValue")
+    public boolean deleteController(Controller controller) {
+        boolean success = true;
+        String world = controller.getWorldName();
+        File worldFolder = new File(worldsFolder, Util.getKey(world));
+        if (worldFolder.exists()) {
+            success = new File(worldFolder, String.format("c-%s.json", controller.getUUID())).delete();
+            try {
+                if (Objects.requireNonNull(worldFolder.list()).length == 0) {
+                    worldFolder.delete();
+                }
+            } catch (Exception e) {
+                pm.getLogger().warning(String.format("Unable to check if world folder %s is empty", world));
+            }
+        }
+        return success;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
     public boolean deleteWaygate(Gate gate, boolean deleteNetwork) {
         boolean success = true;
-        String world = gate.getExit().getWorldName();
+        String world = gate.getWorldName();
         File worldFolder = new File(worldsFolder, Util.getKey(world));
         if (worldFolder.exists()) {
             success = new File(worldFolder, String.format("%s.json", gate.getUUID())).delete();
@@ -416,8 +489,12 @@ public class DataManager {
     }
 
     private boolean saveData(File dataFolder, UUID uuid, String data) {
+        return saveData(dataFolder, uuid, data, "");
+    }
+
+    private boolean saveData(File dataFolder, UUID uuid, String data, String prefix) {
         if (dataFolder.exists()) {
-            File dataFile = new File(dataFolder, String.format("%s.json", uuid.toString()));
+            File dataFile = new File(dataFolder, String.format("%s%s.json", prefix, uuid.toString()));
 
             if (!dataFile.exists()) {
                 try {

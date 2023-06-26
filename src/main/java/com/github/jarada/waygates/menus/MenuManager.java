@@ -2,6 +2,7 @@ package com.github.jarada.waygates.menus;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.WaygateManager;
+import com.github.jarada.waygates.data.Controller;
 import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Network;
@@ -37,7 +38,13 @@ public class MenuManager implements Listener {
     private Inventory      activeInventory;
 
     private Player                  player;
+    private Controller   currentController;
     private Gate            currentWaygate;
+
+    public MenuManager(Player player, Controller currentController) {
+        this(player, currentController.getGate());
+        this.currentController = currentController;
+    }
 
     public MenuManager(Player player, Gate currentWaygate) {
         this.player = player;
@@ -45,6 +52,11 @@ public class MenuManager implements Listener {
         pm = PluginMain.getPluginInstance();
         wm = WaygateManager.getManager();
         dm = DataManager.getManager();
+    }
+
+    public MenuManager saveUpdateToController() {
+        dm.saveController(currentController);
+        return this;
     }
 
     public MenuManager saveUpdateToGate() {
@@ -142,6 +154,38 @@ public class MenuManager implements Listener {
         return accessList;
     }
 
+    private List<Gate> loadNetworkGatesList(Network network) {
+        List<Gate> accessList = wm.getGatesInNetwork(network);
+        List<Gate> localList = wm.getGatesNearLocation(currentController.getLocation(), DataManager.getManager().WG_CONTROLLER_DISTANCE);
+        // Remove Hidden Gates if not owner or bypass
+        accessList.removeIf(accessGate -> !localList.contains(accessGate) || (!isOwner(accessGate) && !canBypass()));
+        return accessList;
+    }
+
+    private List<Network> loadNetworkList() {
+        ArrayList<Network> networks = new ArrayList<>(Network.systemNetworks());
+        if (currentController != null)
+            networks.removeIf(network -> !player.hasPermission(String.format("wg.network.%s", network.getSysKey())));
+        else
+            networks.removeIf(network -> !currentWaygate.getNetwork().equals(network) && !player.hasPermission(String.format("wg.network.%s", network.getSysKey())));
+        networks.addAll(wm.getCustomNetworks(player, currentWaygate));
+        return networks;
+    }
+
+    public void openControllerConfigureMenu() {
+        if (currentController == null)
+            return;
+
+        open(new ControllerConfigureNetworkMenu(this, player, currentController, loadNetworkList()));
+    }
+
+    public void openControllerConfigureGateMenu(Network chosenNetwork) {
+        if (currentController == null)
+            return;
+
+        open(new ControllerConfigureGateMenu(this, player, currentController, loadNetworkGatesList(chosenNetwork)));
+    }
+
     public void openWaygateMenu() {
         if (currentWaygate == null)
             return;
@@ -150,15 +194,21 @@ public class MenuManager implements Listener {
             Gate accessGate = currentWaygate.getFixedDestination();
             if (accessGate.isOwnerHidden() && !(isOwner(accessGate) || canBypass())) {
                 // No Gates To Show
-                open(new WaygateGateMenu(this, player, currentWaygate, new ArrayList<>()));
+                open((currentController != null) ?
+                        new WaygateGateMenu(this, player, currentController, new ArrayList<>()) :
+                        new WaygateGateMenu(this, player, currentWaygate, new ArrayList<>()));
             } else {
                 // Add Single Gate
                 ArrayList<Gate> accessList = new ArrayList<>();
                 accessList.add(accessGate);
-                open(new WaygateGateMenu(this, player, currentWaygate, accessList));
+                open((currentController != null) ?
+                        new WaygateGateMenu(this, player, currentController, accessList) :
+                        new WaygateGateMenu(this, player, currentWaygate, accessList));
             }
         } else {
-            open(new WaygateGateMenu(this, player, currentWaygate, loadAccessList()));
+            open((currentController != null) ?
+                    new WaygateGateMenu(this, player, currentController, loadAccessList()) :
+                    new WaygateGateMenu(this, player, currentWaygate, loadAccessList()));
         }
     }
 
@@ -180,10 +230,7 @@ public class MenuManager implements Listener {
         if (currentWaygate == null)
             return;
 
-        ArrayList<Network> networks = new ArrayList<>(Network.systemNetworks());
-        networks.removeIf(network -> !currentWaygate.getNetwork().equals(network) && !player.hasPermission(String.format("wg.network.%s", network.getSysKey())));
-        networks.addAll(wm.getCustomNetworks(player, currentWaygate));
-        open(new WaygateNetworkMenu(this, player, currentWaygate, networks));
+        open(new WaygateNetworkMenu(this, player, currentWaygate, loadNetworkList()));
     }
 
     public void openWaygateNetworkTypeMenu(String name) {

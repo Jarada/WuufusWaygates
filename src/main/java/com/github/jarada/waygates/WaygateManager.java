@@ -25,8 +25,10 @@ public class WaygateManager {
     private final Map<Network, List<Gate>>    gates;
     private final Map<BlockLocation, Gate>    locationGateMap;
     private final Map<BlockLocation, Gate>    imprintGateMap;
+    private final Map<BlockLocation, Controller> locationControllerMap;
     private final Map<String, List<Gate>>      chunkGateMap;
     private final Map<String, List<Gate>>     playerGateMap;
+    private final Map<String, List<Controller>> worldControllerMap;
     private final Map<String, List<Gate>>     worldGateMap;
     private final List<String>                worldDeletion;
 
@@ -35,8 +37,10 @@ public class WaygateManager {
         gates = new LinkedHashMap<>();
         locationGateMap = new LinkedHashMap<>();
         imprintGateMap = new LinkedHashMap<>();
+        locationControllerMap = new LinkedHashMap<>();
         chunkGateMap = new LinkedHashMap<>();
         playerGateMap = new LinkedHashMap<>();
+        worldControllerMap = new LinkedHashMap<>();
         worldGateMap = new LinkedHashMap<>();
         worldDeletion = new ArrayList<>();
     }
@@ -360,6 +364,21 @@ public class WaygateManager {
         return 0;
     }
 
+    public int countOfLocalOwnedGatesInNetwork(Player p, Network network, BlockLocation location, int radius) {
+        List<Gate> localGates = getGatesNearLocation(location, radius);
+        if (this.gates.containsKey(network)) {
+            int count = 0;
+            boolean canBypass = p.hasPermission("wg.bypass");
+            for (Gate gate : this.gates.get(network)) {
+                if (!localGates.contains(gate) || (!gate.getOwner().equals(p.getUniqueId()) && !canBypass))
+                    continue;
+                count += 1;
+            }
+            return count;
+        }
+        return 0;
+    }
+
     public List<Gate> getGatesInNetwork(Network network) {
         if (this.gates.containsKey(network))
             return this.gates.get(network);
@@ -466,10 +485,7 @@ public class WaygateManager {
         this.recordGate(gate, false);
 
         // Run Sound FX
-        Util.playParticle(startBlock.getLocation(), Particle.REDSTONE, 10);
-        Util.playEffect(startBlock.getLocation(), Effect.ENDER_SIGNAL);
-        Util.playSound(startBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE);
-        // NB Add Gate Creation Sound FX (CG Stored in UGate)
+        createEffect(startBlock);
 
         // Inform Player
         if (imprint)
@@ -508,11 +524,7 @@ public class WaygateManager {
         destroyWaygate(gate);
 
         // Run FX
-        Util.playEffect(destroyingBlock.getLocation(), Effect.ENDER_SIGNAL);
-        Util.playParticle(destroyingBlock.getLocation(), Particle.EXPLOSION_LARGE, 1);
-        Util.playParticle(destroyingBlock.getLocation(), Particle.REDSTONE, 10);
-        Util.playSound(destroyingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE);
-        Util.playSound(destroyingBlock.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE);
+        destroyEffect(destroyingBlock);
 
         // Message
         if (p != null)
@@ -570,6 +582,133 @@ public class WaygateManager {
             }
         }
         return null;
+    }
+
+    /* Controller Recording */
+
+    private void addToControllers(Controller controller) {
+        locationControllerMap.put(controller.getLocation(), controller);
+
+        if (!this.worldControllerMap.containsKey(controller.getWorldName())) {
+            this.worldControllerMap.put(controller.getWorldName(), new ArrayList<>());
+        }
+        this.worldControllerMap.get(controller.getWorldName()).add(controller);
+    }
+
+    private void removeFromControllers(Controller controller) {
+        locationControllerMap.remove(controller.getLocation());
+
+        if (this.worldControllerMap.containsKey(controller.getWorldName())) {
+            this.worldControllerMap.get(controller.getWorldName()).remove(controller);
+            if (this.worldControllerMap.get(controller.getWorldName()).isEmpty()) {
+                this.worldControllerMap.remove(controller.getWorldName());
+            }
+        }
+    }
+
+    private void recordController(Controller controller, boolean loading) {
+        // Add to Map
+        addToControllers(controller);
+
+        // Save Controller to File
+        if (!loading)
+            DataManager.getManager().saveController(controller);
+    }
+
+    private void unrecordController(Controller controller) {
+        // Remove from Map
+        removeFromControllers(controller);
+
+        // Remove from File
+        DataManager.getManager().deleteController(controller);
+    }
+
+    public void loadControllers(List<Controller> controllers) {
+        for (Controller controller : controllers) {
+            recordController(controller, true);
+        }
+        pm.getLogger().info(String.format("Loaded %d controllers in %d world(s)", locationControllerMap.size(),
+                worldGateMap.keySet().size()));
+    }
+
+    public void destroyController(@Nullable Player p, @NotNull Controller controller) {
+        // Clear Waygate
+        destroyController(controller);
+
+        // Run FX
+        destroyEffect(controller.getLocation());
+
+        // Message
+        if (p != null)
+            Msg.CONTROLLER_DESTROYED.sendTo(p);
+    }
+
+    public void destroyController(@NotNull Controller controller) {
+        // Unrecord Gate
+        unrecordController(controller);
+
+        // Clear Menus
+        controller.closeActiveMenus();
+    }
+
+    /* Controller Locating */
+
+    public Controller getControllerAtLocation(BlockLocation blockLocation) {
+        if (this.locationControllerMap.containsKey(blockLocation))
+            return this.locationControllerMap.get(blockLocation);
+        return null;
+    }
+
+    /* Control Manipulation */
+
+    public boolean createController(Player p, Block clickedBlock) {
+        BlockLocation blockLocation = new BlockLocation(clickedBlock.getLocation());
+
+        // If gate already exists, bail out
+        Gate existingGate = getGateAtLocation(blockLocation);
+        if (existingGate != null) {
+            if (!existingGate.getOwner().equals(p.getUniqueId()))
+                Msg.GATE_ALREADY_EXISTS.sendTo(p);
+            return false;
+        }
+
+        // If controller already exists, bail out
+        Controller existingController = getControllerAtLocation(blockLocation);
+        if (existingController != null) {
+            if (!existingController.getOwner().equals(p.getUniqueId()))
+                Msg.CONTROLLER_ALREADY_EXISTS.sendTo(p);
+            return false;
+        }
+
+        // Create Controller
+        Controller controller = new Controller(p.getUniqueId(), blockLocation);
+
+        // Record Controller
+        this.recordController(controller, false);
+
+        // Run Sound FX
+        createEffect(blockLocation.getLocation().getBlock());
+
+        // Inform Player
+        Msg.CONTROLLER_CREATED.sendTo(p);
+        return true;
+    }
+
+    /* Shared FX */
+
+    private void createEffect(Block startBlock) {
+        Util.playParticle(startBlock.getLocation(), Particle.REDSTONE, 10);
+        Util.playEffect(startBlock.getLocation(), Effect.ENDER_SIGNAL);
+        Util.playSound(startBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE);
+        // NB Add Gate Creation Sound FX (CG Stored in UGate)
+    }
+
+    private void destroyEffect(BlockLocation destroyingBlock) {
+        Util.playEffect(destroyingBlock.getLocation(), Effect.ENDER_SIGNAL);
+        Util.playParticle(destroyingBlock.getLocation(), Particle.EXPLOSION_LARGE, 1);
+        Util.playParticle(destroyingBlock.getLocation(), Particle.REDSTONE, 10);
+        Util.playSound(destroyingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE);
+        Util.playSound(destroyingBlock.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE);
     }
 
 }

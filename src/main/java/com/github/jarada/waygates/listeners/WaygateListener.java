@@ -2,10 +2,7 @@ package com.github.jarada.waygates.listeners;
 
 import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.WaygateManager;
-import com.github.jarada.waygates.data.BlockLocation;
-import com.github.jarada.waygates.data.DataManager;
-import com.github.jarada.waygates.data.Gate;
-import com.github.jarada.waygates.data.Msg;
+import com.github.jarada.waygates.data.*;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.types.GateActivationResult;
 import com.github.jarada.waygates.util.Util;
@@ -46,12 +43,20 @@ public class WaygateListener implements Listener {
     /* Gate Integrity */
 
     public void verifyGateIntegrity(Player p, Block block) {
-        // If broken block is part of a gate
         BlockLocation blockLocation = new BlockLocation(block.getLocation());
+
+        // If broken block is part of a gate
         Gate gate = gm.getGateAtLocation(blockLocation);
         if (gate != null) {
             // It is destroyed
             gm.destroyWaygate(p, gate, blockLocation);
+        }
+
+        // If broken block is a controller
+        Controller controller = gm.getControllerAtLocation(blockLocation);
+        if (controller != null) {
+            // It is destroyed
+            gm.destroyController(p, controller);
         }
     }
 

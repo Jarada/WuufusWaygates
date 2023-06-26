@@ -1,10 +1,7 @@
 package com.github.jarada.waygates.listeners;
 
 import com.github.jarada.waygates.WaygateManager;
-import com.github.jarada.waygates.data.BlockLocation;
-import com.github.jarada.waygates.data.DataManager;
-import com.github.jarada.waygates.data.Gate;
-import com.github.jarada.waygates.data.Msg;
+import com.github.jarada.waygates.data.*;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.types.GateCreationResult;
@@ -63,6 +60,19 @@ public class PlayerListener implements Listener {
                 is.setAmount(is.getAmount() - 1);
                 p.getInventory().setItemInMainHand(is);
             }
+        } else if (mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_CONTROL)) {
+            if (!p.hasPermission("wg.create.control"))
+                return;
+
+            // Attempt to create a Controller
+            boolean result = gm.createController(p, event.getClickedBlock());
+            event.setCancelled(true);
+
+            // Consume Waygate Control Creator
+            if (dm.WG_CONTROL_CREATOR_CONSUMES && result && !p.hasPermission("wg.keep.control.creator")) {
+                is.setAmount(is.getAmount() - 1);
+                p.getInventory().setItemInMainHand(is);
+            }
         } else if (mainHand && !p.isSneaking()) {
             if (!p.hasPermission("wg.key.use"))
                 return;
@@ -75,6 +85,12 @@ public class PlayerListener implements Listener {
                 Gate gate = WaygateManager.getManager().getGateAtLocation(new BlockLocation(event.getClickedBlock().getLocation()));
                 if (gate != null && dm.isLockKeyValid(gate, is))
                     keyUseEvent = new WaygateKeyUseEvent(p, a, event.getClickedBlock()).withLockedKey();
+                else {
+                    // Verify Controller Availability and Lock
+                    Controller controller = WaygateManager.getManager().getControllerAtLocation(new BlockLocation(event.getClickedBlock().getLocation()));
+                    if (controller != null && controller.getGate() != null && dm.isLockKeyValid(controller.getGate(), is))
+                        keyUseEvent = new WaygateKeyUseEvent(p, a, event.getClickedBlock()).withLockedKey();
+                }
             }
 
             if (keyUseEvent != null) {
