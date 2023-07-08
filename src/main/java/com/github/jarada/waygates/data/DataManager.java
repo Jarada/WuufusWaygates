@@ -200,18 +200,21 @@ public class DataManager {
                     lore.add(Util.color(msg.toString()));
 
             WAYGATE_CONTROL = Util.setItemNameAndLore(
-                    NBTItemManager.getNBTItem(new ItemStack(Material.STICK, 1), WAYGATE_CONTROL_KEY),
+                    NBTItemManager.getNBTItem(new ItemStack(Material.IRON_NUGGET, 1), WAYGATE_CONTROL_KEY),
                     Msg.LORE_CONTROL_NAME.toString(), lore);
             ItemMeta controlMeta = WAYGATE_CONTROL.getItemMeta();
             if (controlMeta != null) {
                 controlMeta.addEnchant(glow, 1, true);
+                WAYGATE_CONTROL.setItemMeta(controlMeta);
             }
 
             sr = new ShapedRecipe(new NamespacedKey(pm, WAYGATE_CONTROL_KEY), WAYGATE_CONTROL);
-            sr.shape("CCC").setIngredient('C', new RecipeChoice.ExactChoice(WAYGATE_CONSTRUCTOR));
+            sr.shape("CKC")
+                    .setIngredient('C', new RecipeChoice.ExactChoice(WAYGATE_CONSTRUCTOR))
+                    .setIngredient('K', new RecipeChoice.ExactChoice(WAYGATE_KEY));
             recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
-                pm.getLogger().warning("Unable to load recipe! Waygate Controls will be uncraftable");
+                pm.getLogger().warning("Unable to load recipe! Waygate Controllers will be uncraftable");
         }
     }
 
