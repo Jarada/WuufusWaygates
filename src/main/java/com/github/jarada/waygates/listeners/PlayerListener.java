@@ -145,7 +145,8 @@ public class PlayerListener implements Listener {
 
             // Verify Recipe
             if ((e.getRecipe().getResult().isSimilar(dm.WAYGATE_CONSTRUCTOR) && !p.hasPermission("wg.craft.constructor")) ||
-                (e.getRecipe().getResult().isSimilar(dm.WAYGATE_KEY) && !p.hasPermission("wg.craft.key"))) {
+                (e.getRecipe().getResult().isSimilar(dm.WAYGATE_KEY) && !p.hasPermission("wg.craft.key")) ||
+                (e.getRecipe().getResult().isSimilar(dm.WAYGATE_CONTROL) && !p.hasPermission("wg.craft.control.creator"))) {
                 e.setCancelled(true);
                 Msg.NO_PERMS.sendTo(p);
             }

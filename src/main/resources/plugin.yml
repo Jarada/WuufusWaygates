@@ -30,6 +30,7 @@
    wg.craft.*:
      description: Grants access to craft Waygate Constructors and Waygate Keys
      children:
+       wg.craft.control.creator: true
        wg.craft.constructor: true
        wg.craft.key: true
    wg.key.*:
