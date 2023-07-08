@@ -20,10 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MenuManager implements Listener {
 
@@ -183,7 +180,14 @@ public class MenuManager implements Listener {
         if (currentController == null)
             return;
 
-        open(new ControllerConfigureGateMenu(this, player, currentController, loadNetworkGatesList(chosenNetwork)));
+        ControllerConfigureGateMenu menu = new ControllerConfigureGateMenu(this, player, currentController,
+                (DataManager.getManager().WG_CONTROLLER_DISTANCE > 16) ? Collections.emptyList() : loadNetworkGatesList(chosenNetwork));
+        open(menu);
+        if (DataManager.getManager().WG_CONTROLLER_DISTANCE > 16) {
+            menu.updateGates(loadNetworkGatesList(chosenNetwork));
+            if (menu == activeMenu)
+                activeInventory.setContents(menu.optionIcons);
+        }
     }
 
     public void openWaygateMenu() {

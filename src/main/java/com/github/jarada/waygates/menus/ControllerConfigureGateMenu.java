@@ -17,6 +17,11 @@ public class ControllerConfigureGateMenu extends WaygateAccessMenu {
         setup();
     }
 
+    public void updateGates(List<Gate> accessList) {
+        this.accessList = accessList;
+        setup();
+    }
+
     void onInventoryClick(InventoryClickEvent clickEvent) {
         final int slot = clickEvent.getRawSlot();
 

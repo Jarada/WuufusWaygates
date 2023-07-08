@@ -99,7 +99,7 @@ public class DataManager {
         WG_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NAME_MAX_LENGTH"));
         WG_DESC_MAX_LENGTH = config.getInt("Waygates.WG_DESC_MAX_LENGTH");
         WG_NETWORK_NAME_MAX_LENGTH = Integer.max(6, config.getInt("Waygates.WG_NETWORK_NAME_MAX_LENGTH"));
-        WG_CONTROLLER_DISTANCE = Integer.min(150, Integer.max(1, config.getInt("Waygates.WG_CONTROLLER_DISTANCE")));
+        WG_CONTROLLER_DISTANCE = Integer.min(50, Integer.max(1, config.getInt("Waygates.WG_CONTROLLER_DISTANCE")));
         WG_GATE_ACTIVATION_TIME = Integer.min(300, Integer.max(5, config.getInt("Waygates.WG_GATE_ACTIVATION_TIME")));
         WG_GATE_MINIMAL_DISTANCE = Integer.min(50, Integer.max(1, config.getInt("Waygates.WG_GATE_MINIMAL_DISTANCE")));
         WG_GATE_ICON_CHANGE_CONSUMES = config.getBoolean("Waygates.WG_GATE_ICON_CHANGE_CONSUMES");
