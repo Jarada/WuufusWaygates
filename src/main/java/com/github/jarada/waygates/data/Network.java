@@ -236,7 +236,7 @@ public class Network {
 
     public boolean isGateAbleToUseNetwork(Player owner, Gate gate) {
         // Same network, of course!
-        if (gate.getNetwork().equals(this))
+        if (gate != null && gate.getNetwork().equals(this))
             return true;
 
         // System network, permission check
