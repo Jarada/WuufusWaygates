@@ -381,7 +381,7 @@ public class WaygateManager {
 
     public List<Gate> getGatesInNetwork(Network network) {
         if (this.gates.containsKey(network))
-            return this.gates.get(network);
+            return new ArrayList<>(this.gates.get(network));
         return new ArrayList<>();
     }
 
@@ -632,7 +632,7 @@ public class WaygateManager {
     }
 
     public void destroyController(@Nullable Player p, @NotNull Controller controller) {
-        // Clear Waygate
+        // Clear Controller
         destroyController(controller);
 
         // Run FX
@@ -644,7 +644,7 @@ public class WaygateManager {
     }
 
     public void destroyController(@NotNull Controller controller) {
-        // Unrecord Gate
+        // Unrecord Controller
         unrecordController(controller);
 
         // Clear Menus

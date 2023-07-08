@@ -128,6 +128,7 @@ public class MenuManager implements Listener {
         wm = null;
         dm = null;
         player = null;
+        currentController = null;
         currentWaygate = null;
 
         activeMenu = null;
