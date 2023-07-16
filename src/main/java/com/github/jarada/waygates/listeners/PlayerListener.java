@@ -7,6 +7,7 @@ import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.types.GateCreationResult;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,6 +37,9 @@ public class PlayerListener implements Listener {
         boolean mainHand = is != null && is.equals(p.getInventory().getItemInMainHand());
 
         if (a == Action.PHYSICAL || p.hasMetadata("InMenu"))
+            return;
+        
+        if (p.getInventory().getItemInMainHand().getType() == Material.AIR && checkPlayerEmptyHandControllerInteraction(event))
             return;
 
         if (is == null || event.getClickedBlock() == null)
@@ -151,6 +155,21 @@ public class PlayerListener implements Listener {
                 Msg.NO_PERMS.sendTo(p);
             }
         }
+    }
+
+    private boolean checkPlayerEmptyHandControllerInteraction(PlayerInteractEvent event) {
+        Player p = event.getPlayer();
+        Action a = event.getAction();
+
+        if (event.getClickedBlock() != null && !p.isSneaking()) {
+            Controller controller = WaygateManager.getManager().getControllerAtLocation(new BlockLocation(event.getClickedBlock().getLocation()));
+            if (controller != null) {
+                Bukkit.getPluginManager().callEvent(new WaygateKeyUseEvent(p, a, event.getClickedBlock()).withEmptyHand());
+                event.setCancelled(true);
+                return true;
+            }
+        }
+        return false;
     }
 
 }

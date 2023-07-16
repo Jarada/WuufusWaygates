@@ -27,7 +27,6 @@ public class ControllerConfigureGateMenu extends WaygateAccessMenu {
 
         if (optionWaygates[slot] != null) {
             Gate selectedGate = optionWaygates[slot];
-            pm.getLogger().info(String.format("Found gate %s", selectedGate.getName()));
             Bukkit.getScheduler().runTask(pm, () -> {
                 currentController.setGate(selectedGate);
                 mm.saveUpdateToController();

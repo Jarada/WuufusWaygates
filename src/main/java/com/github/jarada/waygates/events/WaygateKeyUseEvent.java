@@ -16,6 +16,7 @@ public class WaygateKeyUseEvent extends Event implements Cancellable {
     private final Action a;
     private final Block  b;
 
+    private boolean emptyHand;
     private boolean lockedKey;
 
     public WaygateKeyUseEvent(Player p, Action a, Block b) {
@@ -50,12 +51,17 @@ public class WaygateKeyUseEvent extends Event implements Cancellable {
         return lockedKey;
     }
 
-    public void setLockedKey(boolean lockedKey) {
-        this.lockedKey = lockedKey;
-    }
-
     public WaygateKeyUseEvent withLockedKey() {
         this.lockedKey = true;
+        return this;
+    }
+
+    public boolean isEmptyHand() {
+        return emptyHand;
+    }
+
+    public WaygateKeyUseEvent withEmptyHand() {
+        this.emptyHand = true;
         return this;
     }
 

@@ -38,6 +38,8 @@ public class MenuManager implements Listener {
     private Controller   currentController;
     private Gate            currentWaygate;
 
+    private boolean              emptyHand;
+
     public MenuManager(Player player, Controller currentController) {
         this(player, currentController.getGate());
         this.currentController = currentController;
@@ -49,6 +51,11 @@ public class MenuManager implements Listener {
         pm = PluginMain.getPluginInstance();
         wm = WaygateManager.getManager();
         dm = DataManager.getManager();
+    }
+
+    public MenuManager withEmptyHand(boolean emptyHand) {
+        this.emptyHand = emptyHand;
+        return this;
     }
 
     public MenuManager saveUpdateToController() {
@@ -200,19 +207,19 @@ public class MenuManager implements Listener {
             if (accessGate.isOwnerHidden() && !(isOwner(accessGate) || canBypass())) {
                 // No Gates To Show
                 open((currentController != null) ?
-                        new WaygateGateMenu(this, player, currentController, new ArrayList<>()) :
+                        new WaygateGateMenu(this, player, currentController, new ArrayList<>(), emptyHand) :
                         new WaygateGateMenu(this, player, currentWaygate, new ArrayList<>()));
             } else {
                 // Add Single Gate
                 ArrayList<Gate> accessList = new ArrayList<>();
                 accessList.add(accessGate);
                 open((currentController != null) ?
-                        new WaygateGateMenu(this, player, currentController, accessList) :
+                        new WaygateGateMenu(this, player, currentController, accessList, emptyHand) :
                         new WaygateGateMenu(this, player, currentWaygate, accessList));
             }
         } else {
             open((currentController != null) ?
-                    new WaygateGateMenu(this, player, currentController, loadAccessList()) :
+                    new WaygateGateMenu(this, player, currentController, loadAccessList(), emptyHand) :
                     new WaygateGateMenu(this, player, currentWaygate, loadAccessList()));
         }
     }
