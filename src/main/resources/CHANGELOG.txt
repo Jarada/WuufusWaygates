@@ -1,5 +1,17 @@
 CHANGELOG
 
+1.4.0 (11/08/23)
+- Added Waygate Control Creator, that can be crafted and then used to create a Waygate Controller
+  - To craft one, put a Waygate Key in the center and then add a Waygate Constructor to the left and right of it (permission wg.craft.control.creator)
+  - To create a Waygate Controller, right click using the Waygate Control Creator on any single block; the block then becomes the Waygate Controller (permission wg.create.control)
+  - Waygate Control Creators are consumed on the creation of a Waygate Controller (as per config option WG_CONTROL_CREATOR_CONSUMES and permission wg.keep.control.creator)
+- Added Waygate Controllers, used to remotely activate a chosen Waygate, similar to a DHD device in Stargate
+  - Waygate Controllers can be configured and used with a Waygate Key or an empty hand
+  - Waygate Controllers can be configured to activate a Waygate within a set radius, default and max of 50 blocks away (set in config option WG_CONTROLLER_DISTANCE)
+  - Once configured, Waygate Controllers can be used to activate a destination or close off the portal on the linked Waygate without having to be present at the gate itself
+- Added ability to define the size of the Waygate Menus: compact, small, medium, large, max, and resize (as per config option MENU_SIZE)
+- Fixed logging statement on startup to indicate correct number of gates
+
 1.3.7 (04/30/23)
 - Added new permissions: wg.keep.*, wg.keep.constructor, wg.keep.key; that allows for bypassing
   consumption of constructor and key by players.
