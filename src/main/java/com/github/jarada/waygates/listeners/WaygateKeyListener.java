@@ -53,14 +53,14 @@ public class WaygateKeyListener implements Listener {
                         controller.getGate() != null && controller.getGate().isOwnerPrivate() && !(controller.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.bypass")
                                 || useEvent.isLockedKey())) {
                     Msg.GATE_ACCESS_DENIED.sendTo(p);
-                } else if (controller.getGate() == null && !useEvent.isEmptyHand()) {
+                } else if (controller.getGate() == null) {
                     // Give it a tick delay as opening a menu straight away can interfere with offhand placement
                     Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () ->
                             new MenuManager(p, controller).openControllerConfigureMenu(), 1L);
                 } else if (controller.getGate() != null) {
                     // Give it a tick delay as opening a menu straight away can interfere with offhand placement
                     Bukkit.getScheduler().scheduleSyncDelayedTask(PluginMain.getPluginInstance(), () ->
-                            new MenuManager(p, controller).withEmptyHand(useEvent.isEmptyHand()).openWaygateMenu(), 1L);
+                            new MenuManager(p, controller).openWaygateMenu(), 1L);
                 }
             }
         }

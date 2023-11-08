@@ -14,16 +14,13 @@ import java.util.List;
 
 public class WaygateGateMenu extends WaygateAccessMenu {
 
-    private boolean emptyHand;
-
     public WaygateGateMenu(MenuManager mm, Player p, Gate currentWaygate, List<Gate> accessList) {
         super(mm, p, currentWaygate, accessList);
         setup();
     }
 
-    public WaygateGateMenu(MenuManager mm, Player p, Controller controller, List<Gate> accessList, boolean emptyHand) {
+    public WaygateGateMenu(MenuManager mm, Player p, Controller controller, List<Gate> accessList) {
         super(mm, p, controller, accessList, true);
-        this.emptyHand = emptyHand;
         setup();
     }
 
@@ -98,9 +95,9 @@ public class WaygateGateMenu extends WaygateAccessMenu {
         if (currentWaygate.isActive())
             addDeactivateGateToMenu();
 
-        if (!emptyHand && currentController != null && (currentController.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")))
+        if (currentController != null && (currentController.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")))
             addItemToMenu(currentWaygate.isActive() ? getActionSlot(6) : getActionSlot(7), Material.LEVER, Msg.MENU_TITLE_RECONFIGURE_CONTROLLER.toString(), "Reconfigure");
-        else if (currentController == null && currentWaygate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin"))
+        else if (currentController == null && (currentWaygate.getOwner().equals(p.getUniqueId()) || p.hasPermission("wg.admin")))
             addItemToMenu(currentWaygate.isActive() ? getActionSlot(6) : getActionSlot(7), Material.LEVER, Msg.MENU_TITLE_SETTINGS.toString(), "Settings");
 
         addCloseToMenu();
