@@ -25,6 +25,7 @@ public enum Msg {
     DELETE_WORLD_WARNING("&cWarning: THIS WILL REMOVE ALL %d GATES FROM WORLD: %s! This CANNOT be undone! To confirm, enter within 20s: /wg delete %s confirm"),
     GATE_ACCESS_DENIED("&cError: &fAccess denied, gate is private."),
     GATE_ALREADY_EXISTS("&cError: &fThere is already a gate there, perhaps use a Waygate Key?"),
+    GATE_COST_FAILURE("&cError: &fYou are trying to go %s distance and need %s diamonds. Diamond blocks can be used in place of 9 diamonds."),
     GATE_CHANGE_OWNER("&6Enter name of new owner for Waygate:"),
     GATE_CHANGE_OWNER_FAILED("&cError: &fUnable to find an online player matching that name"),
     GATE_CHANGE_OWNER_SUCCESS("&aSuccess: &fWaygate %s is now owned by %s!"),

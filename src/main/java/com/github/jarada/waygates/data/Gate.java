@@ -413,6 +413,21 @@ public class Gate {
         return to;
     }
 
+    private boolean verifyCost(Player p, BlockLocation to) {
+        // Check cost
+        return GateTravelCalculator.costForDistance(start, to) <= GateTravelCalculator.resourceOnPlayer(p);
+    }
+
+    private void failCost(Player p, BlockLocation to) {
+        Msg.GATE_COST_FAILURE.sendTo(p,
+                String.valueOf(Math.floor(GateTravelCalculator.distanceForGate(start, to))),
+                String.valueOf(GateTravelCalculator.costForDistance(start, to)));
+    }
+
+    private void actuateCost(Player p, BlockLocation to) {
+        GateTravelCalculator.removeDiamondsForCost(p, GateTravelCalculator.costForDistance(start, to));
+    }
+
     public void teleport(Player p) {
         // Gather Attached Entities
         final List<LivingEntity> leashed = getLeashed(p);
@@ -423,6 +438,14 @@ public class Gate {
         if (to == null) {
             Msg.GATE_EXIT_FAILURE.sendTo(p);
             return;
+        }
+
+        // Verify Cost
+        if (!verifyCost(p, to)) {
+            failCost(p, to);
+            to = exit;
+        } else {
+            actuateCost(p, to);
         }
 
         // Teleport Player
@@ -478,6 +501,23 @@ public class Gate {
                 Msg.GATE_EXIT_FAILURE.sendTo(p);
             return;
         }
+
+        // Verify Cost
+        boolean verifiedCost = true;
+        for (Player p : players) {
+            if (!verifyCost(p, to)) {
+                verifiedCost = false;
+                break;
+            }
+        }
+        for (Player p : players) {
+            if (verifiedCost)
+                actuateCost(p, to);
+            else
+                failCost(p, to);
+        }
+        if (!verifiedCost)
+            to = exit;
 
         // Teleport Vehicle
         executeTeleportVehicle(to, vehicle);
