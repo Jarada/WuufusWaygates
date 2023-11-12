@@ -53,12 +53,6 @@ public class PluginMain extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new VehicleListener(), this);
         getLogger().info("Waygate system online!");
-
-        new UpdateChecker(this, 80094).getVersion(version -> {
-            if (!this.getDescription().getVersion().equalsIgnoreCase(version)) {
-                getLogger().info(String.format("Waygate system update: %s now available!", version));
-            }
-        });
     }
 
     @Override
