@@ -47,6 +47,14 @@ public class GateTravelCalculator {
     public static void removeDiamondsForCost(Player p, int cost) {
         int blocks = Math.min(cost / 9, diamondsOnPlayer(p, true));
         int diamonds = (blocks > 0) ? cost - (blocks * 9) : cost;
+        int splitDiamonds = diamonds - diamondsOnPlayer(p, false);
+
+        if (splitDiamonds > 0) {
+            int blocksToSplit = Math.min((int) Math.ceil(splitDiamonds / 9.0), diamondsOnPlayer(p, true));
+            p.getInventory().removeItem(new ItemStack(Material.DIAMOND_BLOCK, blocksToSplit));
+            p.getInventory().addItem(new ItemStack(Material.DIAMOND, blocksToSplit * 9));
+        }
+
         if (blocks > 0)
             p.getInventory().removeItem(new ItemStack(Material.DIAMOND_BLOCK, blocks));
         if (diamonds > 0)
