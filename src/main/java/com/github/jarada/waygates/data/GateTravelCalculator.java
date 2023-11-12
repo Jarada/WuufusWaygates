@@ -20,6 +20,10 @@ public class GateTravelCalculator {
         return distance;
     }
 
+    public static int displayDistanceForGate(BlockLocation gate, BlockLocation destination) {
+        return (int) Math.floor(distanceForGate(gate, destination));
+    }
+
     public static int costForDistance(BlockLocation gate, BlockLocation destination) {
         return (int) Math.floor(distanceForGate(gate, destination) / 500) + 1;
     }

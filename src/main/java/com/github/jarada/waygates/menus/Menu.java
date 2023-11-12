@@ -276,6 +276,7 @@ public abstract class Menu {
             lore.add(Util.color(Msg.MENU_LORE_GATE_1.toString(loc.getWorld().getName())));
         else
             lore.add(Util.color(Msg.MENU_LORE_GATE_1.toString(Msg.MENU_TEXT_WORLD_NOT_FOUND.toString())));
+        lore.add(Util.color(Msg.MENU_LORE_GATE_COST.toString(GateTravelCalculator.costForDistance(currentWaygate.getStart(), gate.getExit()))));
         if (gate.getOwner() != null) {
             OfflinePlayer owner = Bukkit.getOfflinePlayer(gate.getOwner());
             lore.add(Util.color(Msg.MENU_LORE_GATE_2.toString(owner.getName())));

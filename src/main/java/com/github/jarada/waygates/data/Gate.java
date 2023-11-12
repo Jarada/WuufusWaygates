@@ -420,7 +420,7 @@ public class Gate {
 
     private void failCost(Player p, BlockLocation to) {
         Msg.GATE_COST_FAILURE.sendTo(p,
-                String.valueOf(Math.floor(GateTravelCalculator.distanceForGate(start, to))),
+                String.valueOf(GateTravelCalculator.displayDistanceForGate(start, to)),
                 String.valueOf(GateTravelCalculator.costForDistance(start, to)));
     }
 
