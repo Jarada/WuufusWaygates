@@ -17,6 +17,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class PlayerListener implements Listener {
@@ -160,8 +161,9 @@ public class PlayerListener implements Listener {
     private boolean checkPlayerEmptyHandControllerInteraction(PlayerInteractEvent event) {
         Player p = event.getPlayer();
         Action a = event.getAction();
+        EquipmentSlot h = event.getHand();
 
-        if (event.getClickedBlock() != null && !p.isSneaking()) {
+        if (h == EquipmentSlot.HAND && event.getClickedBlock() != null && !p.isSneaking()) {
             Controller controller = WaygateManager.getManager().getControllerAtLocation(new BlockLocation(event.getClickedBlock().getLocation()));
             if (controller != null) {
                 Bukkit.getPluginManager().callEvent(new WaygateKeyUseEvent(p, a, event.getClickedBlock()).withEmptyHand());
