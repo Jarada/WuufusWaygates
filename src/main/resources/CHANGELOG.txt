@@ -1,5 +1,8 @@
 CHANGELOG
 
+1.4.1 (11/12/23)
+- Fixed the menus of Waygate Controllers from being modifable when opened with an empty hand
+
 1.4.0 (11/08/23)
 - Added Waygate Control Creator, that can be crafted and then used to create a Waygate Controller
   - To craft one, put a Waygate Key in the center and then add a Waygate Constructor to the left and right of it (permission wg.craft.control.creator)
