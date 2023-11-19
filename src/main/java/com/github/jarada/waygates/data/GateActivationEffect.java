@@ -10,9 +10,7 @@ import org.bukkit.block.data.Orientable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public enum GateActivationEffect {
 
@@ -39,19 +37,20 @@ public enum GateActivationEffect {
             if (loadedGates.contains(gate)) return;
             loadedGates.add(gate);
             if (dataManager.WG_GATE_EFFECT_PARTICLES.getSize() > 0) {
-                runnable = Bukkit.getScheduler().runTaskTimer(PluginMain.getPluginInstance(), () -> {
+                clearParticleEffects(gate);
+                runnables.put(gate, Bukkit.getScheduler().runTaskTimer(PluginMain.getPluginInstance(), () -> {
                     try {
                         for (BlockLocation blockLocation : gate.getCoords()) {
                             Location adjustedLocation = blockLocation.getCentralLocation();
                             Objects.requireNonNull(blockLocation.getLocation().getWorld())
                                     .spawnParticle(Particle.ENCHANTMENT_TABLE, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
-                            blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL_MOB_AMBIENT, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
                             blockLocation.getLocation().getWorld().spawnParticle(Particle.PORTAL, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
                         }
                     } catch (NullPointerException e) {
                         // Pass
                     }
-                }, 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
+                }, 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize()));
             }
         }
 
@@ -104,7 +103,8 @@ public enum GateActivationEffect {
             if (loadedGates.contains(gate)) return;
             loadedGates.add(gate);
             if (dataManager.WG_GATE_EFFECT_PARTICLES.getSize() > 0) {
-                runnable = Bukkit.getScheduler().runTaskTimer(PluginMain.getPluginInstance(), () -> {
+                clearParticleEffects(gate);
+                runnables.put(gate, Bukkit.getScheduler().runTaskTimer(PluginMain.getPluginInstance(), () -> {
                     try {
                         for (BlockLocation blockLocation : gate.getCoords()) {
                             Location adjustedLocation = blockLocation.getCentralLocation();
@@ -113,7 +113,7 @@ public enum GateActivationEffect {
                     } catch (NullPointerException e) {
                         // Pass
                     }
-                }, 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize());
+                }, 0, dataManager.WG_GATE_EFFECT_PARTICLES.getSize()));
             }
         }
 
@@ -123,9 +123,9 @@ public enum GateActivationEffect {
         }
     };
 
-    protected List<Gate> activeGates = new ArrayList<>();
-    protected List<Gate> loadedGates = new ArrayList<>();
-    protected BukkitTask runnable;
+    protected static final List<Gate> activeGates = new ArrayList<>();
+    protected static final List<Gate> loadedGates = new ArrayList<>();
+    protected static final Map<Gate, BukkitTask> runnables = new HashMap<>();
 
     private static final GateActivationEffect[] vals = values();
     private static final DataManager dataManager = DataManager.getManager();
@@ -144,8 +144,7 @@ public enum GateActivationEffect {
         setContent(gate, Material.AIR);
         activeGates.remove(gate);
         loadedGates.remove(gate);
-        if (runnable != null && !runnable.isCancelled())
-            runnable.cancel();
+        clearParticleEffects(gate);
     }
 
     public void loadChunk(Gate gate) {
@@ -154,8 +153,7 @@ public enum GateActivationEffect {
 
     public void unloadChunk(Gate gate) {
         loadedGates.remove(gate);
-        if (runnable != null && !runnable.isCancelled())
-            runnable.cancel();
+        clearParticleEffects(gate);
     }
 
     public void setContent(@NotNull Gate gate, Material material)
@@ -202,6 +200,11 @@ public enum GateActivationEffect {
     protected double getOffsetZ(Gate gate) {
         Axis axis = gate.getOrientation();
         return (Axis.Z.equals(axis)) ? 0.075 : 0.75;
+    }
+
+    protected void clearParticleEffects(Gate gate) {
+        if (runnables.containsKey(gate) && !runnables.get(gate).isCancelled())
+            runnables.get(gate).cancel();
     }
 
 }
