@@ -176,17 +176,7 @@ public class WaygateManager {
         removeFromGates(gate);
 
         // Close gates active to this gate, network has changed
-        for (Gate toClose : getGatesInNetwork(prevNetwork)) {
-            if (toClose.isActive() && toClose.getActiveDestination().equals(gate)) {
-                // Close!
-                toClose.deactivate();
-            }
-            if (toClose.getFixedDestination() != null && toClose.getFixedDestination().equals(gate)) {
-                // Remove destination
-                toClose.setFixedDestination(null);
-                DataManager.getManager().saveWaygate(toClose, false);
-            }
-        }
+        closeGatesActiveToGate(gate, prevNetwork);
 
         // Adjust network
         gate.setNetwork(network);
@@ -200,6 +190,20 @@ public class WaygateManager {
         // Clear old network if need be
         if (!prevNetwork.isSystem() && !this.gates.containsKey(prevNetwork))
             DataManager.getManager().deleteNetwork(prevNetwork);
+    }
+
+    private void closeGatesActiveToGate(Gate gate, Network network) {
+        for (Gate toClose : getGatesInNetwork(network)) {
+            if (toClose.isActive() && toClose.getActiveDestination().equals(gate)) {
+                // Close!
+                toClose.deactivate();
+            }
+            if (toClose.getFixedDestination() != null && toClose.getFixedDestination().equals(gate)) {
+                // Remove destination
+                toClose.setFixedDestination(null);
+                DataManager.getManager().saveWaygate(toClose, false);
+            }
+        }
     }
 
     /* Gate Locating */
@@ -535,8 +539,9 @@ public class WaygateManager {
         // Unrecord Gate
         unrecordGate(gate);
 
-        // Close Gate
+        // Close Gate and any gates active to the gate
         gate.deactivate();
+        closeGatesActiveToGate(gate, gate.getNetwork());
 
         // Clear Menus and Listeners
         gate.closeActiveMenus();
