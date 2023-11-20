@@ -1,5 +1,9 @@
 CHANGELOG
 
+1.4.2 (11/20/23)
+- Fixed and improved particle effects on gates
+- Fixed gates not disconnecting themselves from gates that have been destroyed, allowing travel to destroyed gates
+
 1.4.1 (11/12/23)
 - Fixed the menus of Waygate Controllers from being modifable when opened with an empty hand
 
