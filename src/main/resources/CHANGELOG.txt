@@ -1,5 +1,8 @@
 CHANGELOG
 
+1.4.3 (01/10/23)
+- Fixed plugin crash on 1.20.4 caused by removal of custom enchantments from the API (note, items may have to be recreated)
+
 1.4.2 (11/20/23)
 - Fixed and improved particle effects on gates
 - Fixed gates not disconnecting themselves from gates that have been destroyed, allowing travel to destroyed gates
