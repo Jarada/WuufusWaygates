@@ -11,14 +11,13 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.naming.ldap.Control;
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -147,9 +146,6 @@ public class DataManager {
         pm.saveConfig();
 
         if (!reload) {
-            registerGlow();
-            Glow glow = new Glow(new NamespacedKey(pm, "waygateglow"));
-
             List<String> lore = new ArrayList<>();
             Msg[] constructorLore = {Msg.LORE_CONSTRUCTOR_1, Msg.LORE_CONSTRUCTOR_2, Msg.LORE_CONSTRUCTOR_3, Msg.LORE_CONSTRUCTOR_4};
             for (Msg msg : constructorLore)
@@ -162,7 +158,8 @@ public class DataManager {
                 Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
             ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
             if (activatorMeta != null) {
-                activatorMeta.addEnchant(glow, 1, true);
+                activatorMeta.addEnchant(Enchantment.LUCK, 1, true);
+                activatorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
             }
 
@@ -183,7 +180,8 @@ public class DataManager {
                     Msg.LORE_KEY_NAME.toString(), lore);
             ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
             if (keyMeta != null) {
-                keyMeta.addEnchant(glow, 1, true);
+                keyMeta.addEnchant(Enchantment.LUCK, 1, true);
+                keyMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_KEY.setItemMeta(keyMeta);
             }
 
@@ -204,7 +202,8 @@ public class DataManager {
                     Msg.LORE_CONTROL_NAME.toString(), lore);
             ItemMeta controlMeta = WAYGATE_CONTROL.getItemMeta();
             if (controlMeta != null) {
-                controlMeta.addEnchant(glow, 1, true);
+                controlMeta.addEnchant(Enchantment.LUCK, 1, true);
+                controlMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_CONTROL.setItemMeta(controlMeta);
             }
 
@@ -235,8 +234,8 @@ public class DataManager {
                 Msg.LORE_KEY_LOCK_NAME.toString(gate.getName()), lore);
         ItemMeta keyMeta = lock.getItemMeta();
         if (keyMeta != null) {
-            Glow glow = new Glow(new NamespacedKey(pm, "waygateglow"));
-            keyMeta.addEnchant(glow, 1, true);
+            keyMeta.addEnchant(Enchantment.LUCK, 1, true);
+            keyMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             lock.setItemMeta(keyMeta);
         }
 
@@ -307,26 +306,6 @@ public class DataManager {
             return defaultBlocks;
         }
         return requiredBlocks;
-    }
-
-    public void registerGlow() {
-        try {
-            Field f = Enchantment.class.getDeclaredField("acceptingNew");
-            f.setAccessible(true);
-            f.set(null, true);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            NamespacedKey key = new NamespacedKey(pm, "waygateglow");
-            Glow glow = new Glow(key);
-            Enchantment.registerEnchantment(glow);
-        }
-        catch (IllegalArgumentException ignored){}
-        catch(Exception e){
-            e.printStackTrace();
-        }
     }
 
     public void loadWaygates() {
