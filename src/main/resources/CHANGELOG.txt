@@ -1,5 +1,9 @@
 CHANGELOG
 
+1.4.4 (04/14/24)
+- Restricted item transfer through gates to a nether to nether connection to prevent duplication/loss glitches
+- Fixed issue that prevented gates from having descriptions
+
 1.4.3 (01/10/23)
 - Fixed plugin crash on 1.20.4 caused by removal of custom enchantments from the API (note, items may have to be recreated)
 
