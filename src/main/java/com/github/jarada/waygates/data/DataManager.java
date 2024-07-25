@@ -158,7 +158,7 @@ public class DataManager {
                 Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
             ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
             if (activatorMeta != null) {
-                activatorMeta.addEnchant(Enchantment.LUCK, 1, true);
+                activatorMeta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);
                 activatorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
             }
@@ -180,7 +180,7 @@ public class DataManager {
                     Msg.LORE_KEY_NAME.toString(), lore);
             ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
             if (keyMeta != null) {
-                keyMeta.addEnchant(Enchantment.LUCK, 1, true);
+                keyMeta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);
                 keyMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_KEY.setItemMeta(keyMeta);
             }
@@ -202,7 +202,7 @@ public class DataManager {
                     Msg.LORE_CONTROL_NAME.toString(), lore);
             ItemMeta controlMeta = WAYGATE_CONTROL.getItemMeta();
             if (controlMeta != null) {
-                controlMeta.addEnchant(Enchantment.LUCK, 1, true);
+                controlMeta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);
                 controlMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_CONTROL.setItemMeta(controlMeta);
             }
@@ -234,7 +234,7 @@ public class DataManager {
                 Msg.LORE_KEY_LOCK_NAME.toString(gate.getName()), lore);
         ItemMeta keyMeta = lock.getItemMeta();
         if (keyMeta != null) {
-            keyMeta.addEnchant(Enchantment.LUCK, 1, true);
+            keyMeta.addEnchant(Enchantment.LUCK_OF_THE_SEA, 1, true);
             keyMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             lock.setItemMeta(keyMeta);
         }

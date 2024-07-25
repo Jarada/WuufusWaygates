@@ -43,8 +43,8 @@ public enum GateActivationEffect {
                         for (BlockLocation blockLocation : gate.getCoords()) {
                             Location adjustedLocation = blockLocation.getCentralLocation();
                             Objects.requireNonNull(blockLocation.getLocation().getWorld())
-                                    .spawnParticle(Particle.ENCHANTMENT_TABLE, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
-                            blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL_MOB_AMBIENT, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                                    .spawnParticle(Particle.ENCHANT, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            blockLocation.getLocation().getWorld().spawnParticle(Particle.BUBBLE_POP, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
                             blockLocation.getLocation().getWorld().spawnParticle(Particle.PORTAL, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
                         }
                     } catch (NullPointerException e) {
@@ -108,7 +108,7 @@ public enum GateActivationEffect {
                     try {
                         for (BlockLocation blockLocation : gate.getCoords()) {
                             Location adjustedLocation = blockLocation.getCentralLocation();
-                            Objects.requireNonNull(blockLocation.getLocation().getWorld()).spawnParticle(Particle.SPELL_MOB, adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
+                            Objects.requireNonNull(blockLocation.getLocation().getWorld()).spawnParticle(Particle.BUBBLE, adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
                         }
                     } catch (NullPointerException e) {
                         // Pass

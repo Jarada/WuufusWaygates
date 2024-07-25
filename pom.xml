@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.jarada</groupId>
 	<artifactId>waygates</artifactId>
-	<version>1.4.4</version>
+	<version>1.4.5</version>
 	<name>Wuufu's Waygates</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.20.2-R0.1-SNAPSHOT</version>
+			<version>1.21-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>13.0</version>
+			<version>20.1.0</version>
 		</dependency>
 		<!-- CodeMC (for NBT Support) -->
 		<dependency>

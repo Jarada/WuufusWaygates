@@ -452,7 +452,7 @@ public class Gate {
         if (entity.getType().isSpawnable()) {
             entity.teleport(to.getTeleportLocation());
             entity.setFireTicks(0);
-        } else if (entity.getType() == EntityType.DROPPED_ITEM && activeDestination != null &&
+        } else if (entity.getType() == EntityType.ITEM && activeDestination != null &&
                 activeDestination.getActivationEffect() == GateActivationEffect.NETHER) {
             World world = to.getLocation().getWorld();
             if (world != null) {

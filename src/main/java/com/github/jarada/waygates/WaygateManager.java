@@ -702,7 +702,7 @@ public class WaygateManager {
     /* Shared FX */
 
     private void createEffect(Block startBlock) {
-        Util.playParticle(startBlock.getLocation(), Particle.REDSTONE, 10);
+        Util.playParticle(startBlock.getLocation(), Particle.DUST, 10);
         Util.playEffect(startBlock.getLocation(), Effect.ENDER_SIGNAL);
         Util.playSound(startBlock.getLocation(), Sound.BLOCK_BEACON_ACTIVATE);
         // NB Add Gate Creation Sound FX (CG Stored in UGate)
@@ -710,8 +710,8 @@ public class WaygateManager {
 
     private void destroyEffect(BlockLocation destroyingBlock) {
         Util.playEffect(destroyingBlock.getLocation(), Effect.ENDER_SIGNAL);
-        Util.playParticle(destroyingBlock.getLocation(), Particle.EXPLOSION_LARGE, 1);
-        Util.playParticle(destroyingBlock.getLocation(), Particle.REDSTONE, 10);
+        Util.playParticle(destroyingBlock.getLocation(), Particle.EXPLOSION, 1);
+        Util.playParticle(destroyingBlock.getLocation(), Particle.DUST, 10);
         Util.playSound(destroyingBlock.getLocation(), Sound.ENTITY_GENERIC_EXPLODE);
         Util.playSound(destroyingBlock.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE);
     }
