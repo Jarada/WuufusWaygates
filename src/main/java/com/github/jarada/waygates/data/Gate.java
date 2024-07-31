@@ -63,6 +63,11 @@ public class Gate {
         this.createdMillis = System.currentTimeMillis();
     }
 
+    public Gate(UUID owner, Set<BlockLocation> coords, BlockLocation start, GridLocation exit, boolean alwaysOn) {
+        this(owner, coords, start, exit);
+        this.alwaysOn = alwaysOn;
+    }
+
     /* Getters / Setters */
 
     public UUID getUUID() {

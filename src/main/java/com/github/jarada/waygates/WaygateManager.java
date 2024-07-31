@@ -482,7 +482,8 @@ public class WaygateManager {
         if (gate != null)
             imprint = true;
         else
-            gate = new Gate(p.getUniqueId(), coords, new BlockLocation(startBlock.getLocation()), exit);
+            gate = new Gate(p.getUniqueId(), coords, new BlockLocation(startBlock.getLocation()), exit,
+                    DataManager.getManager().WG_GATE_DEFAULT_ALWAYS_ON);
         gate.deactivate();
 
         // Record Gate
