@@ -34,6 +34,10 @@ public class DataManager {
     private static final String WAYGATE_KEY_KEY = "waygatekey";
     private static final String WAYGATE_CONTROL_KEY = "waygatecontrol";
 
+    public final NamespacedKey WAYGATE_CONSTRUCTOR_NAMESPACEDKEY;
+    public final NamespacedKey WAYGATE_KEY_NAMESPACEDKEY;
+    public final NamespacedKey WAYGATE_CONTROL_NAMESPACEDKEY;
+
     private static DataManager          dm;
     private final PluginMain            pm;
     private final WaygateManager        wm;
@@ -62,6 +66,7 @@ public class DataManager {
     public boolean                      WG_KEY_PERMANENT;
     public boolean                      WG_ZOMBIE_PIGMAN_ALLOWED;
     public boolean                      WG_PRIVATE_GATES_ALLOW_TRAVEL;
+    public boolean                      WG_GIVE_PLAYERS_RECIPES;
 
     public DataManager() {
         pm = PluginMain.getPluginInstance();
@@ -70,6 +75,10 @@ public class DataManager {
         messages = new HashMap<>();
         worldsFolder = new File(pm.getDataFolder(), WORLDS_FOLDER_FILENAME);
         networksFolder = new File(pm.getDataFolder(), NETWORKS_FOLDER_FILENAME);
+
+        WAYGATE_CONSTRUCTOR_NAMESPACEDKEY = new NamespacedKey(pm, WAYGATE_CONSTRUCTOR_KEY);
+        WAYGATE_KEY_NAMESPACEDKEY = new NamespacedKey(pm, WAYGATE_KEY_KEY);
+        WAYGATE_CONTROL_NAMESPACEDKEY = new NamespacedKey(pm, WAYGATE_CONTROL_KEY);
     }
 
     public static DataManager getManager() {
@@ -108,6 +117,7 @@ public class DataManager {
         WG_KEY_PERMANENT = config.getBoolean("Waygates.WG_KEY_PERMANENT");
         WG_ZOMBIE_PIGMAN_ALLOWED = config.getBoolean("Waygates.WG_ZOMBIE_PIGMAN_ALLOWED");
         WG_PRIVATE_GATES_ALLOW_TRAVEL = config.getBoolean("Waygates.WG_PRIVATE_GATES_ALLOW_TRAVEL");
+        WG_GIVE_PLAYERS_RECIPES = config.getBoolean("Waygates.WG_GIVE_PLAYERS_RECIPES");
 
         config.addDefault("Waygates.WG_GATE_EFFECT_PARTICLES", "normal");
         try {
@@ -163,7 +173,7 @@ public class DataManager {
                 WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
             }
 
-            ShapedRecipe sr = new ShapedRecipe(new NamespacedKey(pm, WAYGATE_CONSTRUCTOR_KEY), WAYGATE_CONSTRUCTOR);
+            ShapedRecipe sr = new ShapedRecipe(WAYGATE_CONSTRUCTOR_NAMESPACEDKEY, WAYGATE_CONSTRUCTOR);
             sr.shape("RRR", "RGR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('G', Material.GOLD_NUGGET);
             boolean recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
@@ -185,7 +195,7 @@ public class DataManager {
                 WAYGATE_KEY.setItemMeta(keyMeta);
             }
 
-            sr = new ShapedRecipe(new NamespacedKey(pm, WAYGATE_KEY_KEY), WAYGATE_KEY);
+            sr = new ShapedRecipe(WAYGATE_KEY_NAMESPACEDKEY, WAYGATE_KEY);
             sr.shape("RRR", "RKR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('K', Material.FEATHER);
             recipeResult = Bukkit.addRecipe(sr);
             if (!recipeResult)
@@ -207,7 +217,7 @@ public class DataManager {
                 WAYGATE_CONTROL.setItemMeta(controlMeta);
             }
 
-            sr = new ShapedRecipe(new NamespacedKey(pm, WAYGATE_CONTROL_KEY), WAYGATE_CONTROL);
+            sr = new ShapedRecipe(WAYGATE_CONTROL_NAMESPACEDKEY, WAYGATE_CONTROL);
             sr.shape("CKC")
                     .setIngredient('C', new RecipeChoice.ExactChoice(WAYGATE_CONSTRUCTOR))
                     .setIngredient('K', new RecipeChoice.ExactChoice(WAYGATE_KEY));
