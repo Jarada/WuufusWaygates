@@ -1,6 +1,7 @@
 package com.github.jarada.waygates.data;
 
 import com.github.jarada.waygates.PluginMain;
+import com.github.jarada.waygates.types.ParticleType;
 import com.github.jarada.waygates.util.Util;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -42,10 +43,10 @@ public enum GateActivationEffect {
                     try {
                         for (BlockLocation blockLocation : gate.getCoords()) {
                             Location adjustedLocation = blockLocation.getCentralLocation();
-                            Objects.requireNonNull(blockLocation.getLocation().getWorld())
-                                    .spawnParticle(Particle.ENCHANTMENT_TABLE, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
-                            blockLocation.getLocation().getWorld().spawnParticle(Particle.SPELL_MOB_AMBIENT, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
-                            blockLocation.getLocation().getWorld().spawnParticle(Particle.PORTAL, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            World world = Objects.requireNonNull(blockLocation.getLocation().getWorld());
+                            ParticleType.ENCHANTMENT.spawn(world, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            ParticleType.SPELL.spawn(world, adjustedLocation, 1, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
+                            ParticleType.PORTAL.spawn(world, adjustedLocation, 2, getOffsetX(gate), offsetY, getOffsetZ(gate), 0.8);
                         }
                     } catch (NullPointerException e) {
                         // Pass
@@ -108,7 +109,7 @@ public enum GateActivationEffect {
                     try {
                         for (BlockLocation blockLocation : gate.getCoords()) {
                             Location adjustedLocation = blockLocation.getCentralLocation();
-                            Objects.requireNonNull(blockLocation.getLocation().getWorld()).spawnParticle(Particle.SPELL_MOB, adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
+                            ParticleType.WATER.spawn(Objects.requireNonNull(blockLocation.getLocation().getWorld()), adjustedLocation, 0, 0.24, 0.27, 0.66, 1.0);
                         }
                     } catch (NullPointerException e) {
                         // Pass

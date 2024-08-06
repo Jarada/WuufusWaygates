@@ -1,5 +1,6 @@
 package com.github.jarada.waygates.util;
 
+import com.github.jarada.waygates.types.ParticleType;
 import org.apache.commons.text.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -135,7 +136,7 @@ public class Util {
     public static void playParticle(Location loc, Particle particle, int count) {
         World world = loc.getWorld();
         if (world != null) {
-            if (particle == Particle.REDSTONE) {
+            if (particle == ParticleType.REDSTONE.get()) {
                 Particle.DustOptions dustOptions = new Particle.DustOptions(Color.RED, 1);
                 world.spawnParticle(particle, loc, count, 0, 0, 0, 0, dustOptions);
             } else {

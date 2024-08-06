@@ -4,7 +4,6 @@ import com.github.jarada.waygates.data.DataManager;
 import com.github.jarada.waygates.data.Gate;
 import com.github.jarada.waygates.data.Msg;
 import com.github.jarada.waygates.menus.MenuManager;
-import com.github.jarada.waygates.util.Util;
 import org.bukkit.entity.Player;
 
 public class WaygateNetworkCreateCallback extends ChatCallback {

@@ -2,6 +2,7 @@ package com.github.jarada.waygates.data;
 
 import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.PluginMain;
+import com.github.jarada.waygates.types.EnchantmentType;
 import com.github.jarada.waygates.types.MenuSize;
 import com.github.jarada.waygates.util.Util;
 import com.google.common.base.Charsets;
@@ -160,7 +161,7 @@ public class DataManager {
                 Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
             ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
             if (activatorMeta != null) {
-                activatorMeta.addEnchant(Enchantment.LUCK, 1, true);
+                activatorMeta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
                 activatorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
             }
@@ -182,7 +183,7 @@ public class DataManager {
                     Msg.LORE_KEY_NAME.toString(), lore);
             ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
             if (keyMeta != null) {
-                keyMeta.addEnchant(Enchantment.LUCK, 1, true);
+                keyMeta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
                 keyMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_KEY.setItemMeta(keyMeta);
             }
@@ -204,7 +205,7 @@ public class DataManager {
                     Msg.LORE_CONTROL_NAME.toString(), lore);
             ItemMeta controlMeta = WAYGATE_CONTROL.getItemMeta();
             if (controlMeta != null) {
-                controlMeta.addEnchant(Enchantment.LUCK, 1, true);
+                controlMeta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
                 controlMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 WAYGATE_CONTROL.setItemMeta(controlMeta);
             }
@@ -236,7 +237,7 @@ public class DataManager {
                 Msg.LORE_KEY_LOCK_NAME.toString(gate.getName()), lore);
         ItemMeta keyMeta = lock.getItemMeta();
         if (keyMeta != null) {
-            keyMeta.addEnchant(Enchantment.LUCK, 1, true);
+            keyMeta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
             keyMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             lock.setItemMeta(keyMeta);
         }
