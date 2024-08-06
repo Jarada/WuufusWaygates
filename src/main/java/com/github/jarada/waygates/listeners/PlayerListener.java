@@ -1,13 +1,18 @@
 package com.github.jarada.waygates.listeners;
 
+import com.github.jarada.waygates.PluginMain;
 import com.github.jarada.waygates.WaygateManager;
 import com.github.jarada.waygates.data.*;
 import com.github.jarada.waygates.events.WaygateInteractEvent;
 import com.github.jarada.waygates.events.WaygateKeyUseEvent;
 import com.github.jarada.waygates.types.GateCreationResult;
 import com.github.jarada.waygates.util.Util;
+
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +20,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -24,10 +31,22 @@ public class PlayerListener implements Listener {
 
     private final DataManager    dm;
     private final WaygateManager gm;
+    private final PluginMain     pm;
 
     public PlayerListener() {
         dm = DataManager.getManager();
         gm = WaygateManager.getManager();
+        pm = PluginMain.getPluginInstance();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        handleRecipeDiscovery(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        handleRecipeDiscovery(event.getPlayer());
     }
 
     @EventHandler
@@ -174,4 +193,32 @@ public class PlayerListener implements Listener {
         return false;
     }
 
+    private void handleRecipeDiscovery(Player p) {
+        if (!dm.WG_GIVE_PLAYERS_RECIPES)
+            return;
+
+        ArrayList<NamespacedKey> toDiscover = new ArrayList<NamespacedKey>(3);
+        ArrayList<NamespacedKey> toUndiscover = new ArrayList<NamespacedKey>(3);
+        
+        if (p.hasPermission("wg.craft.control.creator")) toDiscover.add(dm.WAYGATE_CONTROL_NAMESPACEDKEY);
+        else toUndiscover.add(dm.WAYGATE_CONTROL_NAMESPACEDKEY);    
+        
+        if (p.hasPermission("wg.craft.constructor")) toDiscover.add(dm.WAYGATE_CONSTRUCTOR_NAMESPACEDKEY);
+        else toUndiscover.add(dm.WAYGATE_CONSTRUCTOR_NAMESPACEDKEY);
+        
+        if (p.hasPermission("wg.craft.key")) toDiscover.add(dm.WAYGATE_KEY_NAMESPACEDKEY);
+        else toUndiscover.add(dm.WAYGATE_KEY_NAMESPACEDKEY);
+
+        if (!toUndiscover.isEmpty()) {
+            int result = p.undiscoverRecipes(toUndiscover);
+            if (result == 0)
+                pm.getLogger().warning(String.format("Player \"%s\" (%s) failed to undiscover recipes.", p.getName(), p.getUniqueId()));
+        }
+
+        if (!toDiscover.isEmpty()) {
+            int result = p.discoverRecipes(toDiscover);
+            if (result == 0)
+                pm.getLogger().warning(String.format("Player \"%s\" (%s) failed to discover recipes.", p.getName(), p.getUniqueId()));
+        }
+    }
 }
