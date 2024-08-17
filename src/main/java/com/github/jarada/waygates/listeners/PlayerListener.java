@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,6 +48,14 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerLogin(PlayerLoginEvent event) {
         handleRecipeDiscovery(event.getPlayer());
+    }
+
+    // Undiscover on quit for two reasons:
+    // 1. To allow players to rediscover recipes if they change while the player is offline.
+    // 2. If the plugin is removed, Spigot will otherwise print errors about missing recipes.
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLogout(PlayerQuitEvent event) {
+        event.getPlayer().undiscoverRecipes(dm.getAllCraftableItems().values());
     }
 
     @EventHandler
@@ -200,14 +209,14 @@ public class PlayerListener implements Listener {
         ArrayList<NamespacedKey> toDiscover = new ArrayList<NamespacedKey>(3);
         ArrayList<NamespacedKey> toUndiscover = new ArrayList<NamespacedKey>(3);
         
-        if (p.hasPermission("wg.craft.control.creator")) toDiscover.add(dm.WAYGATE_CONTROL_NAMESPACEDKEY);
-        else toUndiscover.add(dm.WAYGATE_CONTROL_NAMESPACEDKEY);    
-        
-        if (p.hasPermission("wg.craft.constructor")) toDiscover.add(dm.WAYGATE_CONSTRUCTOR_NAMESPACEDKEY);
-        else toUndiscover.add(dm.WAYGATE_CONSTRUCTOR_NAMESPACEDKEY);
-        
-        if (p.hasPermission("wg.craft.key")) toDiscover.add(dm.WAYGATE_KEY_NAMESPACEDKEY);
-        else toUndiscover.add(dm.WAYGATE_KEY_NAMESPACEDKEY);
+        if (p.hasPermission("wg.craft.key")) toDiscover.add(dm.getCraftableItem(CraftableWaygateItem.WAYGATE_KEY));
+        else toUndiscover.add(dm.getCraftableItem(CraftableWaygateItem.WAYGATE_KEY));
+
+        if (p.hasPermission("wg.craft.constructor")) toDiscover.add(dm.getCraftableItem(CraftableWaygateItem.WAYGATE_CONSTRUCTOR));
+        else toUndiscover.add(dm.getCraftableItem(CraftableWaygateItem.WAYGATE_CONSTRUCTOR));
+
+        if (p.hasPermission("wg.craft.control.creator")) toDiscover.add(dm.getCraftableItem(CraftableWaygateItem.WAYGATE_CONTROL));
+        else toUndiscover.add(dm.getCraftableItem(CraftableWaygateItem.WAYGATE_CONTROL));    
 
         if (!toUndiscover.isEmpty()) {
             int result = p.undiscoverRecipes(toUndiscover);
