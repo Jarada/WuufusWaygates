@@ -1,5 +1,6 @@
 package com.github.jarada.waygates.commands;
 
+import com.github.jarada.waygates.data.CraftableWaygateItem;
 import com.github.jarada.waygates.data.DataManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,7 +13,7 @@ public class WGConstructorCmd implements PluginCommand {
         DataManager dm = DataManager.getManager();
         Player p = (Player) sender;
 
-        ItemStack constructor = dm.WAYGATE_CONSTRUCTOR;
+        ItemStack constructor = dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_CONSTRUCTOR);
         p.getInventory().addItem(constructor);
     }
 

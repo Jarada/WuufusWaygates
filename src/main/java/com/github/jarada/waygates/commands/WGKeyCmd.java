@@ -1,5 +1,6 @@
 package com.github.jarada.waygates.commands;
 
+import com.github.jarada.waygates.data.CraftableWaygateItem;
 import com.github.jarada.waygates.data.DataManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,8 +13,8 @@ public class WGKeyCmd implements PluginCommand {
         DataManager dm = DataManager.getManager();
         Player p = (Player) sender;
 
-        ItemStack constructor = dm.WAYGATE_KEY;
-        p.getInventory().addItem(constructor);
+        ItemStack waygateKey = dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY);
+        p.getInventory().addItem(waygateKey);
     }
 
     @Override

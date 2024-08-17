@@ -74,13 +74,13 @@ public class WaygateKeyListener implements Listener {
 
         if (dm.WG_KEY_PERMANENT && clickEvent.getWhoClicked().hasPermission("wg.key.permanent")) {
             if (!(type == InventoryType.PLAYER || type == InventoryType.CREATIVE || type == InventoryType.CRAFTING)) {
-                if (clickEvent.getCurrentItem() != null && clickEvent.getCurrentItem().isSimilar(dm.WAYGATE_KEY))
+                if (clickEvent.getCurrentItem() != null && clickEvent.getCurrentItem().isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY)))
                     clickEvent.setCancelled(true);
 
                 if (a == InventoryAction.HOTBAR_MOVE_AND_READD || a == InventoryAction.HOTBAR_SWAP) {
                     ItemStack is = clickEvent.getView().getBottomInventory().getItem(clickEvent.getHotbarButton());
 
-                    if (is != null && is.isSimilar(dm.WAYGATE_KEY))
+                    if (is != null && is.isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY)))
                         clickEvent.setCancelled(true);
                 }
             }
@@ -92,7 +92,7 @@ public class WaygateKeyListener implements Listener {
         DataManager dm = DataManager.getManager();
 
         if (dm.WG_KEY_PERMANENT && dropEvent.getPlayer().hasPermission("wg.key.permanent"))
-            if (dropEvent.getItemDrop().getItemStack().isSimilar(dm.WAYGATE_KEY))
+            if (dropEvent.getItemDrop().getItemStack().isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY)))
                 dropEvent.setCancelled(true);
     }
 
@@ -101,7 +101,7 @@ public class WaygateKeyListener implements Listener {
         DataManager dm = DataManager.getManager();
 
         if (dm.WG_KEY_PERMANENT && deathEvent.getEntity().hasPermission("wg.key.permanent")) {
-            deathEvent.getDrops().removeIf(itemStack -> itemStack.isSimilar(dm.WAYGATE_KEY));
+            deathEvent.getDrops().removeIf(itemStack -> itemStack.isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY)));
         }
     }
 
@@ -128,11 +128,11 @@ public class WaygateKeyListener implements Listener {
         if (dm.WG_KEY_PERMANENT && p.hasPermission("wg.key.permanent")) {
             PlayerInventory inv = p.getInventory();
 
-            if (!inv.containsAtLeast(dm.WAYGATE_KEY, 1)) {
+            if (!inv.containsAtLeast(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY), 1)) {
                 int emptySlot = inv.firstEmpty();
 
                 if (emptySlot > -1)
-                    inv.setItem(emptySlot, dm.WAYGATE_KEY);
+                    inv.setItem(emptySlot, dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY));
             }
         }
     }

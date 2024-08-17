@@ -32,7 +32,8 @@ public class DataManager {
     private static final String WORLDS_FOLDER_FILENAME = "worlds";
     private static final String NETWORKS_FOLDER_FILENAME = "networks";
 
-    private final Map<CraftableWaygateItem, NamespacedKey> CRAFTABLE_ITEMS;
+    private final Map<CraftableWaygateItem, NamespacedKey> CRAFTABLE_ITEM_NAMESPACEDKEYS;
+    private final Map<CraftableWaygateItem, ItemStack> CRAFTABLE_ITEM_STACKS;
 
     private static DataManager          dm;
     private final PluginMain            pm;
@@ -41,11 +42,7 @@ public class DataManager {
     private final File                  worldsFolder;
     private final File                  networksFolder;
     private final Map<Msg, String>      messages;
-
-    public ItemStack                    WAYGATE_CONSTRUCTOR;
-    public ItemStack                    WAYGATE_KEY;
-    public ItemStack                    WAYGATE_CONTROL;
-
+    
     public int                          MAX_AREA;
     public List<Map<String, Integer>>   BLOCKS_REQUIRED;
     public MenuSize                     MENU_SIZE;
@@ -73,10 +70,12 @@ public class DataManager {
         worldsFolder = new File(pm.getDataFolder(), WORLDS_FOLDER_FILENAME);
         networksFolder = new File(pm.getDataFolder(), NETWORKS_FOLDER_FILENAME);
 
-        CRAFTABLE_ITEMS = new HashMap<CraftableWaygateItem, NamespacedKey>(3);
-        CRAFTABLE_ITEMS.put(CraftableWaygateItem.WAYGATE_KEY, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_KEY.getKey()));
-        CRAFTABLE_ITEMS.put(CraftableWaygateItem.WAYGATE_CONSTRUCTOR, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_CONSTRUCTOR.getKey()));
-        CRAFTABLE_ITEMS.put(CraftableWaygateItem.WAYGATE_CONTROL, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_CONTROL.getKey()));
+        CRAFTABLE_ITEM_NAMESPACEDKEYS = new HashMap<CraftableWaygateItem, NamespacedKey>(3);
+        CRAFTABLE_ITEM_NAMESPACEDKEYS.put(CraftableWaygateItem.WAYGATE_KEY, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_KEY.getKey()));
+        CRAFTABLE_ITEM_NAMESPACEDKEYS.put(CraftableWaygateItem.WAYGATE_CONSTRUCTOR, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_CONSTRUCTOR.getKey()));
+        CRAFTABLE_ITEM_NAMESPACEDKEYS.put(CraftableWaygateItem.WAYGATE_CONTROL, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_CONTROL.getKey()));
+
+        CRAFTABLE_ITEM_STACKS = new HashMap<CraftableWaygateItem, ItemStack>(3);
     }
 
     public static DataManager getManager() {
@@ -155,9 +154,9 @@ public class DataManager {
 
         if (reload) {
             // Despite this, eligible players will not discover the new recipe until they relog or change worlds.
-            Bukkit.removeRecipe(CRAFTABLE_ITEMS.get(CraftableWaygateItem.WAYGATE_KEY));
-            Bukkit.removeRecipe(CRAFTABLE_ITEMS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR));
-            Bukkit.removeRecipe(CRAFTABLE_ITEMS.get(CraftableWaygateItem.WAYGATE_CONTROL));
+            Bukkit.removeRecipe(CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_KEY));
+            Bukkit.removeRecipe(CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR));
+            Bukkit.removeRecipe(CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONTROL));
         }
 
         setUpRecipes(config);
@@ -499,33 +498,33 @@ public class DataManager {
             config.getString("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONTROL_ITEM")
         );
 
-        WAYGATE_KEY = addRecipe(
+        CRAFTABLE_ITEM_STACKS.put(CraftableWaygateItem.WAYGATE_KEY, addRecipe(
             Msg.LORE_KEY_NAME.toString(),
             new Msg[]{ Msg.LORE_KEY_1, Msg.LORE_KEY_2, Msg.LORE_KEY_3, Msg.LORE_KEY_4 },
-            CRAFTABLE_ITEMS.get(CraftableWaygateItem.WAYGATE_KEY),
+            CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_KEY),
             waygateKeyRecipe,
             recipeMatsMap
-        );
+        ));
 
-        recipeMatsMap.put('+', new RecipeChoice.ExactChoice(WAYGATE_KEY));
+        recipeMatsMap.put('+', new RecipeChoice.ExactChoice(CRAFTABLE_ITEM_STACKS.get(CraftableWaygateItem.WAYGATE_KEY)));
 
-        WAYGATE_CONSTRUCTOR = addRecipe(
+        CRAFTABLE_ITEM_STACKS.put(CraftableWaygateItem.WAYGATE_CONSTRUCTOR, addRecipe(
             Msg.LORE_CONSTRUCTOR_NAME.toString(),
             new Msg[]{ Msg.LORE_CONSTRUCTOR_1, Msg.LORE_CONSTRUCTOR_2, Msg.LORE_CONSTRUCTOR_3, Msg.LORE_CONSTRUCTOR_4 },
-            CRAFTABLE_ITEMS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR),
+            CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR),
             waygateConstructorRecipe,
             recipeMatsMap
-        );
+        ));
 
-        recipeMatsMap.put('$', new RecipeChoice.ExactChoice(WAYGATE_CONSTRUCTOR));
+        recipeMatsMap.put('$', new RecipeChoice.ExactChoice(CRAFTABLE_ITEM_STACKS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR)));
 
-        WAYGATE_CONTROL = addRecipe(
+        CRAFTABLE_ITEM_STACKS.put(CraftableWaygateItem.WAYGATE_CONTROL, addRecipe(
             Msg.LORE_CONTROL_NAME.toString(),
             new Msg[]{ Msg.LORE_CONTROL_1, Msg.LORE_CONTROL_2, Msg.LORE_CONTROL_3, Msg.LORE_CONTROL_4 },
-            CRAFTABLE_ITEMS.get(CraftableWaygateItem.WAYGATE_CONTROL),
+            CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONTROL),
             waygateControlRecipe,
             recipeMatsMap
-        );
+        ));
     }
 
     private ItemStack addRecipe(
@@ -589,11 +588,15 @@ public class DataManager {
     }
 
     public Map<CraftableWaygateItem, NamespacedKey> getAllCraftableItems() {
-        return CRAFTABLE_ITEMS;
+        return CRAFTABLE_ITEM_NAMESPACEDKEYS;
     }
 
-    public NamespacedKey getCraftableItem(CraftableWaygateItem item) {
-        return CRAFTABLE_ITEMS.get(item);
+    public NamespacedKey getCraftableItemNamespacedKey(CraftableWaygateItem item) {
+        return CRAFTABLE_ITEM_NAMESPACEDKEYS.get(item);
+    }
+
+    public ItemStack getCraftableItemStack(CraftableWaygateItem item) {
+        return CRAFTABLE_ITEM_STACKS.get(item);
     }
 
     private static RecipeChoice convertMaterialToRecipeChoice(Material mat) {
