@@ -24,8 +24,8 @@ Waygates:
     R: REDSTONE
     K: FEATHER
     G: GOLD_NUGGET
-  # $: WAYGATE_CONSTRUCTOR
-  # +: WAYGATE_KEY
+  # +: WAYGATE_KEY         - Not configurable. Can be used in either the constructor or control recipe.
+  # $: WAYGATE_CONSTRUCTOR - Not configurable. Can be used in only the control recipe.
   RECIPE_DEFINITIONS:
     WAYGATE_KEY_ITEM: FEATHER
     WAYGATE_KEY_RECIPE:
