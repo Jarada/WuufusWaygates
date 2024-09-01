@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -49,6 +50,14 @@ public class PlayerListener implements Listener {
         handleRecipeDiscovery(event.getPlayer());
     }
 
+    // Undiscover on quit for two reasons:
+    // 1. To allow players to rediscover recipes if they change while the player is offline.
+    // 2. If the plugin is removed, Spigot will otherwise print errors about missing recipes.
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLogout(PlayerQuitEvent event) {
+        event.getPlayer().undiscoverRecipes(dm.getAllCraftableItems().values());
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
@@ -65,7 +74,7 @@ public class PlayerListener implements Listener {
         if (is == null || event.getClickedBlock() == null)
             return;
 
-        if (mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_CONSTRUCTOR)) {
+        if (mainHand && !p.isSneaking() && is.isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_CONSTRUCTOR))) {
             if (!p.hasPermission("wg.create.gate"))
                 return;
 
@@ -84,7 +93,7 @@ public class PlayerListener implements Listener {
                 is.setAmount(is.getAmount() - 1);
                 p.getInventory().setItemInMainHand(is);
             }
-        } else if (mainHand && !p.isSneaking() && is.isSimilar(dm.WAYGATE_CONTROL)) {
+        } else if (mainHand && !p.isSneaking() && is.isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_CONTROL))) {
             if (!p.hasPermission("wg.create.control"))
                 return;
 
@@ -102,7 +111,7 @@ public class PlayerListener implements Listener {
                 return;
 
             WaygateKeyUseEvent keyUseEvent = null;
-            if (is.isSimilar(dm.WAYGATE_KEY)) {
+            if (is.isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY))) {
                 keyUseEvent = new WaygateKeyUseEvent(p, a, event.getClickedBlock());
             } else {
                 // Verify Gate Availability and Lock
@@ -168,9 +177,9 @@ public class PlayerListener implements Listener {
                 return;
 
             // Verify Recipe
-            if ((e.getRecipe().getResult().isSimilar(dm.WAYGATE_CONSTRUCTOR) && !p.hasPermission("wg.craft.constructor")) ||
-                (e.getRecipe().getResult().isSimilar(dm.WAYGATE_KEY) && !p.hasPermission("wg.craft.key")) ||
-                (e.getRecipe().getResult().isSimilar(dm.WAYGATE_CONTROL) && !p.hasPermission("wg.craft.control.creator"))) {
+            if ((e.getRecipe().getResult().isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_CONSTRUCTOR)) && !p.hasPermission("wg.craft.constructor")) ||
+                (e.getRecipe().getResult().isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY)) && !p.hasPermission("wg.craft.key")) ||
+                (e.getRecipe().getResult().isSimilar(dm.getCraftableItemStack(CraftableWaygateItem.WAYGATE_CONTROL)) && !p.hasPermission("wg.craft.control.creator"))) {
                 e.setCancelled(true);
                 Msg.NO_PERMS.sendTo(p);
             }
@@ -200,14 +209,14 @@ public class PlayerListener implements Listener {
         ArrayList<NamespacedKey> toDiscover = new ArrayList<NamespacedKey>(3);
         ArrayList<NamespacedKey> toUndiscover = new ArrayList<NamespacedKey>(3);
         
-        if (p.hasPermission("wg.craft.control.creator")) toDiscover.add(dm.WAYGATE_CONTROL_NAMESPACEDKEY);
-        else toUndiscover.add(dm.WAYGATE_CONTROL_NAMESPACEDKEY);    
-        
-        if (p.hasPermission("wg.craft.constructor")) toDiscover.add(dm.WAYGATE_CONSTRUCTOR_NAMESPACEDKEY);
-        else toUndiscover.add(dm.WAYGATE_CONSTRUCTOR_NAMESPACEDKEY);
-        
-        if (p.hasPermission("wg.craft.key")) toDiscover.add(dm.WAYGATE_KEY_NAMESPACEDKEY);
-        else toUndiscover.add(dm.WAYGATE_KEY_NAMESPACEDKEY);
+        if (p.hasPermission("wg.craft.key")) toDiscover.add(dm.getCraftableItemNamespacedKey(CraftableWaygateItem.WAYGATE_KEY));
+        else toUndiscover.add(dm.getCraftableItemNamespacedKey(CraftableWaygateItem.WAYGATE_KEY));
+
+        if (p.hasPermission("wg.craft.constructor")) toDiscover.add(dm.getCraftableItemNamespacedKey(CraftableWaygateItem.WAYGATE_CONSTRUCTOR));
+        else toUndiscover.add(dm.getCraftableItemNamespacedKey(CraftableWaygateItem.WAYGATE_CONSTRUCTOR));
+
+        if (p.hasPermission("wg.craft.control.creator")) toDiscover.add(dm.getCraftableItemNamespacedKey(CraftableWaygateItem.WAYGATE_CONTROL));
+        else toUndiscover.add(dm.getCraftableItemNamespacedKey(CraftableWaygateItem.WAYGATE_CONTROL));    
 
         if (!toUndiscover.isEmpty()) {
             int result = p.undiscoverRecipes(toUndiscover);

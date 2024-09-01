@@ -44,7 +44,7 @@ public class WaygateGateMenu extends WaygateAccessMenu {
                 } else if (result == GateActivationResult.RESULT_ACTIVATED && DataManager.getManager().WG_KEY_CONSUMES &&
                         !DataManager.getManager().WG_KEY_PERMANENT && !p.hasPermission("wg.keep.key")) {
                     ItemStack is = p.getInventory().getItemInMainHand();
-                    if (is.isSimilar(DataManager.getManager().WAYGATE_KEY) ||
+                    if (is.isSimilar(DataManager.getManager().getCraftableItemStack(CraftableWaygateItem.WAYGATE_KEY)) ||
                             DataManager.getManager().isLockKeyValid(currentWaygate, is)) {
                         is.setAmount(is.getAmount() - 1);
                         p.getInventory().setItemInMainHand(is);

@@ -20,3 +20,23 @@ Waygates:
   BLOCKS_REQUIRED:
     '1':
       EMERALD_BLOCK: 2
+  RECIPE_MATERIALS:
+    R: REDSTONE
+    K: FEATHER
+    G: GOLD_NUGGET
+  # +: WAYGATE_KEY         - Not configurable. Can be used in either the constructor or control recipe.
+  # $: WAYGATE_CONSTRUCTOR - Not configurable. Can be used in only the control recipe.
+  RECIPE_DEFINITIONS:
+    WAYGATE_KEY_ITEM: FEATHER
+    WAYGATE_KEY_RECIPE:
+      - RRR
+      - RKR
+      - RRR
+    WAYGATE_CONSTRUCTOR_ITEM: GOLD_NUGGET
+    WAYGATE_CONSTRUCTOR_RECIPE:
+      - RRR
+      - RGR
+      - RRR
+    WAYGATE_CONTROL_ITEM: IRON_NUGGET
+    WAYGATE_CONTROL_RECIPE:
+      - $+$

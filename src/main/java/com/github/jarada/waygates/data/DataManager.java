@@ -10,8 +10,9 @@ import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
@@ -31,13 +32,8 @@ public class DataManager {
     private static final String WORLDS_FOLDER_FILENAME = "worlds";
     private static final String NETWORKS_FOLDER_FILENAME = "networks";
 
-    private static final String WAYGATE_CONSTRUCTOR_KEY = "waygateconstructor";
-    private static final String WAYGATE_KEY_KEY = "waygatekey";
-    private static final String WAYGATE_CONTROL_KEY = "waygatecontrol";
-
-    public final NamespacedKey WAYGATE_CONSTRUCTOR_NAMESPACEDKEY;
-    public final NamespacedKey WAYGATE_KEY_NAMESPACEDKEY;
-    public final NamespacedKey WAYGATE_CONTROL_NAMESPACEDKEY;
+    private final Map<CraftableWaygateItem, NamespacedKey> CRAFTABLE_ITEM_NAMESPACEDKEYS;
+    private final Map<CraftableWaygateItem, ItemStack> CRAFTABLE_ITEM_STACKS;
 
     private static DataManager          dm;
     private final PluginMain            pm;
@@ -46,11 +42,7 @@ public class DataManager {
     private final File                  worldsFolder;
     private final File                  networksFolder;
     private final Map<Msg, String>      messages;
-
-    public ItemStack                    WAYGATE_CONSTRUCTOR;
-    public ItemStack                    WAYGATE_KEY;
-    public ItemStack                    WAYGATE_CONTROL;
-
+    
     public int                          MAX_AREA;
     public List<Map<String, Integer>>   BLOCKS_REQUIRED;
     public MenuSize                     MENU_SIZE;
@@ -78,9 +70,12 @@ public class DataManager {
         worldsFolder = new File(pm.getDataFolder(), WORLDS_FOLDER_FILENAME);
         networksFolder = new File(pm.getDataFolder(), NETWORKS_FOLDER_FILENAME);
 
-        WAYGATE_CONSTRUCTOR_NAMESPACEDKEY = new NamespacedKey(pm, WAYGATE_CONSTRUCTOR_KEY);
-        WAYGATE_KEY_NAMESPACEDKEY = new NamespacedKey(pm, WAYGATE_KEY_KEY);
-        WAYGATE_CONTROL_NAMESPACEDKEY = new NamespacedKey(pm, WAYGATE_CONTROL_KEY);
+        CRAFTABLE_ITEM_NAMESPACEDKEYS = new HashMap<CraftableWaygateItem, NamespacedKey>(3);
+        CRAFTABLE_ITEM_NAMESPACEDKEYS.put(CraftableWaygateItem.WAYGATE_KEY, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_KEY.getKey()));
+        CRAFTABLE_ITEM_NAMESPACEDKEYS.put(CraftableWaygateItem.WAYGATE_CONSTRUCTOR, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_CONSTRUCTOR.getKey()));
+        CRAFTABLE_ITEM_NAMESPACEDKEYS.put(CraftableWaygateItem.WAYGATE_CONTROL, new NamespacedKey(pm, CraftableWaygateItem.WAYGATE_CONTROL.getKey()));
+
+        CRAFTABLE_ITEM_STACKS = new HashMap<CraftableWaygateItem, ItemStack>(3);
     }
 
     public static DataManager getManager() {
@@ -99,6 +94,8 @@ public class DataManager {
         pm.saveDefaultConfig();
 
         FileConfiguration config = pm.getConfig();
+        config.options().copyDefaults(true);
+
         for (Msg msg : Msg.values()) {
             String path = "Waygates.Messages." + msg.name();
             config.addDefault(path, msg.getDefaultMsg());
@@ -155,79 +152,15 @@ public class DataManager {
             pm.getLogger().warning("Using Static Default for Blocks Required");
         }
 
-        config.options().copyDefaults(true);
-        pm.saveConfig();
-
-        if (!reload) {
-            List<String> lore = new ArrayList<>();
-            Msg[] constructorLore = {Msg.LORE_CONSTRUCTOR_1, Msg.LORE_CONSTRUCTOR_2, Msg.LORE_CONSTRUCTOR_3, Msg.LORE_CONSTRUCTOR_4};
-            for (Msg msg : constructorLore)
-                if (msg.toString().length() > 0)
-                    lore.add(Util.color(msg.toString()));
-
-
-            WAYGATE_CONSTRUCTOR = Util.setItemNameAndLore(
-                NBTItemManager.getNBTItem(new ItemStack(Material.GOLD_NUGGET, 1), WAYGATE_CONSTRUCTOR_KEY),
-                Msg.LORE_CONSTRUCTOR_NAME.toString(), lore);
-            ItemMeta activatorMeta = WAYGATE_CONSTRUCTOR.getItemMeta();
-            if (activatorMeta != null) {
-                activatorMeta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
-                activatorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                WAYGATE_CONSTRUCTOR.setItemMeta(activatorMeta);
-            }
-
-            ShapedRecipe sr = new ShapedRecipe(WAYGATE_CONSTRUCTOR_NAMESPACEDKEY, WAYGATE_CONSTRUCTOR);
-            sr.shape("RRR", "RGR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('G', Material.GOLD_NUGGET);
-            boolean recipeResult = Bukkit.addRecipe(sr);
-            if (!recipeResult)
-                pm.getLogger().warning("Unable to load recipe! Waygate Constructors will be uncraftable");
-
-            lore = new ArrayList<>();
-            Msg[] keyLore = {Msg.LORE_KEY_1, Msg.LORE_KEY_2, Msg.LORE_KEY_3, Msg.LORE_KEY_4};
-            for (Msg msg : keyLore)
-                if (msg.toString().length() > 0)
-                    lore.add(Util.color(msg.toString()));
-
-            WAYGATE_KEY = Util.setItemNameAndLore(
-                    NBTItemManager.getNBTItem(new ItemStack(Material.FEATHER, 1), WAYGATE_KEY_KEY),
-                    Msg.LORE_KEY_NAME.toString(), lore);
-            ItemMeta keyMeta = WAYGATE_KEY.getItemMeta();
-            if (keyMeta != null) {
-                keyMeta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
-                keyMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                WAYGATE_KEY.setItemMeta(keyMeta);
-            }
-
-            sr = new ShapedRecipe(WAYGATE_KEY_NAMESPACEDKEY, WAYGATE_KEY);
-            sr.shape("RRR", "RKR", "RRR").setIngredient('R', Material.REDSTONE).setIngredient('K', Material.FEATHER);
-            recipeResult = Bukkit.addRecipe(sr);
-            if (!recipeResult)
-                pm.getLogger().warning("Unable to load recipe! Waygate Keys will be uncraftable");
-
-            lore = new ArrayList<>();
-            Msg[] controlLore = {Msg.LORE_CONTROL_1, Msg.LORE_CONTROL_2, Msg.LORE_CONTROL_3, Msg.LORE_CONTROL_4};
-            for (Msg msg : controlLore)
-                if (msg.toString().length() > 0)
-                    lore.add(Util.color(msg.toString()));
-
-            WAYGATE_CONTROL = Util.setItemNameAndLore(
-                    NBTItemManager.getNBTItem(new ItemStack(Material.IRON_NUGGET, 1), WAYGATE_CONTROL_KEY),
-                    Msg.LORE_CONTROL_NAME.toString(), lore);
-            ItemMeta controlMeta = WAYGATE_CONTROL.getItemMeta();
-            if (controlMeta != null) {
-                controlMeta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
-                controlMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                WAYGATE_CONTROL.setItemMeta(controlMeta);
-            }
-
-            sr = new ShapedRecipe(WAYGATE_CONTROL_NAMESPACEDKEY, WAYGATE_CONTROL);
-            sr.shape("CKC")
-                    .setIngredient('C', new RecipeChoice.ExactChoice(WAYGATE_CONSTRUCTOR))
-                    .setIngredient('K', new RecipeChoice.ExactChoice(WAYGATE_KEY));
-            recipeResult = Bukkit.addRecipe(sr);
-            if (!recipeResult)
-                pm.getLogger().warning("Unable to load recipe! Waygate Controllers will be uncraftable");
+        if (reload) {
+            // Despite this, eligible players will not discover the new recipe until they relog or change worlds.
+            Bukkit.removeRecipe(CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_KEY));
+            Bukkit.removeRecipe(CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR));
+            Bukkit.removeRecipe(CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONTROL));
         }
+
+        setUpRecipes(config);
+        pm.saveConfig();
     }
 
     public void reload() {
@@ -242,7 +175,7 @@ public class DataManager {
     public ItemStack getLockForGate(Gate gate) {
         List<String> lore = getLockLoreForGate(gate);
         ItemStack lock = Util.setItemNameAndLore(
-                NBTItemManager.getLockNBTItem(new ItemStack(Material.FEATHER, 1), WAYGATE_KEY_KEY,
+                NBTItemManager.getLockNBTItem(new ItemStack(Material.FEATHER, 1), CraftableWaygateItem.WAYGATE_KEY.getKey(),
                         gate.getUUID().toString()),
                 Msg.LORE_KEY_LOCK_NAME.toString(gate.getName()), lore);
         ItemMeta keyMeta = lock.getItemMeta();
@@ -516,6 +449,158 @@ public class DataManager {
 
     private String loadData(File file) throws IOException {
         return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+    }
+
+    private void setUpRecipes(Configuration config) {
+
+        if (!config.contains("Waygates.RECIPE_MATERIALS", true)) {
+            config.addDefault("Waygates.RECIPE_MATERIALS.R", "REDSTONE");
+            config.addDefault("Waygates.RECIPE_MATERIALS.K", "FEATHER");
+            config.addDefault("Waygates.RECIPE_MATERIALS.G", "GOLD_NUGGET");
+        }
+
+        if (!config.contains("Waygates.RECIPE_DEFINITIONS", true)) {
+            config.addDefault("Waygates.RECIPE_DEFINITIONS.WAYGATE_KEY_ITEM", "FEATHER");
+            config.addDefault("Waygates.RECIPE_DEFINITIONS.WAYGATE_KEY_RECIPE", java.util.Arrays.asList("RRR", "RKR", "RRR"));
+            config.addDefault("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONSTRUCTOR_ITEM", "GOLD_NUGGET");
+            config.addDefault("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONSTRUCTOR_RECIPE", java.util.Arrays.asList("RRR", "RGR", "RRR"));
+            config.addDefault("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONTROL_ITEM", "IRON_NUGGET");
+            config.addDefault("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONTROL_RECIPE", java.util.Arrays.asList("$+$"));
+        }
+
+        Map<Character, RecipeChoice> recipeMatsMap = new HashMap<>();
+        ConfigurationSection recipeMatsConfig = config.getConfigurationSection("Waygates.RECIPE_MATERIALS");
+        for (String key : recipeMatsConfig.getKeys(false)) {
+            Character keyChar = key.charAt(0);
+            String matName = recipeMatsConfig.getString(key);
+            if (!Character.isLetter(keyChar)) {
+                pm.getLogger().warning(String.format("Invalid character in recipe config: \"%c\". Please use only letter characters.", keyChar));
+                continue;
+            }
+            Material mat = Material.matchMaterial(matName);
+            if (mat == null) {
+                pm.getLogger().warning(String.format("Invalid material in recipe config: \"%s\".", matName));
+                continue;
+            }
+            recipeMatsMap.put(keyChar, convertMaterialToRecipeChoice(mat));
+        }
+
+        WaygateRecipe waygateKeyRecipe = new WaygateRecipe(
+            config.getStringList("Waygates.RECIPE_DEFINITIONS.WAYGATE_KEY_RECIPE"),
+            config.getString("Waygates.RECIPE_DEFINITIONS.WAYGATE_KEY_ITEM")
+        );
+        WaygateRecipe waygateConstructorRecipe = new WaygateRecipe(
+            config.getStringList("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONSTRUCTOR_RECIPE"),
+            config.getString("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONSTRUCTOR_ITEM")
+        );
+        WaygateRecipe waygateControlRecipe = new WaygateRecipe(
+            config.getStringList("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONTROL_RECIPE"),
+            config.getString("Waygates.RECIPE_DEFINITIONS.WAYGATE_CONTROL_ITEM")
+        );
+
+        CRAFTABLE_ITEM_STACKS.put(CraftableWaygateItem.WAYGATE_KEY, addRecipe(
+            Msg.LORE_KEY_NAME.toString(),
+            new Msg[]{ Msg.LORE_KEY_1, Msg.LORE_KEY_2, Msg.LORE_KEY_3, Msg.LORE_KEY_4 },
+            CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_KEY),
+            waygateKeyRecipe,
+            recipeMatsMap
+        ));
+
+        recipeMatsMap.put('+', new RecipeChoice.ExactChoice(CRAFTABLE_ITEM_STACKS.get(CraftableWaygateItem.WAYGATE_KEY)));
+
+        CRAFTABLE_ITEM_STACKS.put(CraftableWaygateItem.WAYGATE_CONSTRUCTOR, addRecipe(
+            Msg.LORE_CONSTRUCTOR_NAME.toString(),
+            new Msg[]{ Msg.LORE_CONSTRUCTOR_1, Msg.LORE_CONSTRUCTOR_2, Msg.LORE_CONSTRUCTOR_3, Msg.LORE_CONSTRUCTOR_4 },
+            CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR),
+            waygateConstructorRecipe,
+            recipeMatsMap
+        ));
+
+        recipeMatsMap.put('$', new RecipeChoice.ExactChoice(CRAFTABLE_ITEM_STACKS.get(CraftableWaygateItem.WAYGATE_CONSTRUCTOR)));
+
+        CRAFTABLE_ITEM_STACKS.put(CraftableWaygateItem.WAYGATE_CONTROL, addRecipe(
+            Msg.LORE_CONTROL_NAME.toString(),
+            new Msg[]{ Msg.LORE_CONTROL_1, Msg.LORE_CONTROL_2, Msg.LORE_CONTROL_3, Msg.LORE_CONTROL_4 },
+            CRAFTABLE_ITEM_NAMESPACEDKEYS.get(CraftableWaygateItem.WAYGATE_CONTROL),
+            waygateControlRecipe,
+            recipeMatsMap
+        ));
+    }
+
+    private ItemStack addRecipe(
+        String itemName,
+        Msg[] loreLines,
+        NamespacedKey itemKey,
+        WaygateRecipe recipe,
+        Map<Character, RecipeChoice> recipeMats
+    ) {
+        List<String> lore = new ArrayList<>();
+        for (Msg msg : loreLines)
+            if (msg.toString().length() > 0)
+                lore.add(Util.color(msg.toString()));
+
+        ItemStack newItemStack = Util.setItemNameAndLore(
+            NBTItemManager.getNBTItem(
+                new ItemStack(recipe.getItemIcon(), 1),
+                itemKey.getKey()
+            ),
+           itemName,
+           lore
+        );
+        ItemMeta meta = newItemStack.getItemMeta();
+        if (meta != null) {
+            meta.addEnchant(EnchantmentType.LUCK.get(), 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            newItemStack.setItemMeta(meta);
+        }
+
+        ShapedRecipe sr = new ShapedRecipe(itemKey, newItemStack);
+
+        try {
+            switch (recipe.rowCount()) {
+                case 1:
+                    sr.shape(recipe.getRecipeRow(0));
+                    break;
+                case 2:
+                    sr.shape(recipe.getRecipeRow(0), recipe.getRecipeRow(1));
+                    break;
+                case 3:
+                    sr.shape(recipe.getRecipeRow(0), recipe.getRecipeRow(1), recipe.getRecipeRow(2));
+                    break;
+            }
+        } catch (IllegalArgumentException e) {
+            pm.getLogger().warning(String.format("Unable to set the shape of the %s recipe. Ensure your configuration contains a recipe definition for it.", itemName));
+        }
+
+        for (Character ingredientKey : recipe.getIngredientKeys()) {
+            try {
+                sr.setIngredient(ingredientKey, recipeMats.get(ingredientKey));
+            } catch (NullPointerException e) {
+                pm.getLogger().warning(String.format("Unable to find a matching material ingredient for \"%c\" in the %s recipe! Check your configuration.", ingredientKey, itemName));
+            }
+        }
+
+        if (!Bukkit.addRecipe(sr)) {
+            pm.getLogger().warning(String.format("Unable to add recipe! %s will be uncraftable.", itemName));
+        }
+
+        return newItemStack;
+    }
+
+    public Map<CraftableWaygateItem, NamespacedKey> getAllCraftableItems() {
+        return CRAFTABLE_ITEM_NAMESPACEDKEYS;
+    }
+
+    public NamespacedKey getCraftableItemNamespacedKey(CraftableWaygateItem item) {
+        return CRAFTABLE_ITEM_NAMESPACEDKEYS.get(item);
+    }
+
+    public ItemStack getCraftableItemStack(CraftableWaygateItem item) {
+        return CRAFTABLE_ITEM_STACKS.get(item);
+    }
+
+    private static RecipeChoice convertMaterialToRecipeChoice(Material mat) {
+        return new RecipeChoice.MaterialChoice(Collections.singletonList(mat));
     }
 
     static class JSONFilenameFilter implements FilenameFilter {
