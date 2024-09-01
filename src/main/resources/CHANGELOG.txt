@@ -1,5 +1,9 @@
 CHANGELOG
 
+1.6.0 (09/01/24)
+- Added ability to change recipes and items of keys, constructors and controllers (special thanks to kccricket)
+- Fixed issue that prevented Always On gates from updating exits of connected gates when the exit changed
+
 1.5.0 (08/17/24)
 - Update for 1.21 release, built using Java 17
 - Fixes for Particles and Enchantment changes for 1.21 (special thanks to aikomastboom on Github)
