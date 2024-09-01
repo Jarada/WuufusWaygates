@@ -514,6 +514,12 @@ public class WaygateManager {
             GridLocation exit = GateUtil.getExitForGate(p.getLocation(), gate.getStart().getLocation(), gate, null);
             gate.setExit(exit);
 
+            // Update connected gates to new exit
+            for (Gate connected : gates.get(gate.getNetwork())) {
+                if (connected.isActive() && connected.getActiveDestinationUuid().equals(gate.getUUID().toString()))
+                    connected.activate(gate);
+            }
+
             // Save Update
             DataManager.getManager().saveWaygate(gate, false);
 
