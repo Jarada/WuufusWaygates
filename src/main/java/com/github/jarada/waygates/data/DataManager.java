@@ -94,7 +94,6 @@ public class DataManager {
         pm.saveDefaultConfig();
 
         FileConfiguration config = pm.getConfig();
-        config.options().copyDefaults(true);
 
         for (Msg msg : Msg.values()) {
             String path = "Waygates.Messages." + msg.name();
@@ -160,6 +159,7 @@ public class DataManager {
         }
 
         setUpRecipes(config);
+        config.options().copyDefaults(true);
         pm.saveConfig();
     }
 
