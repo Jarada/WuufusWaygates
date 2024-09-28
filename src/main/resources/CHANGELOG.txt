@@ -1,5 +1,8 @@
 CHANGELOG
 
+1.6.1 (09/28/24)
+- Fixed issue that had the defaults sometimes add themselves to the config loaded in.
+
 1.6.0 (09/01/24)
 - Added ability to change recipes and items of keys, constructors and controllers (special thanks to kccricket)
 - Fixed issue that prevented Always On gates from updating exits of connected gates when the exit changed
