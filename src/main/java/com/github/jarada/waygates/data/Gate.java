@@ -194,6 +194,15 @@ public class Gate {
             open();
     }
 
+    public void resetActivationEffect() {
+        if (activationEffect == GateActivationEffect.NETHER) return;
+        if (isActive())
+            close();
+        setActivationEffect(GateActivationEffect.NETHER);
+        if (isActive())
+            open();
+    }
+
     public boolean isOwnerPrivate() {
         return ownerPrivate;
     }

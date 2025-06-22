@@ -86,10 +86,13 @@
      children:
        wg.command.world.list: true
        wg.command.world.delete: true
+       wg.command.world.reset: true
    wg.command.world.list:
      description: Use of command to list gates in world
    wg.command.world.delete:
      description: Use of command to delete all gates in world
+   wg.command.world.reset:
+     description: Use of command to reset all gates in world to Nether effect
    wg.network.*:
      description: Add gates you create to any fixed/global/system network
      children:

@@ -42,6 +42,7 @@ public class PluginMain extends JavaPlugin {
         commands.put("list", new WGListCmd());
         commands.put("lock", new WGLockCmd());
         commands.put("reload", new WGReloadCmd());
+        commands.put("reset", new WGEffectResetCmd());
 
         try {
             Objects.requireNonNull(getCommand("wg")).setExecutor(this);
