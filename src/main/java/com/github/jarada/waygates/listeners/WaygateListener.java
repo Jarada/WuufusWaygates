@@ -12,6 +12,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
@@ -97,14 +99,15 @@ public class WaygateListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
+    public void onBlockFormEvent(BlockFormEvent e) {
+        // If formed block would be within a gate
+        cancelEventIfAtGate(new BlockLocation(e.getBlock().getLocation()), e);
+    }
+
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlaceEvent(BlockPlaceEvent e) {
         // If placed block would be added to a gate
-        BlockLocation blockLocation = new BlockLocation(e.getBlockPlaced().getLocation());
-        Gate gate = gm.getGateAtLocation(blockLocation);
-        if (gate != null) {
-            // Prevent it
-            e.setCancelled(true);
-        }
+        cancelEventIfAtGate(new BlockLocation(e.getBlockPlaced().getLocation()), e);
     }
 
     /* Disable Vanilla Portal Behaviour */
@@ -333,13 +336,20 @@ public class WaygateListener implements Listener {
     public void onBlockWaterMove(BlockFromToEvent e) {
         if (e.getBlock().getType() == Material.WATER) {
             // If water block is spreading in gate
-            BlockLocation blockLocation = new BlockLocation(e.getBlock().getLocation());
-            Gate gate = gm.getGateAtLocation(blockLocation);
-            if (gate != null) {
-                // Prevent it
-                e.setCancelled(true);
-            }
+            cancelEventIfAtGate(new BlockLocation(e.getBlock().getLocation()), e);
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockFertilizeEvent(BlockFertilizeEvent e) {
+        // Prevent bonemeal from growing kelp in water
+        cancelEventIfAtGate(new BlockLocation(e.getBlock().getLocation()), e);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onStructureGrowEvent(StructureGrowEvent e) {
+        // Prevent bonemeal from growing kelp in water
+        cancelEventIfAtGate(new BlockLocation(e.getLocation()), e);
     }
 
     /* Clearance */
@@ -347,5 +357,15 @@ public class WaygateListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerQuit(PlayerQuitEvent e) {
         playerLocationAtEvent.remove(e.getPlayer());
+    }
+
+    /* Cancellation */
+
+    private void cancelEventIfAtGate(BlockLocation blockLocation, Cancellable e) {
+        Gate gate = gm.getGateAtLocation(blockLocation);
+        if (gate != null) {
+            // Prevent it
+            e.setCancelled(true);
+        }
     }
 }
