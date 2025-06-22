@@ -177,12 +177,19 @@ public class Gate {
         this.activationEffect = activationEffect;
     }
 
-    public void loopActivationEffect() {
+    public void loopActivationEffect(Player p) {
         if (isActive())
             close();
         if (activationEffect == null)
             setActivationEffect(getActivationEffect());
-        setActivationEffect(activationEffect.next());
+        boolean validEffect = false;
+        while (!validEffect) {
+            setActivationEffect(activationEffect.next());
+            if (activationEffect == GateActivationEffect.NETHER ||
+                    (p.hasPermission("wg.assign.effect.water") && activationEffect == GateActivationEffect.WATER) ||
+                    (p.hasPermission("wg.assign.effect.magic") && activationEffect == GateActivationEffect.MAGIC))
+                validEffect = true;
+        }
         if (isActive())
             open();
     }

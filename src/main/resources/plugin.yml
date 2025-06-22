@@ -57,6 +57,8 @@
        wg.assign.alwayson: true
        wg.assign.destination: true
        wg.assign.effect: true
+       wg.assign.effect.magic: true
+       wg.assign.effect.water: true
        wg.assign.private: true
        wg.assign.hidden: true
    wg.icon.change:

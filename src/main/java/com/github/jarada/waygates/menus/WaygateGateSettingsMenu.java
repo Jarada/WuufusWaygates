@@ -58,7 +58,7 @@ public class WaygateGateSettingsMenu extends Menu {
                     currentWaygate.setAlwaysOn(!currentWaygate.isAlwaysOn());
                     mm.saveUpdateToGate();
                 } else if (optionNames[slot].equals("Effect")) {
-                    currentWaygate.loopActivationEffect();
+                    currentWaygate.loopActivationEffect(p);
                     mm.saveUpdateToGate();
                 }
                 super.onInventoryClick(clickEvent);
