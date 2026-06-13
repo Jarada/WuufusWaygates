@@ -1,9 +1,12 @@
 CHANGELOG
 
+1.6.4 (06/13/26)
+- Minor fix for PaperMC deprecation in 26.1
+
 1.6.3 (06/22/25)
 - Fix to stop kelp growing in water Waygates
 - Added permissions for selecting magic and water effects (`wg.assign.effect.magic` and `wg.assign.effect.water`)
-- Added new command to reset Waygates of a world back to nether effect (`wg.command.reset` permission,
+- Added new command to reset Waygates of a world back to nether effect (`wg.command.world.reset` permission,
   `/wg reset <world>` command)
 
 1.6.2 (05/25/25)
