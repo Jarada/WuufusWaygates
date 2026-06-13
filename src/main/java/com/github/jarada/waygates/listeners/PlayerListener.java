@@ -22,7 +22,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -46,7 +46,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerLogin(PlayerLoginEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) {
         handleRecipeDiscovery(event.getPlayer());
     }
 
